@@ -1,0 +1,177 @@
+# M A T E R I A L S
+
+/gate/geometry/setMaterialDatabase   ./GateMaterials.db
+
+# W O R L D 
+
+/gate/world/geometry/setXLength 500. cm 
+/gate/world/geometry/setYLength 500. cm 
+/gate/world/geometry/setZLength 500. cm 
+
+# S Y S T E M
+
+/gate/world/daughters/name detector
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert cylinder
+/gate/detector/setMaterial Air
+/gate/detector/geometry/setRmin 0 cm
+/gate/detector/geometry/setRmax 1.5 cm
+/gate/detector/geometry/setHeight 52 cm
+/gate/detector/placement/setTranslation  437.3 0 0 mm
+/gate/detector/vis/forceWireframe
+/gate/detector/vis/setVisible 0
+
+# C R Y S T A L
+###
+/gate/detector/daughters/name crystal0
+/gate/detector/daughters/insert box
+/gate/crystal0/placement/setTranslation 0 0  -22.5 cm
+/gate/crystal0/geometry/setXLength 19   mm
+/gate/crystal0/geometry/setYLength 7   mm
+/gate/crystal0/geometry/setZLength 5.0    cm
+/gate/crystal0/setMaterial EJ230
+/gate/crystal0/vis/forceSolid
+/gate/crystal0/vis/setColor blue
+/gate/crystal0/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal1
+/gate/detector/daughters/insert box
+/gate/crystal1/placement/setTranslation 0 0  -17.5 cm
+/gate/crystal1/geometry/setXLength 19   mm
+/gate/crystal1/geometry/setYLength 7   mm
+/gate/crystal1/geometry/setZLength 5.0    cm
+/gate/crystal1/setMaterial EJ230
+/gate/crystal1/vis/forceSolid
+/gate/crystal1/vis/setColor green
+/gate/crystal1/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal2
+/gate/detector/daughters/insert box
+/gate/crystal2/placement/setTranslation 0 0  -12.5 cm
+/gate/crystal2/geometry/setXLength 19   mm
+/gate/crystal2/geometry/setYLength 7   mm
+/gate/crystal2/geometry/setZLength 5.0    cm
+/gate/crystal2/setMaterial EJ230
+/gate/crystal2/vis/forceSolid
+/gate/crystal2/vis/setColor blue
+/gate/crystal2/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal3
+/gate/detector/daughters/insert box
+/gate/crystal3/placement/setTranslation 0 0  -7.5 cm
+/gate/crystal3/geometry/setXLength 19   mm
+/gate/crystal3/geometry/setYLength 7   mm
+/gate/crystal3/geometry/setZLength 5.0    cm
+/gate/crystal3/setMaterial EJ230
+/gate/crystal3/vis/forceSolid
+/gate/crystal3/vis/setColor green
+/gate/crystal3/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal4
+/gate/detector/daughters/insert box
+/gate/crystal4/placement/setTranslation 0 0  -2.5 cm
+/gate/crystal4/geometry/setXLength 19   mm
+/gate/crystal4/geometry/setYLength 7   mm
+/gate/crystal4/geometry/setZLength 5.0    cm
+/gate/crystal4/setMaterial EJ230
+/gate/crystal4/vis/forceSolid
+/gate/crystal4/vis/setColor blue
+/gate/crystal4/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal5
+/gate/detector/daughters/insert box
+/gate/crystal5/placement/setTranslation 0 0  2.5 cm
+/gate/crystal5/geometry/setXLength 19   mm
+/gate/crystal5/geometry/setYLength 7   mm
+/gate/crystal5/geometry/setZLength 5.0    cm
+/gate/crystal5/setMaterial EJ230
+/gate/crystal5/vis/forceSolid
+/gate/crystal5/vis/setColor green
+/gate/crystal5/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal6
+/gate/detector/daughters/insert box
+/gate/crystal6/placement/setTranslation 0 0  7.5 cm
+/gate/crystal6/geometry/setXLength 19   mm
+/gate/crystal6/geometry/setYLength 7   mm
+/gate/crystal6/geometry/setZLength 5.0    cm
+/gate/crystal6/setMaterial EJ230
+/gate/crystal6/vis/forceSolid
+/gate/crystal6/vis/setColor blue
+/gate/crystal6/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal7
+/gate/detector/daughters/insert box
+/gate/crystal7/placement/setTranslation 0 0  12.5 cm
+/gate/crystal7/geometry/setXLength 19   mm
+/gate/crystal7/geometry/setYLength 7   mm
+/gate/crystal7/geometry/setZLength 5.0    cm
+/gate/crystal7/setMaterial EJ230
+/gate/crystal7/vis/forceSolid
+/gate/crystal7/vis/setColor green
+/gate/crystal7/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal8
+/gate/detector/daughters/insert box
+/gate/crystal8/placement/setTranslation 0 0  17.5 cm
+/gate/crystal8/geometry/setXLength 19   mm
+/gate/crystal8/geometry/setYLength 7   mm
+/gate/crystal8/geometry/setZLength 5.0    cm
+/gate/crystal8/setMaterial EJ230
+/gate/crystal8/vis/forceSolid
+/gate/crystal8/vis/setColor blue
+/gate/crystal8/vis/setVisible 1
+######
+/gate/detector/daughters/name crystal9
+/gate/detector/daughters/insert box
+/gate/crystal9/placement/setTranslation 0 0  22.5 cm
+/gate/crystal9/geometry/setXLength 19   mm
+/gate/crystal9/geometry/setYLength 7   mm
+/gate/crystal9/geometry/setZLength 5.0    cm
+/gate/crystal9/setMaterial EJ230
+/gate/crystal9/vis/forceSolid
+/gate/crystal9/vis/setColor green
+/gate/crystal9/vis/setVisible 1
+###
+
+# P M T S
+
+/gate/detector/daughters/name pmt1
+/gate/detector/daughters/insert box
+/gate/pmt1/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmt1/geometry/setXLength 19 mm
+/gate/pmt1/geometry/setYLength 7 mm
+/gate/pmt1/geometry/setZLength 1 cm
+/gate/pmt1/setMaterial Air
+/gate/pmt1/vis/setVisible 1
+/gate/pmt1/vis/setColor red
+
+/gate/detector/daughters/name pmt2
+/gate/detector/daughters/insert box
+/gate/pmt2/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmt2/geometry/setXLength 19 mm
+/gate/pmt2/geometry/setYLength 7 mm
+/gate/pmt2/geometry/setZLength 1 cm
+/gate/pmt2/setMaterial Air
+/gate/pmt2/vis/setVisible 1
+/gate/pmt2/vis/setColor red
+
+# S U R F A C E S
+
+/gate/crystal/surfaces/name                           crystal_pmt1 
+/gate/crystal/surfaces/insert                         pmt1  
+/gate/crystal/surfaces/crystal_pmt1/setSurface        R4998  
+
+/gate/crystal/surfaces/name                           crystal_pmt2
+/gate/crystal/surfaces/insert                         pmt2  
+/gate/crystal/surfaces/crystal_pmt2/setSurface        R4998  
+
+# R E P E A T E R S
+
+/gate/detector/repeaters/insert ring
+/gate/detector/ring/setRepeatNumber 1
+
+# A T T A C H M E N T S
+
+/gate/systems/detector/level1/attach crystal  
+/gate/crystal/attachCrystalSD 

@@ -5,12 +5,12 @@ detector splitter
 -----------------
 Create geometry macro with split strpis on regions.
 
-Template pattern: Geometry_384_strips_L50.mac made by Pawel Kowalski.
+Template pattern: J-PET cylindrical system 348 strips 500 mm L
 
-python splitter.py -l <strip_lenght> -n <part_number> -o <outpu_tfile> -s <number_strips>
+python splitter.py  -c <crystal_number> -o <outpu_tfile> -s <number_strips>
 
 jplot
 -----
-Draw line of response. Input file generate aplication analysis made by Pawel Kowalski.
+Draw line of response. Input lm file  generate aplication analysis made by Pawel Kowalski.
 
 python jplot.py  <input_file>

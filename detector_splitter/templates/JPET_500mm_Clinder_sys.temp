@@ -28,15 +28,9 @@
 #	MODULE
 /gate/cylindricalPET/daughters/name           strip
 /gate/cylindricalPET/daughters/insert         box
-#/gate/strip/geometry/setRmin 0 cm
-#/gate/strip/geometry/setRmax 1.5 cm
-#/gate/strip/geometry/setHeight 52 cm
-#/gate/strip/placement/setTranslation  437.3 0 0 mm
-
-
 /gate/strip/placement/setTranslation           437.3 0 0 mm
-/gate/strip/geometry/setXLength                30 mm
-/gate/strip/geometry/setYLength                30 mm
+/gate/strip/geometry/setXLength                19 mm
+/gate/strip/geometry/setYLength                7 mm
 /gate/strip/geometry/setZLength                52 cm
 /gate/strip/setMaterial                        Air
 /gate/strip/vis/forceWireframe

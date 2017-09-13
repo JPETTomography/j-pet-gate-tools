@@ -1,0 +1,136 @@
+# M A T E R I A L S
+
+/gate/geometry/setMaterialDatabase   ./GateMaterials.db
+
+# W O R L D 
+
+/gate/world/geometry/setXLength 500. cm 
+/gate/world/geometry/setYLength 500. cm 
+/gate/world/geometry/setZLength 500. cm 
+
+
+
+
+
+# S Y S T E M
+#	RSECTOR
+/gate/world/daughters/name                    cylindricalPET
+/gate/world/daughters/insert                  cylinder
+/gate/cylindricalPET/placement/setTranslation 0.0 0.0 0.0 cm
+/gate/cylindricalPET/geometry/setRmax         52.0 cm
+/gate/cylindricalPET/geometry/setRmin         0 cm
+/gate/cylindricalPET/geometry/setHeight       52 cm
+/gate/cylindricalPET/setMaterial              Air
+/gate/cylindricalPET/vis/forceWireframe
+/gate/cylindricalPET/vis/setColor             yellow
+/gate/cylindricalPET/vis/setVisible                     0
+
+#	MODULE
+/gate/cylindricalPET/daughters/name           strip
+/gate/cylindricalPET/daughters/insert         box
+/gate/strip/placement/setTranslation           437.3 0 0 mm
+/gate/strip/geometry/setXLength                19 mm
+/gate/strip/geometry/setYLength                7 mm
+/gate/strip/geometry/setZLength                52 cm
+/gate/strip/setMaterial                        Air
+/gate/strip/vis/forceWireframe
+/gate/strip/vis/setColor             blue
+/gate/strip/vis/setVisible                     0
+
+
+
+#	BLOCK
+/gate/strip/daughters/name                     detector
+/gate/strip/daughters/insert                   box
+/gate/detector/placement/setTranslation          0.0 0.0 0.0 cm
+/gate/detector/geometry/setXLength 19   mm
+/gate/detector/geometry/setYLength 7   mm
+/gate/detector/geometry/setZLength 50    cm
+/gate/detector/setMaterial                       Air
+/gate/detector/vis/setColor red
+/gate/detector/vis/setVisible                    0
+
+#	C R Y S T A L
+/gate/detector/daughters/name                    crystal
+/gate/detector/daughters/insert                  box
+/gate/crystal/placement/setTranslation        0.0 0.0 0.0 cm
+/gate/crystal/geometry/setXLength             19 mm
+/gate/crystal/geometry/setYLength             7 mm
+/gate/crystal/geometry/setZLength             {{size}} mm
+/gate/crystal/setMaterial                     Air
+/gate/crystal/vis/setColor blue
+/gate/crystal/vis/setVisible                  0
+
+#	EJ230 layer
+/gate/crystal/daughters/name                  EJ230
+/gate/crystal/daughters/insert                box
+/gate/EJ230/placement/setTranslation            0.0 0.0 0.0 cm
+/gate/EJ230/geometry/setXLength                 19 mm
+/gate/EJ230/geometry/setYLength                 7 mm
+/gate/EJ230/geometry/setZLength                 {{size}} mm
+/gate/EJ230/setMaterial                         EJ230
+/gate/EJ230/vis/setColor                        white
+/gate/EJ230/vis/setVisible                  1
+# P M T S
+
+/gate/strip/daughters/name pmt1
+/gate/strip/daughters/insert box
+/gate/pmt1/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmt1/geometry/setXLength 19 mm
+/gate/pmt1/geometry/setYLength 7 mm
+/gate/pmt1/geometry/setZLength 1 cm
+/gate/pmt1/setMaterial Air
+/gate/pmt1/vis/setVisible 1
+/gate/pmt1/vis/setColor red
+
+/gate/strip/daughters/name pmt2
+/gate/strip/daughters/insert box
+/gate/pmt2/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmt2/geometry/setXLength 19 mm
+/gate/pmt2/geometry/setYLength 7 mm
+/gate/pmt2/geometry/setZLength 1 cm
+/gate/pmt2/setMaterial Air
+/gate/pmt2/vis/setVisible 1
+/gate/pmt2/vis/setColor red
+
+# S U R F A C E S
+
+/gate/detector/surfaces/name                           crystal_pmt1 
+/gate/detector/surfaces/insert                         pmt1  
+/gate/detector/surfaces/crystal_pmt1/setSurface        R4998  
+
+/gate/detector/surfaces/name                           crystal_pmt2
+/gate/detector/surfaces/insert                         pmt2  
+/gate/detector/surfaces/crystal_pmt2/setSurface        R4998  
+
+
+
+# R E P E A T E R S
+#	R E P E A T    C R Y S T A L
+/gate/crystal/repeaters/insert                cubicArray
+/gate/crystal/cubicArray/setRepeatNumberX     1
+/gate/crystal/cubicArray/setRepeatNumberY     1
+/gate/crystal/cubicArray/setRepeatNumberZ     {{number_of_crystal}}
+/gate/crystal/cubicArray/setRepeatVector      0.0 0.0 {{size}} mm
+
+
+
+
+
+/gate/strip/repeaters/insert ring
+/gate/strip/ring/setRepeatNumber {{number_of_strips}}
+
+# A T T A C H M E N T S
+
+#	A T T A C H    S Y S T E M 
+/gate/systems/cylindricalPET/rsector/attach   strip
+/gate/systems/cylindricalPET/module/attach    detector
+/gate/systems/cylindricalPET/crystal/attach   crystal
+/gate/systems/cylindricalPET/layer0/attach    EJ230
+
+
+#	A T T A C H    C R Y S T A L  SD
+
+/gate/EJ230/attachCrystalSD
+
+

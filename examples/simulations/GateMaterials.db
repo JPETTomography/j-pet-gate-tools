@@ -177,7 +177,11 @@ Plastic:  d=1.18 g/cm3 ; n=3; state=solid
 EJ230: d=1.023 g/cm3 ; n=2; state=solid
 	+el: name=Carbon ; n=10
 	+el: name=Hydrogen ; n=11        
-        
+
+HDPE: d=0.954 g/cm3 ; n=2; state=solid
+	+el: name=Carbon ; n=2
+	+el: name=Hydrogen ; n=4
+
 Biomimic:  d=1.05 g/cm3 ; n=3; state=solid
         +el: name=Carbon   ; n=5
         +el: name=Hydrogen ; n=8

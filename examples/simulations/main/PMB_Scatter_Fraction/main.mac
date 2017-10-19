@@ -16,15 +16,18 @@
 # GEOMETRY
 #=====================================================
 
-# 4 mm
-/control/execute ../../geometries/D85/Geometry_D85_1lay_L020_4mm.mac
-#/control/execute ../../geometries/D85/Geometry_D85_1lay_L050_4mm.mac
-#/control/execute ../../geometries/D85/Geometry_D85_1lay_L100_4mm.mac
-
-# 7 mm
 #/control/execute ../../geometries/D85/Geometry_D85_1lay_L020_7mm.mac
-#/control/execute ../../geometries/D85/Geometry_D85_1lay_L050_7mm.mac
+/control/execute ../../geometries/D85/Geometry_D85_1lay_L050_7mm.mac
 #/control/execute ../../geometries/D85/Geometry_D85_1lay_L100_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L020_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L050_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L100_7mm.mac
+
+#=====================================================
+#  P H A N T O M
+#=====================================================
+
+/control/execute NEMA_IEC_2001_SF_CL_CR_Phantom.mac
 
 #=====================================================
 # PHYSICS
@@ -42,24 +45,7 @@
 #  P A R T I C L E   S O U R C E
 #=====================================================
 
-/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_01_00_00.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_10_00_00.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_20_00_00.mac
-
-# L020 (source position at 7.5 cm from the centre of the scanner along the z axis)
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_01_00_07.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_10_00_07.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_20_00_07.mac
-
-# L050 (source position at 18.75 cm from the centre of the scanner along the z axis)
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_01_00_19.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_10_00_19.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_20_00_19.mac
-
-# L050 (source position at 37.5 cm from the centre of the scanner along the z axis)
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_01_00_37.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_10_00_37.mac
-#/control/execute ../../sources/PMB_Spatial_Resolution/Source_Sphere_Gamma_L020_20_00_37.mac
+/control/execute NEMA_IEC_2001_SF_CL_CR_Source_Gamma.mac
 
 #=====================================================
 #  D A T A   O U T P U T   
@@ -82,5 +68,5 @@
 
 /gate/application/setTimeSlice   1 s
 /gate/application/setTimeStart   0 s
-/gate/application/setTimeStop    100 s
+/gate/application/setTimeStop    3200 s
 /gate/application/startDAQ

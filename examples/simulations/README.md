@@ -8,7 +8,9 @@ digitizers
 geometries
 ----------
 
-  geometries of the J-PET scanner
+  geometries of the J-PET scanner;
+  more info may be found at:
+  http://koza.if.uj.edu.pl/petwiki/index.php/Simulated_geometries 
 
 main
 ----

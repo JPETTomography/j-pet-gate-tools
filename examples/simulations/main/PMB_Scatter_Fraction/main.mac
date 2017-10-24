@@ -1,0 +1,72 @@
+#=====================================================
+# VISUALISATION
+#=====================================================
+
+#/vis/disable
+/vis/enable
+/control/execute ../../Visualisation.mac
+
+#=====================================================
+# MATERIALS
+#=====================================================
+
+/gate/geometry/setMaterialDatabase ../../GateMaterials.db
+
+#=====================================================
+# GEOMETRY
+#=====================================================
+
+#/control/execute ../../geometries/D85/Geometry_D85_1lay_L020_7mm.mac
+/control/execute ../../geometries/D85/Geometry_D85_1lay_L050_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_1lay_L100_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L020_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L050_7mm.mac
+#/control/execute ../../geometries/D85/Geometry_D85_2lay_L100_7mm.mac
+
+#=====================================================
+#  P H A N T O M
+#=====================================================
+
+/control/execute NEMA_IEC_2001_SF_CL_CR_Phantom.mac
+
+#=====================================================
+# PHYSICS
+#=====================================================
+
+/control/execute ../../physics/PhysicsEMLivermorePolar.mac
+
+#=====================================================
+# INITIALISATION
+#=====================================================
+
+/gate/run/initialize
+
+#=====================================================
+#  P A R T I C L E   S O U R C E
+#=====================================================
+
+/control/execute NEMA_IEC_2001_SF_CL_CR_Source_Gamma.mac
+
+#=====================================================
+#  D A T A   O U T P U T   
+#=====================================================
+
+/control/execute Output.mac
+
+#=====================================================
+#   R A N D O M
+#=====================================================
+
+/gate/random/setEngineName MersenneTwister
+#/gate/random/setEngineSeed 123456789
+/gate/random/setEngineSeed auto
+#/gate/random/verbose 1
+
+#=====================================================
+#   M E A S U R E M E N T   S E T T I N G S   
+#=====================================================
+
+/gate/application/setTimeSlice   1 s
+/gate/application/setTimeStart   0 s
+/gate/application/setTimeStop    3200 s
+/gate/application/startDAQ

@@ -1,0 +1,73 @@
+# W O R L D 
+
+/gate/world/geometry/setXLength 500. cm 
+/gate/world/geometry/setYLength 500. cm 
+/gate/world/geometry/setZLength 500. cm 
+
+# S Y S T E M
+
+/gate/world/daughters/name detector
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/detector/geometry/setXLength 20 mm
+/gate/detector/geometry/setYLength 4 mm
+/gate/detector/geometry/setZLength 52 cm
+/gate/detector/setMaterial Air
+/gate/detector/placement/setTranslation  435.3 0 0 mm
+/gate/detector/vis/forceWireframe
+/gate/detector/vis/setVisible 0
+
+# C R Y S T A L
+
+/gate/detector/daughters/name crystal
+/gate/detector/daughters/insert box
+/gate/crystal/placement/setTranslation 0 0 0 cm
+/gate/crystal/geometry/setXLength 20   mm
+/gate/crystal/geometry/setYLength 4   mm
+/gate/crystal/geometry/setZLength 50    cm
+/gate/crystal/setMaterial EJ230
+/gate/crystal/vis/forceSolid
+/gate/crystal/vis/setColor white
+/gate/crystal/vis/setVisible 1
+
+# P M T S
+
+/gate/detector/daughters/name pmt1
+/gate/detector/daughters/insert box
+/gate/pmt1/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmt1/geometry/setXLength 20 mm
+/gate/pmt1/geometry/setYLength 4 mm
+/gate/pmt1/geometry/setZLength 1 cm
+/gate/pmt1/setMaterial Air
+/gate/pmt1/vis/setVisible 1
+/gate/pmt1/vis/setColor red
+
+/gate/detector/daughters/name pmt2
+/gate/detector/daughters/insert box
+/gate/pmt2/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmt2/geometry/setXLength 20 mm
+/gate/pmt2/geometry/setYLength 4 mm
+/gate/pmt2/geometry/setZLength 1 cm
+/gate/pmt2/setMaterial Air
+/gate/pmt2/vis/setVisible 1
+/gate/pmt2/vis/setColor red
+
+# S U R F A C E S
+
+/gate/crystal/surfaces/name                           crystal_pmt1 
+/gate/crystal/surfaces/insert                         pmt1  
+/gate/crystal/surfaces/crystal_pmt1/setSurface        R4998  
+
+/gate/crystal/surfaces/name                           crystal_pmt2
+/gate/crystal/surfaces/insert                         pmt2  
+/gate/crystal/surfaces/crystal_pmt2/setSurface        R4998  
+
+# R E P E A T E R S
+
+/gate/detector/repeaters/insert ring
+/gate/detector/ring/setRepeatNumber 668
+
+# A T T A C H M E N T S
+
+/gate/systems/detector/level1/attach crystal  
+/gate/crystal/attachCrystalSD 

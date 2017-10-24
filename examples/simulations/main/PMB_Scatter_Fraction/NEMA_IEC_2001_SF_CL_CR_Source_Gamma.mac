@@ -1,0 +1,19 @@
+#=====================================================
+# linear source
+#=====================================================
+
+/gate/source/addSource linear gps
+
+/gate/source/linear/gps/type Volume 
+/gate/source/linear/gps/shape Cylinder 
+/gate/source/linear/gps/radius 1.6 mm 
+/gate/source/linear/gps/halfz 35. cm 
+/gate/source/linear/gps/pos/centre 0. -45. 0. mm
+
+/gate/source/linear/setActivity 1000000 Bq
+/gate/source/linear/setType backtoback
+/gate/source/linear/gps/particle gamma
+/gate/source/linear/gps/ene/mono 511. keV
+/gate/source/linear/gps/angtype iso
+
+/gate/source/list

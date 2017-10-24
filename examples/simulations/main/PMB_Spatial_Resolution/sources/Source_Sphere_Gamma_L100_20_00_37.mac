@@ -1,0 +1,20 @@
+#=====================================================
+# sphere source
+#=====================================================
+
+/gate/source/addSource sphere gps
+
+/gate/source/sphere/gps/type Volume
+/gate/source/sphere/gps/shape Sphere
+/gate/source/sphere/gps/radius 0.5 mm
+/gate/source/sphere/gps/pos/centre 20 0 37.5 cm
+
+/gate/source/sphere/setActivity 370000 Bq
+/gate/source/sphere/setType backtoback
+/gate/source/sphere/gps/particle gamma
+/gate/source/sphere/gps/ene/mono 511. keV
+/gate/source/sphere/gps/angtype iso
+
+#=====================================================
+
+/gate/source/list

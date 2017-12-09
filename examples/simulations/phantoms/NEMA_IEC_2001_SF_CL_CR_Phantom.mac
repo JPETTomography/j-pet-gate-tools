@@ -1,0 +1,45 @@
+# NEMA SCATTER FRACTION, COUNT LOSES, COUNT RATES PHANTOM
+
+/gate/world/daughters/name phantom
+/gate/world/daughters/insert cylinder
+/gate/phantom/geometry/setRmax 101.5 mm
+/gate/phantom/geometry/setHeight 70. cm
+/gate/phantom/setMaterial HDPE
+/gate/phantom/vis/setVisible 1
+/gate/phantom/vis/forceWireframe
+/gate/phantom/vis/setColor blue
+
+/gate/phantom/daughters/name hole
+/gate/phantom/daughters/insert cylinder
+/gate/hole/setMaterial Air
+/gate/hole/geometry/setRmax 3.2 mm
+/gate/hole/geometry/setHeight 70. cm
+/gate/hole/placement/setTranslation 0 -45 0 mm
+/gate/hole/vis/setVisible 1
+/gate/hole/vis/forceWireframe
+/gate/hole/vis/setColor blue
+
+# LINE SOURCE INSERT
+
+/gate/phantom/daughters/name sourceinsert_tube
+/gate/phantom/daughters/insert cylinder
+/gate/sourceinsert_tube/setMaterial HDPE
+/gate/sourceinsert_tube/geometry/setRmin 1.6 mm
+/gate/sourceinsert_tube/geometry/setRmax 2.4 mm
+/gate/sourceinsert_tube/geometry/setHeight 70. cm
+/gate/sourceinsert_tube/placement/setTranslation 0 -45 0 mm
+/gate/sourceinsert_tube/vis/setVisible 1
+/gate/sourceinsert_tube/vis/forceWireframe
+/gate/sourceinsert_tube/vis/setColor white
+
+/gate/phantom/daughters/name sourceinsert_water
+/gate/phantom/daughters/insert cylinder
+/gate/sourceinsert_water/setMaterial Water
+/gate/sourceinsert_water/geometry/setRmax 1.6 mm
+/gate/sourceinsert_water/geometry/setHeight 70. cm
+/gate/sourceinsert_water/placement/setTranslation 0 -45 0 mm
+/gate/sourceinsert_water/vis/setVisible 1
+/gate/sourceinsert_water/vis/forceWireframe
+/gate/sourceinsert_water/vis/setColor blue
+
+/gate/phantom/attachPhantomSD

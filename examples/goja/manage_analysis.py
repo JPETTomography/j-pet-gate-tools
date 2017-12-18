@@ -23,4 +23,5 @@ if __name__ == "__main__":
       root_file = root_directory + "output" + str(i) + ".root"
 
       command = "./goja --root " + root_file + " >> ./coincidences.txt"
+
       os.system(command)

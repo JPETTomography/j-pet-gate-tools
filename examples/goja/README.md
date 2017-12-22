@@ -9,6 +9,10 @@ Dependencies
 ROOT v. 5.X
 Boost v. 1.50.X
 
+Tested for following configurations:
+ ROOT v. 5.34/26, Boost v. 1.58.0.1ubuntu1 (Desktop Ubuntu 16.04 LTS)
+ ROOT v. 5.34-x86_64-gcc48-python27, Boost v. 1.58.0 (cis.gov.pl cluster)
+
 Building
 --------
 mkdir build

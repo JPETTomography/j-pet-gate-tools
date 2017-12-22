@@ -9,6 +9,11 @@ Template pattern: J-PET cylindrical system 348 strips 500 mm L
 
 python splitter.py  -c <crystal_number> -o <outpu_tfile> -s <number_strips>
 
+examples
+--------
+Macros for GATE simulations of the J-PET scanner and
+codes for analysis of the simulations output.
+
 jplot
 -----
 Draw line of response. Input lm file  generate aplication analysis made by Pawel Kowalski.

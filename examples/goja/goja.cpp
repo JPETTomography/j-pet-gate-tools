@@ -13,6 +13,21 @@
 using namespace std;
 namespace po = boost::program_options;
 
+/**
+ * Following environmental variables must be set for proper working fo the
+ * GOJA analyzer (they are set indirectly using goja executable options):
+ *
+ * GOJA_COMPTON_E_TH    fixed energy threshold [MeV]
+ * GOJA_COMPTON_E_TH_0  noise energy threshold [MeV]
+ * GOJA_TIME_WINDOW     time window for a coincidence [ns]
+ * GOJA_MAX_N           maximum number of events above the fixed energy
+ *                      threshold in the coincidence window
+ * GOJA_MAX_N0          maximum number of events above the noise energy
+ *                      threshold in the coincidence window
+ * GOJA_SEP             separate events using time window (0) or using
+ *                      IDs of hits (1)
+ * GOJA_ROOT_FILENAME   path to ROOT file
+ */
 int main (int argc, char* argv[]) {
 
 	po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");

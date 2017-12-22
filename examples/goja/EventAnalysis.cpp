@@ -62,25 +62,25 @@ void EventAnalysis::sort_compton_hits(string key) {
 
 }
 
-int EventAnalysis::verify_type_of_coincidence(Hit h1, Hit h2) {
+EventType EventAnalysis::verify_type_of_coincidence(Hit h1, Hit h2) {
 
-	int t= 0;
+	EventType t = kUnspecified;
 
 	if (h1.eventID==h2.eventID) { //true, phantom-scattered and detector-scattered
 		if (h1.nPhantomCompton==0 and h2.nPhantomCompton==0) {
 			if (h1.nCrystalCompton==1 and h2.nCrystalCompton==1) { //true
-				t = 1;
+				t = kTrue;
 			}
 			else { //detector-scattered
-				t = 3;
+				t = kDetectorScattered;
 			}
 		}
 		else { //phantom-scattered
-			t = 2;
+			t = kPhantomScattered;
 		}
 	}
 	else { //accidental
-		t = 4;
+		t = kAccidental;
 	}
 
 	return t;

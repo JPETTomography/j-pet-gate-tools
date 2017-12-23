@@ -14,7 +14,7 @@ using namespace std;
 #include "EventAnalysis.h"
 #include "Constants.h"
 
-void Hits::Loop() {
+double Hits::Loop() {
 
 	double COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"));
 	double TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))/1e9;
@@ -25,12 +25,13 @@ void Hits::Loop() {
 	EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
 
 	if (fChain == 0)
-		return;
+		return 0.;
 	Long64_t nentries = fChain->GetEntriesFast();
 	Long64_t nbytes = 0, nb = 0;
 
 	int last_eventID;
-	double last_time;
+	double last_time = 0.;
+	double start_time = 0.;
 
 	vector<Hit> hits;
 	hits.clear();
@@ -45,6 +46,7 @@ void Hits::Loop() {
 		if (jentry==0) {
 			last_eventID = eventID;
 			last_time = time;
+			start_time = time;
 		}
 
 		Hit h;
@@ -90,4 +92,6 @@ void Hits::Loop() {
 		last_time = time;
 
 	}
+
+	return last_time - start_time;
 }

@@ -49,7 +49,10 @@ int main (int argc, char* argv[]) {
 	                                   "the analysis of 100 files with names from output/output1.root "
 	                                   "to output/output100.root "
 	                                   "(base name is specified in the GATE macro using the following command: "
-	                                   "/gate/output/root/setFileName output/output)");
+	                                   "/gate/output/root/setFileName output/output)")
+	("save-real-time-to", po::value<string>(), "save real time of the simulation to the file path "
+	                                           "(necessary when the input consists of many files [option --root-many] "
+	                                           "and some of them may be broken [for example not closed properly])");
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -114,6 +117,7 @@ int main (int argc, char* argv[]) {
 		setenv("GOJA_SEP", "0", 1);
 	}
 
+	double real_time = 0.;
 	if (!(vm.count("root")) and !(vm.count("root-many"))) {
 		cout << "You need to add root file(s) using --root or --root-many. See help.\n";
 		return 1;
@@ -123,7 +127,7 @@ int main (int argc, char* argv[]) {
 		ss << vm["root"].as<string>();
 		setenv("GOJA_ROOT_FILENAME", ss.str().c_str(), 1);
 		Hits h;
-		h.Loop();
+		real_time = h.Loop();
 	}
 	else if (vm.count("root-many")) {
 		stringstream ss;
@@ -140,8 +144,15 @@ int main (int argc, char* argv[]) {
 			string root_filename = basename + to_string(i) + ".root";
 			setenv("GOJA_ROOT_FILENAME", root_filename.c_str(), 1);
 			Hits h;
-			h.Loop();
+			real_time += h.Loop();
 		}
+	}
+
+	if (vm.count("save-real-time-to")) {
+		ofstream f;
+		f.open(vm["save-real-time-to"].as<string>());
+		f << real_time << endl;
+		f.close();
 	}
 
 	return 0;

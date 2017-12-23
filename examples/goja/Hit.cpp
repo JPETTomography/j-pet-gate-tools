@@ -18,7 +18,6 @@ Hit::Hit() {
   sourcePosX = 0.;
   sourcePosY = 0.;
   sourcePosZ = 0.;
-  comptVolName = "";
   nPhantomCompton = -1;
   nCrystalCompton = -1;
   nPhantomRayleigh = -1;
@@ -36,7 +35,6 @@ void Hit::print_hit() {
   cout << "processName=" << processName << endl;
   cout << "hit position = [" << posX << ", " << posY << ", " << posZ << "]" << endl;
   cout << "source position = [" << sourcePosX << ", " << sourcePosY << ", " << sourcePosZ << "]" << endl;
-  cout << "comptVolName=" << comptVolName << endl;
   cout << "nPhantomCompton=" << nPhantomCompton << endl;
   cout << "nCrystalCompton=" << nCrystalCompton << endl;
   cout << "nPhantomRayleigh=" << nPhantomRayleigh << endl;

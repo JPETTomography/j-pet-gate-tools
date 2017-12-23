@@ -64,7 +64,6 @@ double Hits::Loop() {
 		h.sourcePosX = sourcePosX;
 		h.sourcePosY = sourcePosY;
 		h.sourcePosZ = sourcePosZ;
-		h.comptVolName = comptVolName;
 		h.nPhantomCompton = nPhantomCompton;
 		h.nCrystalCompton = nCrystalCompton;
 		h.nPhantomRayleigh = nPhantomRayleigh;

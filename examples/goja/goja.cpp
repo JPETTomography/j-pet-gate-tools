@@ -5,10 +5,22 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include <map>
 
 #include "boost/program_options.hpp"
 
 #include "Hits.h"
+
+#define SET_GOJA_ENV_VAR(option, variable, default_value) { \
+	if (vm.count(option)) { \
+		stringstream ss; \
+		ss << vm[option].as<string>(); \
+		setenv(variable, ss.str().c_str(), 1); \
+	} \
+	else { \
+		setenv(variable, default_value, 1); \
+	} \
+	}
 
 using namespace std;
 namespace po = boost::program_options;
@@ -34,12 +46,12 @@ int main (int argc, char* argv[]) {
 
 	desc.add_options()
     ("help", "produce help message")
-	("eth", po::value<double>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
-    ("eth0", po::value<double>(), "noise energy threshold [MeV] (default: 0.01 MeV)")
-	("tw", po::value<double>(), "time window for a coincidence [ns] (default: 3 ns)")
-	("N", po::value<double>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
-	("N0", po::value<double>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 3)")
-	("sep", po::value<int>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
+	("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
+    ("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.01 MeV)")
+	("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
+	("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
+	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 3)")
+	("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
 	("root", po::value<string>(), "file path of the single GATE *.root file,"
 	                              "for example --root=output.root")
 	("root-many", po::value<string>(), "file path of the base GATE *.root file "
@@ -52,7 +64,8 @@ int main (int argc, char* argv[]) {
 	                                   "/gate/output/root/setFileName output/output)")
 	("save-real-time-to", po::value<string>(), "save real time of the simulation to the file path "
 	                                           "(necessary when the input consists of many files [option --root-many] "
-	                                           "and some of them may be broken [for example not closed properly])");
+	                                           "and some of them may be broken [for example not closed properly])")
+	("save-multiplicities-to", po::value<string>(), "save multiplicities to the file path");
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -63,61 +76,15 @@ int main (int argc, char* argv[]) {
 		return 1;
 	}
 
-	if (vm.count("eth")) {
-		stringstream ss;
-		ss << vm["eth"].as<double>();
-		setenv("GOJA_COMPTON_E_TH", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_COMPTON_E_TH", "0.2", 1);
-	}
-
-	if (vm.count("eth0")) {
-		stringstream ss;
-		ss << vm["eth0"].as<double>();
-		setenv("GOJA_COMPTON_E_TH_0", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_COMPTON_E_TH_0", "0.01", 1);
-	}
-
-	if (vm.count("tw")) {
-		stringstream ss;
-		ss << vm["tw"].as<double>();
-		setenv("GOJA_TIME_WINDOW", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_TIME_WINDOW", "3", 1);
-	}
-
-	if (vm.count("N")) {
-		stringstream ss;
-		ss << vm["N"].as<double>();
-		setenv("GOJA_MAX_N", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_MAX_N", "2", 1);
-	}
-
-	if (vm.count("N0")) {
-		stringstream ss;
-		ss << vm["N0"].as<double>();
-		setenv("GOJA_MAX_N0", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_MAX_N0", "3", 1);
-	}
-
-	if (vm.count("sep")) {
-		stringstream ss;
-		ss << vm["sep"].as<int>();
-		setenv("GOJA_SEP", ss.str().c_str(), 1);
-	}
-	else {
-		setenv("GOJA_SEP", "0", 1);
-	}
+	SET_GOJA_ENV_VAR("eth", "GOJA_COMPTON_E_TH", "0.2");
+	SET_GOJA_ENV_VAR("eth0", "GOJA_COMPTON_E_TH_0", "0.01");
+	SET_GOJA_ENV_VAR("tw", "GOJA_TIME_WINDOW", "3");
+	SET_GOJA_ENV_VAR("N", "GOJA_MAX_N", "2");
+	SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "3");
+	SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
 
 	double real_time = 0.;
+	vector<int> multiplicities;
 	if (!(vm.count("root")) and !(vm.count("root-many"))) {
 		cout << "You need to add root file(s) using --root or --root-many. See help.\n";
 		return 1;
@@ -127,7 +94,9 @@ int main (int argc, char* argv[]) {
 		ss << vm["root"].as<string>();
 		setenv("GOJA_ROOT_FILENAME", ss.str().c_str(), 1);
 		Hits h;
-		real_time = h.Loop();
+		LoopResults lr = h.Loop();
+		real_time = lr.real_time;
+		multiplicities = lr.multiplicities;
 	}
 	else if (vm.count("root-many")) {
 		stringstream ss;
@@ -144,7 +113,9 @@ int main (int argc, char* argv[]) {
 			string root_filename = basename + to_string(i) + ".root";
 			setenv("GOJA_ROOT_FILENAME", root_filename.c_str(), 1);
 			Hits h;
-			real_time += h.Loop();
+			LoopResults lr = h.Loop();
+			real_time += lr.real_time;
+			multiplicities.insert(multiplicities.end(), lr.multiplicities.begin(), lr.multiplicities.end());
 		}
 	}
 
@@ -152,6 +123,23 @@ int main (int argc, char* argv[]) {
 		ofstream f;
 		f.open(vm["save-real-time-to"].as<string>());
 		f << real_time << endl;
+		f.close();
+	}
+
+	if (vm.count("save-multiplicities-to")) {
+		map<unsigned int, unsigned int> multiplicities_hist;
+		for (unsigned int i=0; i<multiplicities.size(); i++) {
+			int m = multiplicities[i];
+			if (multiplicities_hist.find(m) == multiplicities_hist.end())
+				multiplicities_hist[m] = 1;
+			else
+				multiplicities_hist[m] += 1;
+		}
+		ofstream f;
+		f.open(vm["save-multiplicities-to"].as<string>());
+		for(auto iterator = multiplicities_hist.begin(); iterator != multiplicities_hist.end(); iterator++) {
+			f << iterator->first << "\t" << iterator->second << endl;
+		}
 		f.close();
 	}
 

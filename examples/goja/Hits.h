@@ -1,9 +1,3 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Fri Feb 22 08:19:29 2013 by ROOT version 5.34/02
-// from TChain Hits/
-//////////////////////////////////////////////////////////
-
 #ifndef Hits_h
 #define Hits_h
 
@@ -18,16 +12,17 @@
 
 #include "Hit.h"
 
+struct LoopResults {
+    double real_time;
+    vector<int> multiplicities;
+};
+
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
 class Hits {
 public :
-   // Variables used in hist2volt application - PK
-   std::vector<double> time_offsets_A, time_offsets_B;
-   std::vector<Hit> coincidences;
-
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
@@ -112,7 +107,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual double     Loop();
+   virtual LoopResults Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 };

@@ -1,5 +1,4 @@
 #include "EventAnalysis.h"
-#include <TRandom.h>
 
 //================================================================================
 // MATHEMATICAL AND ADDITIONAL FUNCTIONS
@@ -133,6 +132,7 @@ void EventAnalysis::analyze_event(vector< Hit > hits)
 	int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
 
 	select_compton_hits(hits);
+	sort_compton_hits("TIME");
 
 	if (N==MAX_N and N0<=MAX_N0) print_coincidences();
 

@@ -10,4 +10,3 @@ cd ${PBS_O_WORKDIR}    # Take me to the directory where I launched qsub
 Gate ./.Gate/main/main${PBS_ARRAYID}.mac
  
 exit 0;
-

@@ -1,1 +1,3 @@
 *.root
+examples/goja/nbproject/
+examples/goja/build/

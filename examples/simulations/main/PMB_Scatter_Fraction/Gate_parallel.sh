@@ -31,4 +31,3 @@ qsub -t 1-$NR_OF_SPLITS array.pbs
 
 # 5. See your jobs in the cluster queue
 qstat -t -u $USER
-

@@ -1,0 +1,24 @@
+/gate/output/root/enable
+/gate/output/root/setFileName             output/output
+/gate/output/root/setRootHitFlag          1
+/gate/output/root/setRootSinglesFlag      0
+#/gate/output/root/setRootCoincidencesFlag 1
+/gate/output/root/setRootOpticalFlag      0
+
+##/gate/output/root/setRootdelayFlag        1
+##/gate/output/root/setRootNtupleFlag       1
+
+#/gate/output/ascii/enable
+#/gate/output/ascii/setFileName output/test
+
+# enable ascii output for hits
+#/gate/output/ascii/setOutFileHitsFlag 1
+#
+# enable ascii output for Singles (end of digitizer chain)
+#/gate/output/ascii/setOutFileSinglesFlag 0
+#
+# enable ascii output for coincidences
+#/gate/output/ascii/setOutFileCoincidencesFlag 0
+#
+# enable ascii output for singles (after a digitizer module)
+#/gate/output/ascii/setOutFileSinglesS1Flag 0

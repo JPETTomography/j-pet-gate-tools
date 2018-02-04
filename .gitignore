@@ -1,3 +1,4 @@
 *.root
 examples/goja/nbproject/
 examples/goja/build/
+examples/python_scripts/Results/

@@ -12,44 +12,48 @@ import sys
 import matplotlib.image as mpimg
 from collections import OrderedDict
 
+SLICE_WIDTH = 2. # in cm
+BINS_DISPLACEMENTS = 100
+BINS_ANGLES = 90
+
 class sinogram:
-  
-  displacements = []
-  anlges = []
-  
-  H = []
-  dedges = []
-  aedges = []
-  
+
   def __init__(self):
     self.displacements = []
     self.angles = []
+    self.H = []
+    self.dedges = []
+    self.aedges = []
 
 #===========================================
 
 # TODO: correct the way pf calculating the index at the edge
+
 def z2i (z, L):
+
   N = int(L/2.)
   SINOGRAM_WIDTH = L/N # in cm
 
-  i = int(floor((z+L/2.)/SINOGRAM_WIDTH))  
+  i = int(floor((z+L/2.)/SINOGRAM_WIDTH))
   if i==N: i=N-1
   return i
-  
-def mainfunction(geometry, filepath, activity):
+
+def mainfunction(geometry, activity, filepath, workdir):
 
   #===========================================
-  # matplotlib parameters
+  # Matplotlib plotting parameters
   #===========================================
-  
+
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
 
   #===========================================
+  # Length of the scintillators
+  #===========================================
 
-  L = 0. # length of the scintillators
+  L = 0.
   if "L020" in filepath:
       L = 20.
   elif "L050" in filepath:
@@ -58,37 +62,46 @@ def mainfunction(geometry, filepath, activity):
       L = 100.
   else:
       L = 50.
-  N = int(L/2.) # slice width equal to 2 cm
 
-  workdir = "./Results/SF_NECR2/" + geometry + "/"
-  
-  if (not os.path.isdir("./Results/SF_NECR2")): os.system("mkdir ./Results/SF_NECR2")
-  if (not os.path.isdir(workdir)): os.system("mkdir " + workdir)
-  if (not os.path.isdir(workdir + "rebinned")): os.system("mkdir " + workdir + "rebinned")
+  #===========================================
+  # Number of slices
+  #===========================================
 
-  tmp = loadtxt(filepath)  
-  posX1 = tmp[:,0]
-  posY1 = tmp[:,1]
-  posZ1 = tmp[:,2]
-  times1 = tmp[:,3]
-  posX2 = tmp[:,4]
-  posY2 = tmp[:,5]
-  posZ2 = tmp[:,6]
-  times2 = tmp[:,7]
-  toc = tmp[:,12]
-  
-  IDs1 = tmp[:,8]
-  IDs2 = tmp[:,9]
+  N = int(L/SLICE_WIDTH)
 
-  #TODO below time calculation is improved using goja option --save-real-time-to
-  time = max(max(times1),max(times2))/1e12 # time of a whole simulation taken into account in seconds as a max value of registered hits
-  
-  I = len(tmp)
+  #===========================================
+  # Loading coincidences from the file
+  #===========================================
+
+  coincidences = loadtxt(filepath + "_coincidences")
+  #coincidences = genfromtxt(filepath + "_coincidences")
+  posX1 = coincidences[:,0]
+  posY1 = coincidences[:,1]
+  posZ1 = coincidences[:,2]
+  times1 = coincidences[:,3]
+  posX2 = coincidences[:,4]
+  posY2 = coincidences[:,5]
+  posZ2 = coincidences[:,6]
+  times2 = coincidences[:,7]
+  IDs1 = coincidences[:,8]
+  IDs2 = coincidences[:,9]
+  toc = coincidences[:,12]
+
+  #===========================================
+  # Setting the time of the full simulation
+  #===========================================
+
+  time = 0.
+  if os.path.exists(filepath + "_realtime"):
+    time = loadtxt(filepath + "_realtime")
+  else:
+    time = max(max(times1),max(times2))/1e12
+
+  #===========================================
+  # Creating and filling the dictionary of sinograms
+  #===========================================
 
   sinograms = dict() # dictionary of sinograms is created
-
-  a = [] # array of angles
-  d = [] # array of displacements
 
   # Counters initialization
   N_true = 0
@@ -96,93 +109,111 @@ def mainfunction(geometry, filepath, activity):
   N_dsca = 0
   N_acci = 0
   N_all = 0
-  
-  for i in range(I):
-      
+
+  for i in range(len(coincidences)):
+
     # Displacement - distance between LOR and (0,0,0) in XY crossection
-    displacement = (posX2[i]*posY1[i]-posY2[i]*posX1[i]) / sqrt((posY2[i]-posY1[i])*(posY2[i]-posY1[i]) + (posX2[i]-posX1[i])*(posX2[i]-posX1[i]))
+    displacement = 0.
+    denominator = sqrt((posY2[i]-posY1[i])**2 + (posX2[i]-posX1[i])**2)
+    if denominator != 0:
+      displacement = (posX2[i]*posY1[i]-posY2[i]*posX1[i]) / denominator
 
     # Angle
+    angle = 0.
     if (posX2[i]-posX1[i])!=0:
       angle = atan((posY1[i]-posY2[i])/(posX2[i]-posX1[i]))
+
     if displacement>0:
       angle=angle+pi/2.
-    else: 
+    else:
       angle=angle+3.*pi/2.
     if angle > pi:
       angle = angle - pi
       displacement = -displacement
-      
-    if ((not isnan(displacement)) and (not isnan(angle)) and displacement<12): # cut from the NEMA norm
-      
-      # counters incrementation
+
+    cond1 = displacement != 0. or angle != 0.
+    cond2 = (not isnan(displacement)) and (not isnan(angle))
+    if cond1 and cond2 and displacement<12: # cut from the NEMA norm
+
+      # Counters incrementation
       if toc[i]==1: N_true = N_true + 1
       elif toc[i]==2: N_psca = N_psca + 1
       elif toc[i]==3: N_dsca = N_dsca + 1
       elif toc[i]==4: N_acci = N_acci + 1
       N_all = N_all + 1
 
-      d.append(displacement)
-      a.append(angle)
+      indices = [z2i(posZ1[i],L), z2i(posZ2[i],L)]
+      indices.sort()
 
-      indices = sort([z2i(posZ1[i],L), z2i(posZ2[i],L)])
-      indices = list(indices)
-     
       # the dictionary is filled using sorted pair of slice indexes, the event is attached to its sinogram
       if (indices[0],indices[1]) in sinograms:
         sinograms[(indices[0],indices[1])].displacements.append(displacement)
         sinograms[(indices[0],indices[1])].angles.append(angle)
-    
+
       else:
-	# if there is no such a sinogram, it is created
+        # if there is no such a sinogram, it is created
         s = sinogram()
         sinograms[(indices[0],indices[1])] = s
         sinograms[(indices[0],indices[1])].displacements.append(displacement)
         sinograms[(indices[0],indices[1])].angles.append(angle)
 
-  # 1
-  # sinograms as lists of values - sorting by indices
-  sinograms = OrderedDict(sorted(sinograms.items()))
+  #===========================================
+  # Converting sinograms into 2D histograms
+  #===========================================
 
-  # 2
-  # sinograms as 2D matrices
-  # converting into histograms
-  d_bins = 100
-  a_bins = 90
-  BINS = [d_bins, a_bins]
+  BINS = [BINS_DISPLACEMENTS, BINS_ANGLES]
   RANGE = [[0, 12], [0, pi]]
 
   for s in sinograms:
-    
+
     H, dedges, aedges = histogram2d(sinograms[s].displacements, sinograms[s].angles, bins=BINS, range=RANGE)
 
     sinograms[s].H = H
     sinograms[s].dedges = dedges
     sinograms[s].aedges = aedges
 
-  # 3. Rebinning sinograms
+  #===========================================
+  # Rebinning (SSRB)
+  #===========================================
+
   sinograms_rebinned = dict()
-  indices = linspace(0,2*N-2,2*N-1) 
+
+  indices = linspace(0,2*N-2,2*N-1)/2. # indices of the rebinned sinogram, they may be partial: 0, 0.5, 1, ...
+
   for i in indices:
+
     s = sinogram()
-    Di = min(i-indices[0],indices[-1]-i)
-    l = linspace(-Di,Di,2*Di+1)
-    l = (i+l[0::2])/2
+    Di = min(i, indices[-1]-i)
     H_sum = zeros(H.shape)
-    for k in range(len(l)):
-      couple = sort([int(l[k]),int(l[-k])])
-      if ((couple[0],couple[1]) in sinograms.keys()): # checking if oblique inogram exists in the set of all sinograms
+
+    for k in range(int(Di)+1):
+
+      current_slice = int(indices[int(i)]*2.)
+
+      couple = []
+      if Di == int(Di):
+        couple = sort([current_slice-k, current_slice+k])
+      else:
+        couple = sort([current_slice-k, current_slice+k+1])
+
+      if ((couple[0],couple[1]) in sinograms.keys()): # checking if oblique sinogram exists in the set of all sinograms
         H_sum = H_sum + sinograms[(couple[0],couple[1])].H
-    H_sum = H_sum/len(l)
+
     s.H = H_sum
     sinograms_rebinned[i] = s
 
-  # 4. Summing rebinned sinograms
+  #===========================================
+  # Summing rebinned sinograms
+  #===========================================
+
   H_final = zeros(H.shape)
   for key in sinograms_rebinned:
     H_final = H_final + sinograms_rebinned[key].H
 
-  # 5. Plotting rebinned sinograms
+  #===========================================
+  # Plotting rebinned sinograms
+  #===========================================
+
   plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
   plt.imshow(H_final.T, interpolation='nearest', origin='low', extent=[dedges[0], dedges[-1], aedges[0], aedges[-1]], aspect='auto')
   plt.colorbar()
@@ -191,27 +222,30 @@ def mainfunction(geometry, filepath, activity):
   plt.savefig(workdir + "sinogram_final_" + activity + ".png")
   plt.clf()
 
-  # 6. Summing lines of rebinned final sinogram
-  step = dedges[1]-dedges[0]
-  vecsum = zeros(2*d_bins-1)
+  #===========================================
+  # Summing lines of rebinned final sinogram
+  #===========================================
 
-  for i in range(a_bins):
+  step = dedges[1]-dedges[0]
+  vecsum = zeros(2*BINS_DISPLACEMENTS-1)
+
+  for i in range(BINS_ANGLES):
     vec = H_final[:,i].T
     vec = list(vec)
     maxind = vec.index(max(vec))
 
-    startindex = d_bins-maxind-1
+    startindex = BINS_DISPLACEMENTS-maxind-1
 
     for j in range(len(vec)):
       vecsum[startindex+j] = vecsum[startindex+j]+vec[j]
- 
-  vecd = step*linspace(-d_bins+1, d_bins-1, 2*d_bins-1)
 
-  ind_m20mm = d_bins - int(2./step)
-  ind_p20mm = d_bins + int(2./step)
+  vecd = step*linspace(-BINS_DISPLACEMENTS+1, BINS_DISPLACEMENTS-1, 2*BINS_DISPLACEMENTS-1)
+
+  ind_m20mm = BINS_DISPLACEMENTS - int(2./step)
+  ind_p20mm = BINS_DISPLACEMENTS + int(2./step)
   val_m20mm = vecsum[ind_m20mm-1]
   val_p20mm = vecsum[ind_p20mm-1]
-  
+
   thres = (val_m20mm+val_p20mm)/2.
 
   plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
@@ -228,9 +262,9 @@ def mainfunction(geometry, filepath, activity):
   plt.savefig(workdir + "sumhist_"+activity+".png")
   plt.clf()
   plt.close()
-  
+
   #===========================================
-  
+
   # T - above the threshold line (treated as true)
   # S - below the threshold line (treated as scattered but includes also the accidental coincidences)
 
@@ -242,10 +276,10 @@ def mainfunction(geometry, filepath, activity):
     else:
       S = S + thres
       T = T + vecsum[i] - thres
-  
+
   newT = T/(S+T)*N_all
   newS = S/(S+T)*N_all
-  
+
   T = newT
   S = newS
 
@@ -253,23 +287,32 @@ def mainfunction(geometry, filepath, activity):
 
   SF_sin = S/(S+T)*100. # sin - sinogram
   SF_ctr = float(N_dsca+N_psca)/(N_dsca+N_psca+N_true)*100. # ctr - counter
-  
+
   NECR_sin = T*T/(S+T)/time
   NECR_ctr = N_true*N_true/N_all/time
 
   NECR_sin = NECR_sin/1000. # cps -> kcps
   NECR_ctr = NECR_ctr/1000. # cps -> kcps
-  
-  # Printing calculated values into the image
-  
-  print float_activity, "\t", SF_sin, "\t", SF_ctr, "\t", NECR_sin, "\t", NECR_ctr, "\t", T, "\t", S, "\t", N_true, "\t", N_dsca, "\t", N_psca, "\t", N_acci, "\t", time
+
+  # Printing calculated values
+  data_for_single_activity = str(float_activity) + "\t"
+  data_for_single_activity += str(SF_sin) + "\t" + str(SF_ctr) + "\t"
+  data_for_single_activity += str(NECR_sin) + "\t" + str(NECR_ctr) + "\t"
+  data_for_single_activity += str(T) + "\t" + str(S) + "\t"
+  data_for_single_activity += str(N_true) + "\t" + str(N_dsca) + "\t" + str(N_psca) + "\t" + str(N_acci) + "\t"
+  data_for_single_activity += str(time)
+
+  print data_for_single_activity
+
+  with open(workdir + "necr_dependency.txt", "a") as necr_dependency:
+    necr_dependency.write(data_for_single_activity + '\n')
 
   #===========================================
 
   tim_diffs = []
   ang_diffs = []
-  
-  for i in range(len(tmp)):
+
+  for i in range(len(coincidences)):
     tdiff = abs(times1[i]-times2[i])/1e3 # in ns TODO abs ??????????????
     tim_diffs.append(tdiff)
     #v=[vx,vy] = posX1, posY1
@@ -281,22 +324,19 @@ def mainfunction(geometry, filepath, activity):
     vu = posX1[i]*posX2[i] + posY1[i]*posY2[i]
     modv = sqrt(posX1[i]*posX1[i] + posY1[i]*posY1[i])
     modu = sqrt(posX2[i]*posX2[i] + posY2[i]*posY2[i])
-    try: 
-        a = acos(vu/(modv*modu))/pi*180.
-        adiff = a
-    except: 
-        pass
+    try:
+      a = acos(vu/(modv*modu))/pi*180.
+      adiff = a
+    except:
+      pass
     ang_diffs.append(adiff)
-    #print tdiff, adiff 
+    #print tdiff, adiff
 
   #===========================================
 
   # Saving 2D histogram into the image
-  
-  #d_bins = 100
-  #a_bins = 180
-  
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(100,100), range=[[0, 3],[0, 180]]) #d_bins,a_bins))
+
+  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(BINS_DISPLACEMENTS,BINS_ANGLES), range=[[0, 3],[0, 180]])
 
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
@@ -334,25 +374,36 @@ def mainfunction(geometry, filepath, activity):
   plt.close()
 
 if __name__ == "__main__":
-  
+
   #===========================================
   # The script assumes that the files with next activities are in the "directory"
   # and they have name matching the pattern: geometry_NECR_activity, for example
   # D85_1lay_L050_7mm_NECR_1000 (GOJA format)
   #===========================================
-  
+
   activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000"]
 
-  geometry = "D85_1lay_L050_7mm"
+  if (not os.path.isdir("./Results")): os.system("mkdir ./Results")
+  if (not os.path.isdir("./Results/NECR")): os.system("mkdir ./Results/NECR")
 
-  if len(sys.argv)==2:
-    geometry = sys.argv[1]
-  
-  for i in range(len(activities)):
+  geometries = ["D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm"]
 
-    activity = activities[i]
-    
-    directory = "/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/goja2/"
-    filepath = directory + geometry + "_NECR_" + activity
-    
-    mainfunction(geometry, filepath, activity)
+  for geometry in geometries:
+
+    print geometry
+
+    workdir = "./Results/NECR/" + geometry + "/"
+    if (not os.path.isdir(workdir)): os.system("mkdir " + workdir)
+    if (not os.path.isdir(workdir + "rebinned")): os.system("mkdir " + workdir + "rebinned")
+    if (os.path.isfile(workdir + "necr_dependency.txt")):
+      os.system("rm " + workdir + "necr_dependency.txt")
+
+    for i in range(len(activities)):
+
+      activity = activities[i]
+
+      directory = "/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/PMB_realtime/"
+
+      filepath = directory + geometry + "_NECR_" + activity
+
+      mainfunction(geometry, activity, filepath, workdir)

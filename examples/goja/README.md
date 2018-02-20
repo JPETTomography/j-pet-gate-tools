@@ -6,6 +6,7 @@ from them.
 
 Dependencies
 ------------
+
 ROOT v. 5.X
 Boost v. 1.50.X
 
@@ -13,23 +14,33 @@ Tested for following configurations:
  ROOT v. 5.34/26, Boost v. 1.58.0.1ubuntu1 (Desktop Ubuntu 16.04 LTS)
  ROOT v. 5.34-x86_64-gcc48-python27, Boost v. 1.58.0 (cis.gov.pl cluster)
 
-Building
---------
-mkdir build
+Building and installation
+-------------------------
+
+mkdir build (in source directory)
 cd build
 cmake ..
 make
 sudo make install
 
+Files 'goja' and 'goja_manager.py' will be installed by default in /usr/local/bin directory.
+
 Usage
 -----
-Example:
+
+Examples:
+
+Example 1:
 goja --eth 0.2 --eth0 0.01 --tw 3 --root output.root > coincidences.txt
 If the user won't redirect the output to a file, it will be written into the
 standard output (console).
 
+Example 2:
+goja_manager.py --mode analyze --gate-output ../output/ --goja-output ./
+
 GOJA output
 -----------
+
 GOJA output consists of 16 columns. Each line of the output contains a single coincidences (LOR).
 Columns 1-4 contain information about the 1st hit:
 1) posX1 [cm]
@@ -53,4 +64,6 @@ Next columns contain following information:
 
 Help
 ----
+
 Type goja --help (or just goja without arguments) for details.
+Type goja_manager.py --help for details fo the GOJA manager.

@@ -393,6 +393,22 @@ if __name__ == "__main__":
                       default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/PMB_realtime/",
                       help='path to dir with the GOJA sensitivity results')
 
+  parser.add_argument('--slice-width',
+                      dest='slice_width',
+                      type=float,
+                      default=SLICE_WIDTH,
+                      help='with of the virtual slice')
+  parser.add_argument('--bins-displacements',
+                      dest='bins_displacements',
+                      type=float,
+                      default=BINS_DISPLACEMENTS,
+                      help='nr of bins for displacements')
+  parser.add_argument('--bins-angles',
+                      dest='bins_angles',
+                      type=float,
+                      default=BINS_ANGLES,
+                      help='nr of bins for angles')
+
   args = parser.parse_args()
 
   if not args.coincidences_directory:
@@ -404,6 +420,10 @@ if __name__ == "__main__":
   elif not is_coincidences_directory_valid(args.coincidences_directory):
     print "Directory " + args.coincidences_directory + " is not valid. It should contain coincidences files with proper names. Check --help option."
     sys.exit()
+
+  SLICE_WIDTH = args.slice_width
+  BINS_DISPLACEMENTS = args.bins_displacements
+  BINS_ANGLES = args.bins_angles
 
   directory = args.coincidences_directory
 

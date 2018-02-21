@@ -6,8 +6,7 @@ from numpy import *
 from matplotlib import rcParams, rcdefaults, rc
 from matplotlib.colors import LogNorm
 from math import *
-import os
-import sys
+import argparse, os, sys
 
 import matplotlib.image as mpimg
 from collections import OrderedDict
@@ -373,6 +372,10 @@ def mainfunction(geometry, activity, filepath, workdir):
   plt.clf()
   plt.close()
 
+def is_coincidences_directory_valid(coincidences_directory):
+  #TODO
+  return 1
+
 if __name__ == "__main__":
 
   #===========================================
@@ -380,6 +383,29 @@ if __name__ == "__main__":
   # and they have name matching the pattern: geometry_NECR_activity, for example
   # D85_1lay_L050_7mm_NECR_1000 (GOJA format)
   #===========================================
+
+  parser = argparse.ArgumentParser(description='Calculate sensitivity and sensitivity profiles using the GOJA results.',
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+  parser.add_argument('--coincidences-directory',
+                      dest='coincidences_directory',
+                      type=str,
+                      default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/PMB_realtime/",
+                      help='path to dir with the GOJA sensitivity results')
+
+  args = parser.parse_args()
+
+  if not args.coincidences_directory:
+    print "No directory with coincidences provided. Analysis cannot be performed. Check --help option."
+    sys.exit()
+  elif not os.path.isdir(args.coincidences_directory):
+    print "Directory " + args.coincidences_directory + " is unavailable. Check --help option."
+    sys.exit()
+  elif not is_coincidences_directory_valid(args.coincidences_directory):
+    print "Directory " + args.coincidences_directory + " is not valid. It should contain coincidences files with proper names. Check --help option."
+    sys.exit()
+
+  directory = args.coincidences_directory
 
   activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000"]
 
@@ -401,8 +427,6 @@ if __name__ == "__main__":
     for i in range(len(activities)):
 
       activity = activities[i]
-
-      directory = "/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/PMB_realtime/"
 
       filepath = directory + geometry + "_NECR_" + activity
 

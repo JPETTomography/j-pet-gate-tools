@@ -6,21 +6,41 @@ from numpy import *
 from matplotlib import rcParams, rcdefaults, rc
 from matplotlib.colors import LogNorm
 import matplotlib.image as mpimg
-import os
+import argparse, os, sys
+
+def is_coincidences_directory_valid(coincidences_directory):
+  #TODO
+  return 1
 
 if __name__ == "__main__":
+
+  parser = argparse.ArgumentParser(description='Calculate sensitivity and sensitivity profiles using the GOJA results.',
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+  parser.add_argument('--coincidences-directory',
+                      dest='coincidences_directory',
+                      type=str,
+                      default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/1_Sensitivity/PMB_realtime/",
+                      help='path to dir with the GOJA sensitivity results')
+
+  args = parser.parse_args()
+
+  if not args.coincidences_directory:
+    print "No directory with coincidences provided. Analysis cannot be performed. Check --help option."
+    sys.exit()
+  elif not os.path.isdir(args.coincidences_directory):
+    print "Directory " + args.coincidences_directory + " is unavailable. Check --help option."
+    sys.exit()
+  elif not is_coincidences_directory_valid(args.coincidences_directory):
+    print "Directory " + args.coincidences_directory + " is not valid. It should contain coincidences files with proper names. Check --help option."
+    sys.exit()
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 24
 
-  #energies = linspace(50,280,24)
-
-  #sensitivities_1MBq_100s = []
-
-  #time = 1000. # in s
   activity = 1000. # in kBq
 
-  coincidences_directory = "/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/1_Sensitivity/PMB_realtime/"
+  coincidences_directory = args.coincidences_directory
 
   geometries = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L100_7mm", "D75_2lay_L020_7mm", "D75_2lay_L050_7mm", "D75_2lay_L100_7mm", "D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm", "D95_1lay_L020_7mm", "D95_1lay_L050_7mm", "D95_1lay_L100_7mm", "D95_2lay_L020_7mm", "D95_2lay_L050_7mm", "D95_2lay_L100_7mm"]
 
@@ -98,7 +118,6 @@ if __name__ == "__main__":
 
     hist, bin_edges = histogram(sourcePosZ_true, bins=b)
 
-    activity = 1000 # in kBq
     norm_factor = activity/N # activity per slice
 
     sensitivity_profile = hist/norm_factor/time

@@ -126,7 +126,7 @@
 /gate/source/sphere10mm/gps/type              Volume
 /gate/source/sphere10mm/gps/shape             Sphere
 /gate/source/sphere10mm/gps/radius            0.5 cm
-/gate/source/sphere10mm/setActivity           395169 Bq
+/gate/source/sphere10mm/setActivity           11100. Bq
 /gate/source/sphere10mm/setType               backtoback
 /gate/source/sphere10mm/gps/particle          gamma
 /gate/source/sphere10mm/gps/ene/mono          511. keV
@@ -139,7 +139,7 @@
 /gate/source/capillary10mm/gps/shape          Cylinder
 /gate/source/capillary10mm/gps/radius         0.25 cm
 /gate/source/capillary10mm/gps/halfz          3.2 cm
-/gate/source/capillary10mm/setActivity        948405 Bq
+/gate/source/capillary10mm/setActivity        26641. Bq
 /gate/source/capillary10mm/setType            backtoback
 /gate/source/capillary10mm/gps/particle       gamma
 /gate/source/capillary10mm/gps/ene/mono       511. keV
@@ -151,7 +151,7 @@
 /gate/source/sphere13mm/gps/type              Volume
 /gate/source/sphere13mm/gps/shape             Sphere
 /gate/source/sphere13mm/gps/radius            0.65 cm
-/gate/source/sphere13mm/setActivity           868186 Bq
+/gate/source/sphere13mm/setActivity           24387. Bq
 /gate/source/sphere13mm/setType               backtoback
 /gate/source/sphere13mm/gps/particle          gamma
 /gate/source/sphere13mm/gps/ene/mono          511. keV
@@ -164,7 +164,7 @@
 /gate/source/capillary13mm/gps/shape          Cylinder
 /gate/source/capillary13mm/gps/radius         0.25 cm
 /gate/source/capillary13mm/gps/halfz          3.1125 cm
-/gate/source/capillary13mm/setActivity        922472 Bq
+/gate/source/capillary13mm/setActivity        25912. Bq
 /gate/source/capillary13mm/setType            backtoback
 /gate/source/capillary13mm/gps/particle       gamma
 /gate/source/capillary13mm/gps/ene/mono       511. keV
@@ -176,7 +176,7 @@
 /gate/source/sphere17mm/gps/type              Volume
 /gate/source/sphere17mm/gps/shape             Sphere
 /gate/source/sphere17mm/gps/radius            0.85 cm
-/gate/source/sphere17mm/setActivity           1941465 Bq
+/gate/source/sphere17mm/setActivity           54536. Bq
 /gate/source/sphere17mm/setType               backtoback
 /gate/source/sphere17mm/gps/particle          gamma
 /gate/source/sphere17mm/gps/ene/mono          511. keV
@@ -189,7 +189,7 @@
 /gate/source/capillary17mm/gps/shape          Cylinder
 /gate/source/capillary17mm/gps/radius         0.25 cm
 /gate/source/capillary17mm/gps/halfz          3.025 cm
-/gate/source/capillary17mm/setActivity        896539 Bq
+/gate/source/capillary17mm/setActivity        25184. Bq
 /gate/source/capillary17mm/setType            backtoback
 /gate/source/capillary17mm/gps/particle       gamma
 /gate/source/capillary17mm/gps/ene/mono       511. keV
@@ -201,7 +201,7 @@
 /gate/source/sphere22mm/gps/type              Volume
 /gate/source/sphere22mm/gps/shape             Sphere
 /gate/source/sphere22mm/gps/radius            1.1 cm
-/gate/source/sphere22mm/setActivity           4207758 Bq
+/gate/source/sphere22mm/setActivity           118196. Bq
 /gate/source/sphere22mm/setType               backtoback
 /gate/source/sphere22mm/gps/particle          gamma
 /gate/source/sphere22mm/gps/ene/mono          511. keV
@@ -214,7 +214,7 @@
 /gate/source/capillary22mm/gps/shape          Cylinder
 /gate/source/capillary22mm/gps/radius         0.25 cm
 /gate/source/capillary22mm/gps/halfz          2.9 cm
-/gate/source/capillary22mm/setActivity        859492 Bq
+/gate/source/capillary22mm/setActivity        24143. Bq
 /gate/source/capillary22mm/setType            backtoback
 /gate/source/capillary22mm/gps/particle       gamma
 /gate/source/capillary22mm/gps/ene/mono       511. keV

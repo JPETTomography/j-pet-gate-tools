@@ -2,7 +2,7 @@
 
 /gate/source/addSource                        upperinterior_hot
 /gate/source/upperinterior_hot/gps/centre     0.0 -3.5 0.0 cm
-/gate/source/upperinterior_hot/gps/type       Volume 
+/gate/source/upperinterior_hot/gps/type       Volume
 /gate/source/upperinterior_hot/gps/shape      Cylinder
 /gate/source/upperinterior_hot/gps/radius     14.7 cm
 /gate/source/upperinterior_hot/gps/halfz      10.7 cm
@@ -50,7 +50,7 @@
 
 /gate/source/addSource                        LRinterior_hot
 /gate/source/LRinterior_hot/gps/centre        -7.0 -3.5 0.0 cm
-/gate/source/LRinterior_hot/gps/type          Volume 
+/gate/source/LRinterior_hot/gps/type          Volume
 /gate/source/LRinterior_hot/gps/shape         Cylinder
 /gate/source/LRinterior_hot/gps/radius        7.7 cm
 /gate/source/LRinterior_hot/gps/halfz         10.7 cm

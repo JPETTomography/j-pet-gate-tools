@@ -40,7 +40,8 @@
 #  P A R T I C L E   S O U R C E
 #=====================================================
 
-/control/execute NEMA_IEC_2001_IQ_Source_Gamma.mac
+/control/execute NEMA_IEC_2001_IQ_Source_Gamma_N4.mac
+#/control/execute NEMA_IEC_2001_IQ_Source_Gamma_N8.mac
 
 #=====================================================
 #  D A T A   O U T P U T   

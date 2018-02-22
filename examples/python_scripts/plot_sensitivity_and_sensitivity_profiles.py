@@ -3,13 +3,12 @@
 
 import matplotlib.pyplot as plt
 from numpy import *
-from matplotlib import rcParams, rcdefaults, rc
-from matplotlib.colors import LogNorm
-import matplotlib.image as mpimg
+from matplotlib import rcParams
 import operator
-import pylab
 from matplotlib.ticker import FormatStrFormatter
-import os
+import argparse
+
+from nema_common import *
 
 def create_label (template, label_old):
 
@@ -45,31 +44,42 @@ def create_label (template, label_old):
 
 if __name__ == "__main__":
 
+  parser = argparse.ArgumentParser(description='Plot sensitivity and sensitivity profiles.',
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+  parser.add_argument('--blurred',
+                      type=int,
+                      default=0,
+                      help='for plotting blurred sensitivity profiles set to 1')
+
+  parser.add_argument('--outputformat',
+                      type=str,
+                      default="png",
+                      help='output format of images')
+
+  args = parser.parse_args()
+
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 10
-  outputformat = ".png"
-
-  coincidences_directory = "./Results/Sensitivity/"
-
-  workdir = "./Results/Sensitivity/"
-  if (not os.path.isdir(workdir)): os.system("mkdir " + workdir)
-
-  files = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L100_7mm", "D75_2lay_L020_7mm", "D75_2lay_L050_7mm", "D75_2lay_L100_7mm", "D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm", "D95_1lay_L020_7mm", "D95_1lay_L050_7mm", "D95_1lay_L100_7mm", "D95_2lay_L020_7mm", "D95_2lay_L050_7mm", "D95_2lay_L100_7mm"]
 
   data = {}
 
-  for coincidences_file in files:
+  for geometry in geometries_Sensitivity:
 
-    sensitivity = float(loadtxt(coincidences_directory + coincidences_file + "_sensitivity.txt"))
-    sensitivityProfile = loadtxt(coincidences_directory + coincidences_file + "_sensitivity_profile.txt")
+    sensitivity = float(loadtxt(workdir_Sensitivity + geometry + "_sensitivity.txt"))
+    sensitivityProfiles = loadtxt(workdir_Sensitivity + geometry + "_sensitivity_profiles.txt")
+    sensitivityProfile = sensitivityProfiles[:,0]
+    sensitivityProfile_PMT = sensitivityProfiles[:,1]
 
-    data[coincidences_file] = [sensitivity, sensitivityProfile]
+    data[geometry] = [sensitivity, sensitivityProfile, sensitivityProfile_PMT]
 
   N = 0
 
   templates = ["D75", "D85", "D95", "L020", "L050", "L100", "1lay", "2lay"]
 
-  titles = ["D = 75 cm", "D = 85 cm", "D = 95 cm", "L = 20 cm", "L = 50 cm", "L = 100 cm", "1 layer", "2 layers"]
+  titles = ["D = 75 cm", "D = 85 cm", "D = 95 cm",
+            "L = 20 cm", "L = 50 cm", "L = 100 cm",
+            "1 layer", "2 layers"]
 
   for i in range(len(templates)):
 
@@ -129,7 +139,12 @@ if __name__ == "__main__":
         rcParams['font.size'] = 26
         rcParams['legend.fontsize'] = 12
 
-      plt.plot(arguments, d[1][1], label=create_label(t,d[0]), linewidth=lw, linestyle=ls, color=c)
+      label_blurred = ""
+      if not args.blurred:
+        plt.plot(arguments, d[1][1], label=create_label(t,d[0]), linewidth=lw, linestyle=ls, color=c)
+      else:
+        plt.plot(arguments, d[1][2], label=create_label(t,d[0]), linewidth=lw, linestyle=ls, color=c)
+        label_blurred = "_blurred"
 
     if t=="L020":
       plt.gca().get_yaxis().set_major_formatter(FormatStrFormatter('%d'))
@@ -144,7 +159,7 @@ if __name__ == "__main__":
     #plt.legend(loc=1)
     plt.xlim(-35,35)
     plt.ylim(ymin=0)
-    plt.savefig(workdir + "sensitivityProfile_" + t + outputformat)
+    plt.savefig(workdir_Sensitivity + "sensitivityProfile_" + t + label_blurred + "." + args.outputformat)
 
     # create a second figure for the legend
     #figlegend = pylab.figure(figsize = (8,6))
@@ -176,5 +191,5 @@ if __name__ == "__main__":
   rcParams['legend.fontsize'] = 18
   plt.legend(loc=2)
 
-  plt.savefig(workdir + "Sensitivities" + outputformat, bbox_inches='tight')
+  plt.savefig(workdir_Sensitivity + "Sensitivities." + args.outputformat, bbox_inches='tight')
   plt.clf()

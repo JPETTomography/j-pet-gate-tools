@@ -1,4 +1,6 @@
 *.root
+*.pyc
 examples/goja/nbproject/
+examples/python_scripts/python_scripts/
 examples/goja/build/
 examples/python_scripts/Results/

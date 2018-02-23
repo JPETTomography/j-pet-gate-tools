@@ -16,8 +16,8 @@ examples
   Macros for GATE simulations of the J-PET scanner and
   python codes for analysis of the NEMA simulations.
 
-examples/goja
--------------
+goja
+----
 
   Code of the c++ app that reads .root output from GATE software and
   converts hits to set of coincidences saved in plain text files.

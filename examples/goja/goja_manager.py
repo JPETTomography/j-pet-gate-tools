@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import matplotlib.pyplot as plt
-from numpy import *
-from matplotlib import rcParams, rcdefaults, rc
-from matplotlib.colors import LogNorm
-
 import os
-import argparse
-
-import matplotlib.image as mpimg
-
-import re
 import sys
+import argparse
+import re
+from numpy import *
 
 def verify_goja_output(gate_path, goja_path):
     nr_of_missing_files = 0
@@ -30,6 +23,8 @@ def verify_goja_output(gate_path, goja_path):
     return nr_of_missing_files
 
 if __name__ == "__main__":
+
+  help_message = "Type goja_manager.py --help."
 
   parser = argparse.ArgumentParser(description='Analyze, verify and concatenate the GOJA results.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -50,7 +45,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="analyze",
-                      help='analyze, verify or concatenate')
+                      help='analyze, analyze-missing, verify or concatenate')
 
   parser.add_argument('--N0',
                       dest='N0',
@@ -67,33 +62,49 @@ if __name__ == "__main__":
   args = parser.parse_args()
 
   if not os.path.isdir(args.path_gate_output):
-    print "Directory " + args.path_gate_output + " does not exist. Type goja_manager.py --help."
+    print "Directory " + args.path_gate_output + " does not exist. " + help_message
     sys.exit()
 
   if not os.path.isdir(args.path_goja_output):
-    print "Directory " + args.path_goja_output + " does not exist. Type goja_manager.py --help."
+    print "Directory " + args.path_goja_output + " does not exist. " + help_message
     sys.exit()
 
   if args.mode=="analyze":
 
     print "Analysis:"
 
-    nr_of_root_files = 0
+    fnames = os.listdir(args.path_gate_output)
+    fnames = [fname for fname in fnames if ".root" in fname]
+    fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
+
+    for fname in fnames:
+      basepath = args.path_goja_output + fname[:-5]
+      goja_command = "goja --root " + args.path_gate_output + fname \
+                     + " --N0 " + str(args.N0) \
+                     + " --save-real-time-to " + basepath + "_realtime" \
+                     + " > " + basepath + "_coincidences &"
+      print goja_command
+      os.system(goja_command)
+
+  elif args.mode=="analyze-missing":
+
+    print "Analysis of missing files:"
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
     fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
     for fname in fnames:
-      nr_of_root_files += 1
-      basename = fname[:-5]
-      basepath = args.path_goja_output + basename
-      goja_command = "goja --root " + args.path_gate_output + fname \
-                     + " --N0 " + str(args.N0) \
-                     + " --save-real-time-to " + basepath + "_realtime" \
-                     + " > " + basepath + "_coincidences &"
-      print goja_command
-#      os.system(goja_command)
+      path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
+      path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
+      if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime):
+        basepath = args.path_goja_output + fname[:-5]
+        goja_command = "goja --root " + args.path_gate_output + fname \
+                       + " --N0 " + str(args.N0) \
+                       + " --save-real-time-to " + basepath + "_realtime" \
+                       + " > " + basepath + "_coincidences &"
+        print goja_command
+        os.system(goja_command)
 
   elif args.mode=="verify":
 
@@ -139,4 +150,4 @@ if __name__ == "__main__":
 
   else:
 
-    print 'Inproper mode. Type goja_manager.py --help.'
+    print 'Inproper mode. ' + help_message

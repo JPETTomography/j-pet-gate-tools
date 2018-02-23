@@ -44,14 +44,19 @@ geometries_Sensitivity = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L1
                           "D95_1lay_L020_7mm", "D95_1lay_L050_7mm", "D95_1lay_L100_7mm",
                           "D95_2lay_L020_7mm", "D95_2lay_L050_7mm", "D95_2lay_L100_7mm"]
 
+geometries_NECR = ["D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm",
+                   "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm"]
+
 # Workdir directories:
 workdir_Results = "./Results/"
 workdir_Sensitivity = workdir_Results + "Sensitivity/"
+workdir_NECR = workdir_Results + "NECR/"
 
 def prepare_directories():
 
   if (not os.path.isdir(workdir_Results)): os.system("mkdir " + workdir_Results)
   if (not os.path.isdir(workdir_Sensitivity)): os.system("mkdir " + workdir_Sensitivity)
+  if (not os.path.isdir(workdir_NECR)): os.system("mkdir " + workdir_NECR)
 
 #Gaussian distribution. sourcePosZ is the mean, and sigma is the standard deviation.
 # L is the lenght of the scintillators.

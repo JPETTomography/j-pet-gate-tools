@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt2
 from numpy import *
 from matplotlib import rcParams, rcParamsDefault
 from matplotlib.colors import LogNorm
-import matplotlib.image as mpimg
-from scipy import interpolate
 
-workdir = "./Results/NECR/"
+from nema_common import *
+
+outputformat = ""
 
 def plot_rates(geometry,float_activity,N_true,N_dsca,N_psca,N_acci,time):
 
@@ -32,7 +31,7 @@ def plot_rates(geometry,float_activity,N_true,N_dsca,N_psca,N_acci,time):
   plt2.ylim(ymin=0)
   plt2.xlabel("Activity concentration [kBq/cc]")
   plt2.ylabel("Rate [kcps]")
-  plt2.savefig(workdir + geometry + "_rates" + outputformat)
+  plt2.savefig(workdir_Results + geometry + "_rates" + outputformat)
   plt2.clf()
   plt2.close()
 
@@ -59,15 +58,22 @@ def plot_necrs(float_activities, NECRs, colors, labels, necr_type):
   plt.yticks(fontsize=FONTSIZE)
   plt.xlabel("Activity concentration [kBq/cc]", fontsize=FONTSIZE)
   plt.ylabel("NECR [kcps]", fontsize=FONTSIZE)
-  plt.savefig(workdir + "NECR_all_geometries_" + necr_type + outputformat)
+  plt.savefig(workdir_Results + "NECR_all_geometries_" + necr_type + outputformat)
   plt.clf()
   plt.close()
 
 if __name__ == "__main__":
 
-  outputformat = ".png"
+  parser = argparse.ArgumentParser(description='Plot NECR.',
+                                   formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  geometries = ["D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm"]
+  parser.add_argument('-of', '--outputformat',
+                      type=str,
+                      default="png",
+                      help='output format of images')
+
+  args = parser.parse_args()
+  outputformat = args.outputformat
 
   float_activity = []
   NECRs_sin = []
@@ -82,9 +88,9 @@ if __name__ == "__main__":
   colors = []
   labels = []
 
-  for i in range(len(geometries)):
+  for geometry in geometries_NECR:
 
-    tmp = loadtxt(workdir + geometries[i] + "/necr_dependency.txt")
+    tmp = loadtxt(workdir_Results + geometry + "/necr_dependency.txt")
     float_activity = tmp[:,0]
     SF_sin = tmp[:,1]
     SF_crt = tmp[:,2]
@@ -99,22 +105,22 @@ if __name__ == "__main__":
     N_acci = tmp[:,10]
     time = tmp[:,11]
 
-    plot_rates(geometries[i],float_activity,N_true,N_dsca,N_psca,N_acci,time)
+    plot_rates(geometry,float_activity,N_true,N_dsca,N_psca,N_acci,time)
 
     new_label = ""
-    if "1lay" in geometries[i]:
+    if "1lay" in geometry:
         linestyle='-'
         new_label += "1 layer"
     else:
         linestyle = '--'
         new_label += "2 layers"
-    if "L020" in geometries[i]:
+    if "L020" in geometry:
         datacolor = 'r'
         new_label += ", L = 20 cm"
-    elif "L050" in geometries[i]:
+    elif "L050" in geometry:
         datacolor = 'b'
         new_label += ", L = 50 cm"
-    elif "L100" in geometries[i]:
+    elif "L100" in geometry:
         datacolor = 'y'
         new_label += ", L = 100 cm"
 

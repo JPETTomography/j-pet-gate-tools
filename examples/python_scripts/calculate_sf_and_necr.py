@@ -11,6 +11,8 @@ import argparse, os, sys
 import matplotlib.image as mpimg
 from collections import OrderedDict
 
+from nema_common import *
+
 SLICE_WIDTH = 2. # in cm
 BINS_DISPLACEMENTS = 100
 BINS_ANGLES = 90
@@ -427,27 +429,26 @@ if __name__ == "__main__":
 
   directory = args.coincidences_directory
 
-  activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800","0900","1000","1100","1200","1300","1400","1500","1600","1700","1800","1900","2000"]
+  activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800",
+                "0900","1000","1100","1200","1300","1400","1500","1600","1700",
+                "1800","1900","2000"]
 
-  if (not os.path.isdir("./Results")): os.system("mkdir ./Results")
-  if (not os.path.isdir("./Results/NECR")): os.system("mkdir ./Results/NECR")
+  prepare_directories()
 
-  geometries = ["D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm"]
-
-  for geometry in geometries:
+  for geometry in geometries_NECR:
 
     print geometry
 
-    workdir = "./Results/NECR/" + geometry + "/"
-    if (not os.path.isdir(workdir)): os.system("mkdir " + workdir)
-    if (not os.path.isdir(workdir + "rebinned")): os.system("mkdir " + workdir + "rebinned")
+    workdir = workdir_NECR + geometry + "/"
+    if (not os.path.isdir(workdir)):
+      os.system("mkdir " + workdir)
+    if (not os.path.isdir(workdir + "rebinned")):
+      os.system("mkdir " + workdir + "rebinned")
     if (os.path.isfile(workdir + "necr_dependency.txt")):
       os.system("rm " + workdir + "necr_dependency.txt")
 
     for i in range(len(activities)):
 
       activity = activities[i]
-
       filepath = directory + geometry + "_NECR_" + activity
-
       mainfunction(geometry, activity, filepath, workdir)

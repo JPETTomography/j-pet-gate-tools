@@ -47,12 +47,12 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Plot sensitivity and sensitivity profiles.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  parser.add_argument('--blurred',
+  parser.add_argument('-b', '--blurred',
                       type=int,
                       default=0,
                       help='for plotting blurred sensitivity profiles set to 1')
 
-  parser.add_argument('--outputformat',
+  parser.add_argument('-of', '--outputformat',
                       type=str,
                       default="png",
                       help='output format of images')

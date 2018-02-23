@@ -29,7 +29,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Calculate sensitivity and sensitivity profiles using the GOJA results.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  parser.add_argument('--coincidences-directory',
+  parser.add_argument('-cd', '--coincidences-directory',
                       dest='coincidences_directory',
                       type=str,
                       default="/home/pkowalski/Pulpit/PMB_realtime_sensitivity/",

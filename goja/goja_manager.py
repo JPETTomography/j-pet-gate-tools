@@ -29,19 +29,19 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Analyze, verify and concatenate the GOJA results.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  parser.add_argument('--gate-output',
+  parser.add_argument('-gt', '--gate-output',
                       dest='path_gate_output',
                       type=str,
                       default="../output/",
                       help='path to dir with the splitted GATE results')
 
-  parser.add_argument('--goja-output',
+  parser.add_argument('-gj', '--goja-output',
                       dest='path_goja_output',
                       type=str,
                       default="./",
                       help='path to dir with the GOJA results')
 
-  parser.add_argument('--mode',
+  parser.add_argument('-m', '--mode',
                       dest='mode',
                       type=str,
                       default="analyze",
@@ -53,13 +53,13 @@ if __name__ == "__main__":
                       default=1000,
                       help='maximum number of events above the noise energy threshold in the coincidence window  [for mode \'analyze\']')
 
-  parser.add_argument('--simulation-name',
+  parser.add_argument('-sn', '--simulation-name',
                       dest='simulation_name',
                       type=str,
                       default="simulation",
                       help='name of the simulation [for mode \'concatenate\']')
 
-  parser.add_argument('--clean',
+  parser.add_argument('-c', '--clean',
                       action='store_true',
                       help='remove partial files aftre concatenation [for mode \'concatenate\']')
 

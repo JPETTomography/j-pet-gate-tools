@@ -6,6 +6,7 @@ import sys
 import argparse
 import re
 from numpy import *
+import string
 
 def verify_goja_output(gate_path, goja_path):
     nr_of_missing_files = 0
@@ -51,7 +52,13 @@ if __name__ == "__main__":
                       dest='N0',
                       type=int,
                       default=1000,
-                      help='maximum number of events above the noise energy threshold in the coincidence window  [for mode \'analyze\']')
+                      help='maximum number of events above the noise energy threshold in the coincidence window [for mode \'analyze\']')
+
+  parser.add_argument('-r', '--run',
+                      dest='type_of_run',
+                      type=str,
+                      default='locally',
+                      help='run \'locally\' or \'on-cluster\' [for mode \'analyze\']')
 
   parser.add_argument('-sn', '--simulation-name',
                       dest='simulation_name',
@@ -81,14 +88,40 @@ if __name__ == "__main__":
     fnames = [fname for fname in fnames if ".root" in fname]
     fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
-    for fname in fnames:
-      basepath = args.path_goja_output + fname[:-5]
-      goja_command = "goja --root " + args.path_gate_output + fname \
+    if args.type_of_run == 'locally':
+      for fname in fnames:
+        goja_command = "goja --root " + args.path_gate_output + fname \
                      + " --N0 " + str(args.N0) \
-                     + " --save-real-time-to " + basepath + "_realtime" \
-                     + " > " + basepath + "_coincidences &"
-      print goja_command
-      os.system(goja_command)
+                     + " --save-real-time-to " + args.path_goja_output + fname[0:-5] + "_realtime" \
+                     + " > " + args.path_goja_output + fname[0:-5] + "_coincidences &"
+        os.system(goja_command)
+        print goja_command
+
+    elif args.type_of_run == 'on-cluster':
+      basename = fnames[0][0:-5]
+      basepath_goja = (args.path_goja_output + basename).rstrip(string.digits)
+      basepath_gate = (args.path_gate_output + basename).rstrip(string.digits)
+      # generate array.pbs:
+      os.system('echo \'#!/bin/sh\' > array.pbs')
+      os.system('echo \'#PBS -q i3d\' >> array.pbs')
+      os.system('echo \'#PBS -l nodes=1:ppn=1\' >> array.pbs')
+      os.system('echo \'#PBS -N GOJA\' >> array.pbs')
+      os.system('echo \'#PBS -V\' >> array.pbs')
+      os.system('echo \'cd ${PBS_O_WORKDIR}\' >> array.pbs')
+      goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
+                   + " --N0 " + str(args.N0) \
+                   + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
+                   + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
+      os.system('echo \'' + goja_command + '\' >> array.pbs')
+      os.system('echo \'exit 0;\' >> array.pbs')
+      # push into queue:
+      qsub_command = 'qsub -t 1-' + str(len(fnames)) + ' array.pbs'
+      os.system(qsub_command)
+      # remove array.pbs:
+      os.system('rm array.pbs')
+
+    else:
+      print "Inproper type of run. " + help_message
 
   elif args.mode=="analyze-missing":
 
@@ -102,11 +135,11 @@ if __name__ == "__main__":
       path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
       path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
       if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime):
-        basepath = args.path_goja_output + fname[:-5]
+        basepath_goja = args.path_goja_output + fname[:-5]
         goja_command = "goja --root " + args.path_gate_output + fname \
                        + " --N0 " + str(args.N0) \
-                       + " --save-real-time-to " + basepath + "_realtime" \
-                       + " > " + basepath + "_coincidences &"
+                       + " --save-real-time-to " + basepath_goja + "_realtime" \
+                       + " > " + basepath_goja + "_coincidences &"
         print goja_command
         os.system(goja_command)
 
@@ -143,19 +176,19 @@ if __name__ == "__main__":
       for fname in fnames:
 
         basename = fname[0:-13]
-        basepath = args.path_goja_output + basename
+        basepath_goja = args.path_goja_output + basename
 
-        realtime += loadtxt(basepath + "_realtime")
-        os.system("cat " + basepath + "_coincidences >> " + path_coincidences)
+        realtime += loadtxt(basepath_goja + "_realtime")
+        os.system("cat " + basepath_goja + "_coincidences >> " + path_coincidences)
 
       savetxt(path_realtime, [realtime])
 
       if args.clean:
         for fname in fnames:
           basename = fname[0:-13]
-          basepath = args.path_goja_output + basename
-          os.system("rm " + basepath + "_coincidences")
-          os.system("rm " + basepath + "_realtime")
+          basepath_goja = args.path_goja_output + basename
+          os.system("rm " + basepath_goja + "_coincidences")
+          os.system("rm " + basepath_goja + "_realtime")
 
       print "Goja output succesfully concatenated."
 

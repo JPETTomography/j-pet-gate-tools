@@ -52,6 +52,12 @@ if __name__ == "__main__":
                       default="analyze",
                       help='analyze, verify or concatenate')
 
+  parser.add_argument('--N0',
+                      dest='N0',
+                      type=int,
+                      default=1000,
+                      help='maximum number of events above the noise energy threshold in the coincidence window')
+
   parser.add_argument('--simulation-name',
                       dest='simulation_name',
                       type=str,
@@ -83,11 +89,11 @@ if __name__ == "__main__":
       basename = fname[:-5]
       basepath = args.path_goja_output + basename
       goja_command = "goja --root " + args.path_gate_output + fname \
-                     + " --N0 1000" \
+                     + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + basepath + "_realtime" \
                      + " > " + basepath + "_coincidences &"
       print goja_command
-      os.system(goja_command)
+#      os.system(goja_command)
 
   elif args.mode=="verify":
 

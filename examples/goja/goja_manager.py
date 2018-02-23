@@ -51,13 +51,17 @@ if __name__ == "__main__":
                       dest='N0',
                       type=int,
                       default=1000,
-                      help='maximum number of events above the noise energy threshold in the coincidence window')
+                      help='maximum number of events above the noise energy threshold in the coincidence window  [for mode \'analyze\']')
 
   parser.add_argument('--simulation-name',
                       dest='simulation_name',
                       type=str,
                       default="simulation",
-                      help='name of the simulation')
+                      help='name of the simulation [for mode \'concatenate\']')
+
+  parser.add_argument('--clean',
+                      action='store_true',
+                      help='remove partial files aftre concatenation [for mode \'concatenate\']')
 
   args = parser.parse_args()
 
@@ -145,6 +149,13 @@ if __name__ == "__main__":
         os.system("cat " + basepath + "_coincidences >> " + path_coincidences)
 
       savetxt(path_realtime, [realtime])
+
+      if args.clean:
+        for fname in fnames:
+          basename = fname[0:-13]
+          basepath = args.path_goja_output + basename
+          os.system("rm " + basepath + "_coincidences")
+          os.system("rm " + basepath + "_realtime")
 
       print "Goja output succesfully concatenated."
 

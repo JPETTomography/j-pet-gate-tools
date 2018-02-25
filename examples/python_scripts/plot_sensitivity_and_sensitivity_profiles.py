@@ -129,9 +129,9 @@ if __name__ == "__main__":
       if t in ["D75", "D85", "D95"]:
         rcParams['font.size'] = 30
         rcParams['legend.fontsize'] = 18
-        plt.ylim([0,12])
+        plt.ylim([0,25])
         plt.gca().get_yaxis().set_major_formatter(FormatStrFormatter('%d'))
-        plt.gca().get_yaxis().set_ticks([0,5,10])
+        plt.gca().get_yaxis().set_ticks([0,5,10,15,20,25])
       elif t in ["L020", "L050", "L100"]:
         rcParams['font.size'] = 30
         rcParams['legend.fontsize'] = 18

@@ -10,15 +10,18 @@ from nema_common import *
 
 activity = 1000. # in kBq
 
+suffix_coincidences = "_sensitivity_COINCIDENCES_short"
+suffix_realtime = "_sensitivity_REALTIME_short"
+
 def is_coincidences_directory_valid(coincidences_directory):
 
   result = True
   for geometry in geometries_Sensitivity:
-    coincidences_file = coincidences_directory + geometry + "_sensitivity_coincidences";
+    coincidences_file = coincidences_directory + geometry + suffix_coincidences;
     if not os.path.isfile(coincidences_file):
       print("File " + coincidences_file + " is missing.")
       result = False
-    realtime_file = coincidences_directory + geometry + "_sensitivity_realtime";
+    realtime_file = coincidences_directory + geometry + suffix_realtime;
     if not os.path.isfile(realtime_file):
       print("File " + realtime_file + " is missing.")
       result = False
@@ -65,13 +68,13 @@ if __name__ == "__main__":
 
     norm_factor = activity/N # activity per slice
 
-    file_to_load = coincidences_directory + geometry + "_sensitivity_coincidences"
+    file_to_load = coincidences_directory + geometry + suffix_coincidences
     print(file_to_load)
     tmp = loadtxt(file_to_load)
 
     toc = tmp[:,12]
     sourcePosZ = tmp[:,15]
-    time = loadtxt(coincidences_directory + geometry + "_sensitivity_realtime")
+    time = loadtxt(coincidences_directory + geometry + suffix_realtime)
 
     true = 0
     for t in toc:

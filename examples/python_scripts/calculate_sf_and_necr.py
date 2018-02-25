@@ -17,6 +17,9 @@ SLICE_WIDTH = 2. # in cm
 BINS_DISPLACEMENTS = 100
 BINS_ANGLES = 90
 
+suffix_coincidences = "_NECR_COINCIDENCES_short"
+suffix_realtime = "_NECR_REALTIME_short"
+
 class sinogram:
 
   def __init__(self):
@@ -74,8 +77,7 @@ def mainfunction(geometry, activity, filepath, workdir):
   # Loading coincidences from the file
   #===========================================
 
-  coincidences = loadtxt(filepath + "_coincidences")
-  #coincidences = genfromtxt(filepath + "_coincidences")
+  coincidences = loadtxt(filepath + suffix_coincidences)
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
   posZ1 = coincidences[:,2]
@@ -84,8 +86,6 @@ def mainfunction(geometry, activity, filepath, workdir):
   posY2 = coincidences[:,5]
   posZ2 = coincidences[:,6]
   times2 = coincidences[:,7]
-  IDs1 = coincidences[:,8]
-  IDs2 = coincidences[:,9]
   toc = coincidences[:,12]
 
   #===========================================
@@ -93,8 +93,9 @@ def mainfunction(geometry, activity, filepath, workdir):
   #===========================================
 
   time = 0.
-  if os.path.exists(filepath + "_realtime"):
-    time = loadtxt(filepath + "_realtime")
+  realtime_path = filepath + suffix_realtime
+  if os.path.exists(realtime_path):
+    time = loadtxt(realtime_path)
   else:
     time = max(max(times1),max(times2))/1e12
 
@@ -240,49 +241,58 @@ def mainfunction(geometry, activity, filepath, workdir):
     for j in range(len(vec)):
       vecsum[startindex+j] = vecsum[startindex+j]+vec[j]
 
-  vecd = step*linspace(-BINS_DISPLACEMENTS+1, BINS_DISPLACEMENTS-1, 2*BINS_DISPLACEMENTS-1)
+  veci = linspace(-BINS_DISPLACEMENTS+1, BINS_DISPLACEMENTS-1, 2*BINS_DISPLACEMENTS-1)
+  vecd = step*veci
 
-  ind_m20mm = BINS_DISPLACEMENTS - int(2./step)
-  ind_p20mm = BINS_DISPLACEMENTS + int(2./step)
-  val_m20mm = vecsum[ind_m20mm-1]
-  val_p20mm = vecsum[ind_p20mm-1]
+  #===========================================
 
-  thres = (val_m20mm+val_p20mm)/2.
+  ind_m20mm = BINS_DISPLACEMENTS - int(2./step) - 1
+  ind_p20mm = BINS_DISPLACEMENTS + int(2./step) - 1
+  val_m20mm = vecsum[ind_m20mm]
+  val_p20mm = vecsum[ind_p20mm]
+
+  # y = a*x + b
+  a = float(val_m20mm-val_p20mm)/float(ind_m20mm-ind_p20mm)
+  b = val_m20mm - (float(val_m20mm-val_p20mm))/(float(ind_m20mm-ind_p20mm))*float(ind_m20mm)
+  thres = a*(veci+BINS_DISPLACEMENTS-1)+b
+
+  # T - above the threshold line (treated as true)
+  # S - below the threshold line (treated as scattered but includes also the accidental coincidences)
+
+  T = 0 # true
+  S = 0 # scattered (and accidental)
+  for i in range(len(vecsum)):
+    if vecd[i]<-2 or vecd[i]>2:
+      S = S + vecsum[i]
+    else:
+      if vecsum[i]<thres[i]:
+        S = S + vecsum[i]
+      else:
+        S = S + thres[i]
+        T = T + vecsum[i] - thres[i]
+
+  T = T/(S+T)*N_all
+  S = S/(S+T)*N_all
+
+  #===========================================
 
   plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
-  plt.plot(vecd,vecsum/1000)
-  plt.plot([-L,L],[thres/1000,thres/1000],color='r')
-  plt.plot([-2,-2],[0,2*thres/1000],color='k')
-  plt.plot([2,2],[0,2*thres/1000],color='k')
+  plt.plot(vecd,vecsum/1000.)
+  plt.plot([vecd[ind_m20mm],vecd[ind_p20mm]],[thres[ind_m20mm]/1000.,thres[ind_p20mm]/1000.],color='r')
+  plt.plot([-2,-2],[0,2*thres[ind_m20mm]/1000.],color='k')
+  plt.plot([2,2],[0,2*thres[ind_p20mm]/1000.],color='k')
+
   plt.xlabel("Displacement [cm]")
   plt.ylabel("Kilo counts")
 
   plt.xlim(-12,12) # from NEMA cut
-  plt.ylim(0,1.1*max(vecsum/1000))
+  plt.ylim(0,1.1*max(vecsum/1000.))
 
   plt.savefig(workdir + "sumhist_"+activity+".png")
   plt.clf()
   plt.close()
 
   #===========================================
-
-  # T - above the threshold line (treated as true)
-  # S - below the threshold line (treated as scattered but includes also the accidental coincidences)
-
-  T = 0 # true
-  S = 0 # true (and accidental)
-  for i in range(len(vecsum)):
-    if vecsum[i]<thres and (vecd[i]<-2 or vecd[i]>2):
-      S = S + vecsum[i]
-    else:
-      S = S + thres
-      T = T + vecsum[i] - thres
-
-  newT = T/(S+T)*N_all
-  newS = S/(S+T)*N_all
-
-  T = newT
-  S = newS
 
   float_activity = float(activity)/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
 
@@ -331,7 +341,6 @@ def mainfunction(geometry, activity, filepath, workdir):
     except:
       pass
     ang_diffs.append(adiff)
-    #print tdiff, adiff
 
   #===========================================
 
@@ -340,25 +349,14 @@ def mainfunction(geometry, activity, filepath, workdir):
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(BINS_DISPLACEMENTS,BINS_ANGLES), range=[[0, 3],[0, 180]])
 
   fig = plt.figure(figsize=(8, 6))
-  ax = fig.add_subplot(111)
-  #plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
-  ##plt.xlabel(r'$z_S$')
-  ##  plt.xticks([0, 30, 60, 90, 120, 150, 180], ["0", "30", "60", "90", "120", "150", "180"])
-  ##plt.ylabel(r'$x_S$')
-  ##  plt.yticks([0, 30, 60, 90, 120, 150, 180], ["0", "30", "60", "90", "120", "150", "180"])
-  ##  plt.text(100, 10, r'$E_{th}='+ene.split('_')[0] + '$' + '\n' + r'$\theta_{12} < \theta_{23} < \theta_{31}$')
-  ##  VMAX_2g = 10**ceil(log10(H_12_23.max()))
-  ##  if (VMAX_2g==1): VMAX_2g=10
-  ##  VMAX_3g = 10**ceil(log10(H_12_23_3g.max()))
-  ##  if (VMAX_3g==1): VMAX_3g=10
-  ##plt.title("Map of efficiency\nlongitudinal (y=0)")
+  fig.add_subplot(111)
+  plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
+
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='nearest', origin='low',
+             extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]],
+             aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
-  ##  plt.imshow(H_12_23_3g.T, interpolation='nearest', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX_3g), cmap='summer_r', alpha=0.5)
-  ##  plt.colorbar()
-  #plt.savefig("./2_histogram_2D.png")
-  ##plt.savefig("./"+name+"_longitudinal.pdf")
 
   param = 2.2
   xxx = linspace(0,param,100)
@@ -392,7 +390,7 @@ if __name__ == "__main__":
   parser.add_argument('--coincidences-directory',
                       dest='coincidences_directory',
                       type=str,
-                      default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/PMB_realtime/",
+                      default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/N0_1000_short/",
                       help='path to dir with the GOJA sensitivity results')
 
   parser.add_argument('--slice-width',
@@ -442,13 +440,11 @@ if __name__ == "__main__":
     workdir = workdir_NECR + geometry + "/"
     if (not os.path.isdir(workdir)):
       os.system("mkdir " + workdir)
-    if (not os.path.isdir(workdir + "rebinned")):
-      os.system("mkdir " + workdir + "rebinned")
     if (os.path.isfile(workdir + "necr_dependency.txt")):
       os.system("rm " + workdir + "necr_dependency.txt")
 
     for i in range(len(activities)):
 
       activity = activities[i]
-      filepath = directory + geometry + "_NECR_" + activity
+      filepath = directory + geometry + "_" + activity
       mainfunction(geometry, activity, filepath, workdir)

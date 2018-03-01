@@ -1,0 +1,38 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\ql\qnatural\pardirnatural
+
+\f0\fs24 \cf0 README FILE\
+Specification of the NEMA NU 4-2008 small animal phantoms in GATE\
+\
+Description: This dataset contains the GATE macro files for the phantom geometries and source distributions of the small animal PET imaging protocols of the NEMA NU 4-2008 standard. These files can be used to test the accuracy of GATE simulations of small animal PET scanners.\
+\
+Size: 61 kilobytes\
+\
+Platform: Linux and Mac platforms.\
+\
+Environment: Tested on GATE 6.1 on Mac OS 10.6.8.\
+\
+Major Component Description: Phantom and source macro files for the phantoms specified in the NEMA NU 4-2008 protocol: image quality, point source, mouse scatter, rat scatter, and monkey scatter.\
+\
+Detailed Set-up Instructions:\
+\
+1) Copy the macro and source files into the directory containing the main emission simulation macro.\
+\
+2) Update the material definitions file to include Nylon and Rubber as specified in the article (PMMA is already included in the default GATE material definitions file as 'plexiglass').\
+\
+Detailed Run Instructions:\
+\
+1) Include the phantom of interest in the main macro by using the following command:\
+\
+/control/execute phantom_name.mac\
+\
+2) Include the source corresponding to the phantom in the main macro by using the following command which appears after '/gate/run/initialize':\
+\
+/control/execute source_name.mac\
+\
+Output Description: The output will contain coincidence data for annihilation  photons originating from within the phantom The form will depend on the format selected in the main emission simulation GATE macro.\
+\
+Contact Information: Please contact Geron Bindseil with questions: gbindsei@uwo.ca (alliteratively: geron9@gmail.com).}

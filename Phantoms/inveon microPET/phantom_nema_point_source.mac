@@ -1,0 +1,15 @@
+# NEMA Specification NU 4-2008: Point Source
+# Created by Geron Bindseil, Western University, 2012.
+
+/gate/world/daughters/name NEMA
+/gate/world/daughters/insert box
+/gate/NEMA/setMaterial Plexiglass
+/gate/NEMA/geometry/setXLength   10. mm
+/gate/NEMA/geometry/setYLength   10. mm
+/gate/NEMA/geometry/setZLength   10. mm
+/gate/NEMA/placement/setTranslation 0. 0. 0. mm
+/gate/NEMA/vis/forceSolid
+/gate/NEMA/vis/setColor white
+
+/gate/NEMA/attachPhantomSD
+

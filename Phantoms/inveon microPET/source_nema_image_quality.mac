@@ -1,0 +1,56 @@
+#################
+#               #
+#  S O U R C E  #
+#               #
+#################
+
+# NEMA Specification NU 4-2008: Image Quality Phantom
+
+# This is the source associated with the NEMA image quality phantom for
+# small animal imaging. Seven regions describe the location of activity:
+#
+# - The large upper chamber is filled with F18 solution.
+# - The 5 line sources in the solid part.
+# - The disk-shaped cap on the bottom of the phantom.
+# 
+# These sources can be added, by creating large source volume encompassing
+# all these smaller regions and then using the Forbid command to remove
+# cold regions or regions composed of Plexiglass.
+
+# Set the activity
+/gate/source/addSource F18Main
+/gate/source/F18Main/setActivity 3700000. becquerel #Properly is 3700000 in units Bq
+/gate/source/F18Main/gps/particle e+
+/gate/source/F18Main/setForcedUnstableFlag true
+/gate/source/F18Main/setForcedHalfLife 6586.2 s
+/gate/source/F18Main/gps/energytype Fluor18
+
+# Set the geometry large main volume
+/gate/source/F18Main/gps/type Volume
+/gate/source/F18Main/gps/shape Cylinder
+/gate/source/F18Main/gps/radius 15. mm
+/gate/source/F18Main/gps/halfz 26.5 mm
+/gate/source/F18Main/gps/angtype iso
+/gate/source/F18Main/gps/centre 0. 0. 3.5 mm
+
+# Now make sure there's no activity in the cold areas
+/gate/source/F18Main/gps/Forbid top_cover_chamber_1
+/gate/source/F18Main/gps/Forbid top_cover_chamber_1_contents
+/gate/source/F18Main/gps/Forbid top_cover_chamber_2
+/gate/source/F18Main/gps/Forbid top_cover_chamber_2_contents
+/gate/source/F18Main/gps/Forbid body_solid
+/gate/source/F18Main/gps/Forbid wide_o_ring
+/gate/source/F18Main/gps/Forbid small_shaft_1
+/gate/source/F18Main/gps/Forbid small_shaft_2
+/gate/source/F18Main/gps/Forbid small_shaft_3
+/gate/source/F18Main/gps/Forbid small_shaft_4
+/gate/source/F18Main/gps/Forbid small_shaft_5
+/gate/source/F18Main/gps/Forbid small_shaft_6
+/gate/source/F18Main/gps/Forbid hole_shaft_1
+/gate/source/F18Main/gps/Forbid hole_shaft_2
+/gate/source/F18Main/gps/Forbid hole_shaft_3
+/gate/source/F18Main/gps/Forbid hole_shaft_4
+/gate/source/F18Main/gps/Forbid hole_shaft_5
+/gate/source/F18Main/gps/Forbid hole_shaft_6
+
+/gate/source/list

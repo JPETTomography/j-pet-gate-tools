@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
   parser.add_argument('-c', '--clean',
                       action='store_true',
-                      help='remove partial files aftre concatenation [for mode \'concatenate\']')
+                      help='remove partial files after concatenation [for mode \'concatenate\']')
 
   args = parser.parse_args()
 
@@ -102,23 +102,24 @@ if __name__ == "__main__":
       basepath_goja = (args.path_goja_output + basename).rstrip(string.digits)
       basepath_gate = (args.path_gate_output + basename).rstrip(string.digits)
       # generate array.pbs:
-      os.system('echo \'#!/bin/sh\' > array.pbs')
-      os.system('echo \'#PBS -q i3d\' >> array.pbs')
-      os.system('echo \'#PBS -l nodes=1:ppn=1\' >> array.pbs')
-      os.system('echo \'#PBS -N GOJA\' >> array.pbs')
-      os.system('echo \'#PBS -V\' >> array.pbs')
-      os.system('echo \'cd ${PBS_O_WORKDIR}\' >> array.pbs')
-      goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
-                   + " --N0 " + str(args.N0) \
-                   + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
-                   + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
-      os.system('echo \'' + goja_command + '\' >> array.pbs')
-      os.system('echo \'exit 0;\' >> array.pbs')
+      with open('array.pbs', 'a') as array_pbs:
+        array_pbs.write('#!/bin/sh\n')
+        array_pbs.write('#PBS -q i3d\n')
+        array_pbs.write('#PBS -l nodes=1:ppn=1\n')
+        array_pbs.write('#PBS -N GOJA\n')
+        array_pbs.write('#PBS -V\n')
+        array_pbs.write('cd ${PBS_O_WORKDIR}\n')
+        goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
+                     + " --N0 " + str(args.N0) \
+                     + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
+                     + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
+        array_pbs.write(goja_command + '\n')
+        array_pbs.write('exit 0;\n')
       # push into queue:
       qsub_command = 'qsub -t 1-' + str(len(fnames)) + ' array.pbs'
       os.system(qsub_command)
       # remove array.pbs:
-      os.system('rm array.pbs')
+      os.unlink('array.pbs')
 
     else:
       print "Inproper type of run. " + help_message
@@ -162,10 +163,10 @@ if __name__ == "__main__":
     else:
       path_coincidences = args.path_goja_output + args.simulation_name + "_COINCIDENCES"
       if os.path.isfile(path_coincidences):
-        os.system('rm ' + path_coincidences)
+        os.unlink(path_coincidences)
       path_realtime = args.path_goja_output + args.simulation_name + "_REALTIME"
       if os.path.isfile(path_realtime):
-        os.system('rm ' + path_realtime)
+        os.unlink(path_realtime)
 
       realtime = 0.
 
@@ -187,8 +188,8 @@ if __name__ == "__main__":
         for fname in fnames:
           basename = fname[0:-13]
           basepath_goja = args.path_goja_output + basename
-          os.system("rm " + basepath_goja + "_coincidences")
-          os.system("rm " + basepath_goja + "_realtime")
+          os.unlink(basepath_goja + "_coincidences")
+          os.unlink(basepath_goja + "_realtime")
 
       print "Goja output succesfully concatenated."
 

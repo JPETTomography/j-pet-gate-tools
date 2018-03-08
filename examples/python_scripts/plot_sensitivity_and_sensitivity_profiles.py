@@ -151,7 +151,7 @@ if __name__ == "__main__":
       plt.gca().get_yaxis().set_ticks([0,1])
     elif t=="L100":
       plt.gca().get_yaxis().set_major_formatter(FormatStrFormatter('%d'))
-      plt.gca().get_yaxis().set_ticks([0,5,10])
+      plt.gca().get_yaxis().set_ticks([0,5,10,15,20])
 
     plt.title(titles[i] + ", 7 mm")
     plt.xlabel("Position along z axis [cm]")
@@ -170,8 +170,7 @@ if __name__ == "__main__":
 
     plt.clf()
 
-  plt.xlabel("Length of scintillator [cm]")
-  plt.ylabel("Sensitivity [cps/kBq]")
+  # Plot sensitivities:
 
   L = [20,50,100]
   D75_1lay = [data["D75_1lay_L020_7mm"][0], data["D75_1lay_L050_7mm"][0], data["D75_1lay_L100_7mm"][0]]
@@ -181,15 +180,33 @@ if __name__ == "__main__":
   D85_2lay = [data["D85_2lay_L020_7mm"][0], data["D85_2lay_L050_7mm"][0], data["D85_2lay_L100_7mm"][0]]
   D95_2lay = [data["D95_2lay_L020_7mm"][0], data["D95_2lay_L050_7mm"][0], data["D95_2lay_L100_7mm"][0]]
 
+  plt.subplots_adjust(left=0.19, right=0.99, top=0.97, bottom=0.17)
   plt.plot(L, D75_1lay, '*', color='r', label="D=75cm, 1 layer")
   plt.plot(L, D85_1lay, 'o', color='r', label="D=85cm, 1 layer")
   plt.plot(L, D95_1lay, '+', color='r', label="D=95cm, 1 layer")
   plt.plot(L, D75_2lay, '*', color='k', label="D=75cm, 2 layers")
   plt.plot(L, D85_2lay, 'o', color='k', label="D=85cm, 2 layers")
   plt.plot(L, D95_2lay, '+', color='k', label="D=95cm, 2 layers")
-  rcParams['font.size'] = 24
+  plt.xlabel("Length of scintillator [cm]")
+  plt.ylabel("Sensitivity [cps/kBq]")
   rcParams['legend.fontsize'] = 18
   plt.legend(loc=2)
+  plt.savefig(workdir_Sensitivity + "Sensitivities." + args.outputformat)
+  plt.clf()
 
-  plt.savefig(workdir_Sensitivity + "Sensitivities." + args.outputformat, bbox_inches='tight')
+  # Plot sensitivities ratios (between 1- and 2-layer geometries):
+
+  D75_ratio = array(D75_2lay)/array(D75_1lay)
+  D85_ratio = array(D85_2lay)/array(D85_1lay)
+  D95_ratio = array(D95_2lay)/array(D95_1lay)
+
+  plt.subplots_adjust(left=0.19, right=0.99, top=0.97, bottom=0.17)
+  plt.plot(L, D75_ratio, '*', color='r', label = "D=75cm")
+  plt.plot(L, D85_ratio, 'o', color='r', label = "D=85cm")
+  plt.plot(L, D95_ratio, '+', color='r', label = "D=95cm")
+  plt.xlabel("Length of scintillator [cm]")
+  plt.ylabel("Ratio")
+  rcParams['legend.fontsize'] = 18
+  plt.legend(loc=1)
+  plt.savefig(workdir_Sensitivity + "Sensitivities_ratios." + args.outputformat)
   plt.clf()

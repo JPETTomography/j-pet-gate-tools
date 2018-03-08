@@ -210,3 +210,9 @@ if __name__ == "__main__":
   plt.legend(loc=1)
   plt.savefig(workdir_Sensitivity + "Sensitivities_ratios." + args.outputformat)
   plt.clf()
+
+  # Print mean and max values:
+
+  print "GEOMETRY         \tMEAN\tMAX"
+  for geometry in geometries_Sensitivity:
+    print "%s\t%.2f\t%.2f" % (geometry, mean(data[geometry][1]), max(data[geometry][1]))

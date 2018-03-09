@@ -162,11 +162,15 @@ if __name__ == "__main__":
 
     else:
       path_coincidences = args.path_goja_output + args.simulation_name + "_COINCIDENCES"
-      if os.path.isfile(path_coincidences):
+      try:
         os.unlink(path_coincidences)
+      except:
+        pass
       path_realtime = args.path_goja_output + args.simulation_name + "_REALTIME"
-      if os.path.isfile(path_realtime):
+      try:
         os.unlink(path_realtime)
+      except:
+        pass
 
       realtime = 0.
 
@@ -174,13 +178,16 @@ if __name__ == "__main__":
       fnames = [fname for fname in fnames if "_coincidences" in fname]
       fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
-      for fname in fnames:
+      with open(path_coincidences, 'w') as outfile:
+        for fname in fnames:
+          basename = fname[0:-13]
+          basepath_goja = args.path_goja_output + basename
 
-        basename = fname[0:-13]
-        basepath_goja = args.path_goja_output + basename
+          realtime += loadtxt(basepath_goja + "_realtime")
 
-        realtime += loadtxt(basepath_goja + "_realtime")
-        os.system("cat " + basepath_goja + "_coincidences >> " + path_coincidences)
+          with open(basepath_goja + "_coincidences") as infile:
+            for line in infile:
+              outfile.write(line)
 
       savetxt(path_realtime, [realtime])
 

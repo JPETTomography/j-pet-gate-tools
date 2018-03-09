@@ -3,13 +3,12 @@
 
 import matplotlib.pyplot as plt
 from numpy import *
-from matplotlib import rcParams, rcdefaults, rc
+from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from math import *
-import argparse, os, sys
-
-import matplotlib.image as mpimg
-from collections import OrderedDict
+import argparse
+import os
+import sys
 
 from nema_common import *
 
@@ -29,20 +28,60 @@ class sinogram:
     self.dedges = []
     self.aedges = []
 
-#===========================================
-
-# TODO: correct the way pf calculating the index at the edge
-
+## The function discretizes the position of the hit along the strip.
+#
+#  @param    z   position of the hit along the strip [cm]
+#  @param    L   legnth of the strip [cm]
+#
+#  @return   i   index of the virtual slice (along the strip)
 def z2i (z, L):
 
   N = int(L/2.)
   SINOGRAM_WIDTH = L/N # in cm
 
   i = int(floor((z+L/2.)/SINOGRAM_WIDTH))
-  if i==N: i=N-1
+  if i==N:
+    i=N-1 # TODO: correct the way pf calculating the index at the edge
   return i
 
-def mainfunction(geometry, activity, filepath, workdir):
+## The function performs rebinning using the SSRB algorithm.
+#
+#  @param    sinograms   dictionary of all oblique sinograms
+#  @param    N           number of virtual slices
+#  @param    H_shape     shape of the hisotgrammed sinogram
+#
+#  @return   val         dictionary of all rebinned sinograms
+def perform_rebinning(sinograms, N, H_shape):
+
+  sinograms_rebinned = dict()
+
+  indices = linspace(0,2*N-2,2*N-1)/2. # indices of the rebinned sinogram, they may be partial: 0, 0.5, 1, ...
+
+  for i in indices:
+
+    s = sinogram()
+    Di = min(i, indices[-1]-i)
+    H_sum = zeros(H_shape)
+
+    for k in range(int(Di)+1):
+
+      current_slice = int(indices[int(i)]*2.)
+
+      couple = []
+      if Di == int(Di):
+        couple = sort([current_slice-k, current_slice+k])
+      else:
+        couple = sort([current_slice-k, current_slice+k+1])
+
+      if ((couple[0],couple[1]) in sinograms.keys()): # checking if oblique sinogram exists in the set of all sinograms
+        H_sum = H_sum + sinograms[(couple[0],couple[1])].H
+
+    s.H = H_sum
+    sinograms_rebinned[i] = s
+
+  return sinograms_rebinned
+
+def perform_analysis(activity, filepath, workdir):
 
   #===========================================
   # Matplotlib plotting parameters
@@ -103,7 +142,7 @@ def mainfunction(geometry, activity, filepath, workdir):
   # Creating and filling the dictionary of sinograms
   #===========================================
 
-  sinograms = dict() # dictionary of sinograms is created
+  sinograms = dict()
 
   # Counters initialization
   N_true = 0
@@ -135,7 +174,8 @@ def mainfunction(geometry, activity, filepath, workdir):
 
     cond1 = displacement != 0. or angle != 0.
     cond2 = (not isnan(displacement)) and (not isnan(angle))
-    if cond1 and cond2 and displacement<12: # cut from the NEMA norm
+
+    if cond1 and cond2 and displacement<NEMA_DISPLACEMENT_CUT:
 
       # Counters incrementation
       if toc[i]==1: N_true = N_true + 1
@@ -178,31 +218,7 @@ def mainfunction(geometry, activity, filepath, workdir):
   # Rebinning (SSRB)
   #===========================================
 
-  sinograms_rebinned = dict()
-
-  indices = linspace(0,2*N-2,2*N-1)/2. # indices of the rebinned sinogram, they may be partial: 0, 0.5, 1, ...
-
-  for i in indices:
-
-    s = sinogram()
-    Di = min(i, indices[-1]-i)
-    H_sum = zeros(H.shape)
-
-    for k in range(int(Di)+1):
-
-      current_slice = int(indices[int(i)]*2.)
-
-      couple = []
-      if Di == int(Di):
-        couple = sort([current_slice-k, current_slice+k])
-      else:
-        couple = sort([current_slice-k, current_slice+k+1])
-
-      if ((couple[0],couple[1]) in sinograms.keys()): # checking if oblique sinogram exists in the set of all sinograms
-        H_sum = H_sum + sinograms[(couple[0],couple[1])].H
-
-    s.H = H_sum
-    sinograms_rebinned[i] = s
+  sinograms_rebinned = perform_rebinning(sinograms, N, H.shape)
 
   #===========================================
   # Summing rebinned sinograms
@@ -374,7 +390,7 @@ def mainfunction(geometry, activity, filepath, workdir):
 
 def is_coincidences_directory_valid(coincidences_directory):
   #TODO
-  return 1
+  return True
 
 if __name__ == "__main__":
 
@@ -431,7 +447,7 @@ if __name__ == "__main__":
                 "0900","1000","1100","1200","1300","1400","1500","1600","1700",
                 "1800","1900","2000"]
 
-  prepare_directories()
+  create_work_directories()
 
   for geometry in geometries_NECR:
 
@@ -447,4 +463,4 @@ if __name__ == "__main__":
 
       activity = activities[i]
       filepath = directory + geometry + "_" + activity
-      mainfunction(geometry, activity, filepath, workdir)
+      perform_analysis(activity, filepath, workdir)

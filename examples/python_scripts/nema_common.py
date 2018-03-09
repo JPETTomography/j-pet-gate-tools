@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os,  random
-from numpy  import sqrt
+import os
+import random
+from numpy import sqrt
 
 # Physical constants:
+
 c_scin = 12.6 # [cm/s]
+
+# Technical constants:
+
+## NEMA_SF_NECR_CUT
+#
+#  Cut from the NEMA norm: when sinograms are analyzed, all LORs with
+#  displacement larger than this threshold may be removed from the dataset.
+NEMA_DISPLACEMENT_CUT = 12 # [cm]
 
 class strip:
 
@@ -37,7 +47,7 @@ strips = {
   100: strip100,
 }
 
-geometries_Sensitivity = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L100_7mm",
+geometries_sensitivity = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L100_7mm",
                           "D75_2lay_L020_7mm", "D75_2lay_L050_7mm", "D75_2lay_L100_7mm",
                           "D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm",
                           "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm",
@@ -52,7 +62,7 @@ workdir_Results = "./Results/"
 workdir_Sensitivity = workdir_Results + "Sensitivity/"
 workdir_NECR = workdir_Results + "NECR/"
 
-def prepare_directories():
+def create_work_directories():
 
   if (not os.path.isdir(workdir_Results)): os.system("mkdir " + workdir_Results)
   if (not os.path.isdir(workdir_Sensitivity)): os.system("mkdir " + workdir_Sensitivity)

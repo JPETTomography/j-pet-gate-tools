@@ -13,19 +13,29 @@ activity = 1000. # in kBq
 suffix_coincidences = "_sensitivity_COINCIDENCES_short"
 suffix_realtime = "_sensitivity_REALTIME_short"
 
+## The function checks validity of the coincidences directory.
+#
+#  The function checks if for each geometry (from geometry_sensitivities vector),
+#  there are 2 files in the coincidences directory: *coincidences file with the
+#  set of list mode data in the GOJA format and *realtime file with single double
+#  value with real time of simulations. For more details see: goja --help.
+#
+#  @param  coincidences_directory  directory with files *coincidences and
+#                                  *realtime for each geometry (generated with
+#                                  goja_manager.py)
+#  @return validity                bool value
 def is_coincidences_directory_valid(coincidences_directory):
 
-  result = True
-  for geometry in geometries_Sensitivity:
+  for geometry in geometries_sensitivity:
     coincidences_file = coincidences_directory + geometry + suffix_coincidences;
     if not os.path.isfile(coincidences_file):
       print("File " + coincidences_file + " is missing.")
-      result = False
+      return False
     realtime_file = coincidences_directory + geometry + suffix_realtime;
     if not os.path.isfile(realtime_file):
       print("File " + realtime_file + " is missing.")
-      result = False
-  return result
+      return False
+  return True
 
 if __name__ == "__main__":
 
@@ -52,7 +62,7 @@ if __name__ == "__main__":
 
   coincidences_directory = args.coincidences_directory
 
-  for geometry in geometries_Sensitivity:
+  for geometry in geometries_sensitivity:
 
     N = 0
     L = 0
@@ -72,21 +82,21 @@ if __name__ == "__main__":
     print(file_to_load)
     tmp = loadtxt(file_to_load)
 
-    toc = tmp[:,12]
+    type_of_coincidence = tmp[:,12]
     sourcePosZ = tmp[:,15]
     time = loadtxt(coincidences_directory + geometry + suffix_realtime)
 
-    true = 0
-    for t in toc:
-      if t==1: true+=1
+    true_coincidences = 0
+    for t in type_of_coincidence:
+      if t==1: true_coincidences+=1
 
-    sensitivity = true/time/activity
+    sensitivity = true_coincidences/time/activity
 
     sourcePosZ_true = []
     sourcePosZ_true_PMT = []
 
     for i in range(len(sourcePosZ)):
-      if toc[i]==1:
+      if type_of_coincidence[i]==1:
         sourcePosZ_true.append(sourcePosZ[i])
         posPMT = blur_sourcePosZ(sourcePosZ[i], strips[L].sigmaPMT, L)
         sourcePosZ_true_PMT.append(posPMT)
@@ -99,7 +109,7 @@ if __name__ == "__main__":
     sensitivity_profile = hist[0]/norm_factor/time
     sensitivity_profile_PMT = hist_PMT[0]/norm_factor/time
 
-    prepare_directories()
+    create_work_directories()
 
     savetxt(workdir_Sensitivity + geometry + "_sensitivity.txt", [sensitivity])
     savetxt(workdir_Sensitivity + geometry + "_sensitivity_profiles.txt",

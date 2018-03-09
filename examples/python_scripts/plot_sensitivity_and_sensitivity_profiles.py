@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
   data = {}
 
-  for geometry in geometries_Sensitivity:
+  for geometry in geometries_sensitivity:
 
     sensitivity = float(loadtxt(workdir_Sensitivity + geometry + "_sensitivity.txt"))
     sensitivityProfiles = loadtxt(workdir_Sensitivity + geometry + "_sensitivity_profiles.txt")
@@ -214,5 +214,5 @@ if __name__ == "__main__":
   # Print mean and max values:
 
   print "GEOMETRY         \tMEAN\tMAX"
-  for geometry in geometries_Sensitivity:
+  for geometry in geometries_sensitivity:
     print "%s\t%.2f\t%.2f" % (geometry, mean(data[geometry][1]), max(data[geometry][1]))

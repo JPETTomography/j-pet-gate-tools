@@ -3,6 +3,7 @@
 
 import os
 import sys
+import errno
 import argparse
 import re
 from numpy import *
@@ -164,13 +165,19 @@ if __name__ == "__main__":
       path_coincidences = args.path_goja_output + args.simulation_name + "_COINCIDENCES"
       try:
         os.unlink(path_coincidences)
-      except:
-        pass
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
       path_realtime = args.path_goja_output + args.simulation_name + "_REALTIME"
       try:
         os.unlink(path_realtime)
-      except:
-        pass
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
 
       realtime = 0.
 

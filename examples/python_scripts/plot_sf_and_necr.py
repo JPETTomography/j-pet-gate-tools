@@ -44,7 +44,7 @@ def plot_necrs(float_activities, NECRs, colors, labels, necr_type, lstyles):
     plt.plot(float_activities[i], NECRs[i], lstyles[i], color=colors[i], label=labels[i], markersize=4)
 
   rcParams.update(rcParamsDefault)
-  rcParams['legend.fontsize'] = 8
+  rcParams['legend.fontsize'] = 11
   rcParams['font.size'] = 20
 
   FONTSIZE = 20

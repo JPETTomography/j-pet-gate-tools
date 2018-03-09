@@ -63,7 +63,7 @@ def perform_rebinning(sinograms, N, H_shape):
     Di = min(i, indices[-1]-i)
     H_sum = zeros(H_shape)
 
-    for k in range(int(Di)+1):
+    for k in xrange(int(Di)+1):
 
       current_slice = int(indices[int(i)]*2.)
 
@@ -151,7 +151,7 @@ def perform_analysis(activity, filepath, workdir):
   N_acci = 0
   N_all = 0
 
-  for i in range(len(coincidences)):
+  for i in xrange(len(coincidences)):
 
     # Displacement - distance between LOR and (0,0,0) in XY crossection
     displacement = 0.
@@ -247,14 +247,14 @@ def perform_analysis(activity, filepath, workdir):
   step = dedges[1]-dedges[0]
   vecsum = zeros(2*BINS_DISPLACEMENTS-1)
 
-  for i in range(BINS_ANGLES):
+  for i in xrange(BINS_ANGLES):
     vec = H_final[:,i].T
     vec = list(vec)
     maxind = vec.index(max(vec))
 
     startindex = BINS_DISPLACEMENTS-maxind-1
 
-    for j in range(len(vec)):
+    for j in xrange(len(vec)):
       vecsum[startindex+j] = vecsum[startindex+j]+vec[j]
 
   veci = linspace(-BINS_DISPLACEMENTS+1, BINS_DISPLACEMENTS-1, 2*BINS_DISPLACEMENTS-1)
@@ -277,7 +277,7 @@ def perform_analysis(activity, filepath, workdir):
 
   T = 0 # true
   S = 0 # scattered (and accidental)
-  for i in range(len(vecsum)):
+  for i in xrange(len(vecsum)):
     if vecd[i]<-2 or vecd[i]>2:
       S = S + vecsum[i]
     else:
@@ -339,7 +339,7 @@ def perform_analysis(activity, filepath, workdir):
   tim_diffs = []
   ang_diffs = []
 
-  for i in range(len(coincidences)):
+  for i in xrange(len(coincidences)):
     tdiff = abs(times1[i]-times2[i])/1e3 # in ns TODO abs ??????????????
     tim_diffs.append(tdiff)
     #v=[vx,vy] = posX1, posY1
@@ -378,7 +378,7 @@ def perform_analysis(activity, filepath, workdir):
   xxx = linspace(0,param,100)
   yyy = []
   # Ellipse curve
-  for i in range(len(xxx)):
+  for i in xrange(len(xxx)):
     yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(param*param)))
   plt.plot(xxx,yyy,color='red')
   plt.xlabel("Time difference [ns]")
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     if (os.path.isfile(workdir + "necr_dependency.txt")):
       os.system("rm " + workdir + "necr_dependency.txt")
 
-    for i in range(len(activities)):
+    for i in xrange(len(activities)):
 
       activity = activities[i]
       filepath = directory + geometry + "_" + activity

@@ -40,7 +40,7 @@ def plot_necrs(float_activities, NECRs, colors, labels, necr_type, lstyles):
 
   fig, axs = plt.subplots(nrows=1, ncols=1, sharex=True)
 
-  for i in range(len(NECRs)):
+  for i in xrange(len(NECRs)):
     plt.plot(float_activities[i], NECRs[i], lstyles[i], color=colors[i], label=labels[i], markersize=4)
 
   rcParams.update(rcParamsDefault)

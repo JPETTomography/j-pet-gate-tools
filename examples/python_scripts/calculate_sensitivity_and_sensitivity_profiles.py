@@ -95,7 +95,7 @@ if __name__ == "__main__":
     sourcePosZ_true = []
     sourcePosZ_true_PMT = []
 
-    for i in range(len(sourcePosZ)):
+    for i in xrange(len(sourcePosZ)):
       if type_of_coincidence[i]==1:
         sourcePosZ_true.append(sourcePosZ[i])
         posPMT = blur_sourcePosZ(sourcePosZ[i], strips[L].sigmaPMT, L)

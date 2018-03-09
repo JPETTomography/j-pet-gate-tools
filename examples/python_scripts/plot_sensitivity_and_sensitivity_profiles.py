@@ -16,7 +16,7 @@ def create_label (template, label_old):
     tmp = label_old.split('_')
 
     flag = 0
-    for i in range(len(tmp)):
+    for i in xrange(len(tmp)):
         if tmp[i]!=template and tmp[i]!="7mm":
             if tmp[i]=="D75":
                 label_new += "D=75cm"
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             "L = 20 cm", "L = 50 cm", "L = 100 cm",
             "1 layer", "2 layers"]
 
-  for i in range(len(templates)):
+  for i in xrange(len(templates)):
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111)

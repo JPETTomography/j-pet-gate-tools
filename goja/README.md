@@ -64,7 +64,7 @@ goja_manager.py --mode analyze --gate-output ../output/ --goja-output ./
 
 Example 3: Analyze the NEMA sensitivity GATE output
 
-If one wants to use goja and goja_manager.py on cis.gov.pl cluste, he needs to load gate/7.2 module:
+If one wants to use goja and goja_manager.py on cis.gov.pl cluster, he needs to load gate/7.2 module:
 
   module load gate/7.2
 

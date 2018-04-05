@@ -49,6 +49,12 @@ if __name__ == "__main__":
                       default="analyze",
                       help='analyze, analyze-missing, verify or concatenate')
 
+  parser.add_argument('--eth0',
+                      dest='eth0',
+                      type=float,
+                      default=0.01,
+                      help='noise energy threshold in MeV [for mode \'analyze\']')
+
   parser.add_argument('--N0',
                       dest='N0',
                       type=int,
@@ -92,6 +98,7 @@ if __name__ == "__main__":
     if args.type_of_run == 'locally':
       for fname in fnames:
         goja_command = "goja --root " + args.path_gate_output + fname \
+                     + " --eth0 " + str(args.eth0) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + args.path_goja_output + fname[0:-5] + "_realtime" \
                      + " > " + args.path_goja_output + fname[0:-5] + "_coincidences &"
@@ -111,6 +118,7 @@ if __name__ == "__main__":
         array_pbs.write('#PBS -V\n')
         array_pbs.write('cd ${PBS_O_WORKDIR}\n')
         goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
+                     + " --eth0 " + str(args.eth0) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
                      + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
@@ -139,6 +147,7 @@ if __name__ == "__main__":
       if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime):
         basepath_goja = args.path_goja_output + fname[:-5]
         goja_command = "goja --root " + args.path_gate_output + fname \
+                       + " --eth0 " + str(args.eth0) \
                        + " --N0 " + str(args.N0) \
                        + " --save-real-time-to " + basepath_goja + "_realtime" \
                        + " > " + basepath_goja + "_coincidences &"

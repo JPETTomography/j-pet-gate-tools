@@ -3,14 +3,11 @@
 
 import matplotlib.pyplot as plt
 from numpy import *
-from matplotlib import rcParams, rcdefaults, rc
+import numpy as np
+from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from math import *
-import os
 import argparse
-
-import matplotlib.image as mpimg
-from collections import OrderedDict
 
 # Plot using data from GATE simulations
 def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
@@ -21,50 +18,25 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
 
   posX1 = tmp[:,0]
   posY1 = tmp[:,1]
-  posZ1 = tmp[:,2]
   times1 = tmp[:,3]
   posX2 = tmp[:,4]
   posY2 = tmp[:,5]
-  posZ2 = tmp[:,6]
   times2 = tmp[:,7]
-  IDs1 = tmp[:,8]
-  IDs2 = tmp[:,9]
-  toc = tmp[:,12]
-
-  # Approx time of a whole simulation taken into account in seconds as a max value of registered hits
-
-  time = max(max(times1),max(times2))/1e12
-  I = len(tmp)
 
   # Calculate vectors of times and angles differences
 
-  tim_diffs = []
-  ang_diffs = []
+  tim_diffs = absolute(times1 - times2)/1e3 # in ns
 
-  for i in range(len(tmp)):
+  vx = posX1
+  vy = posY1
+  ux = posX2
+  uy = posY2
 
-    tdiff = abs(times1[i]-times2[i])/1e3 # in ns
+  vu = vx*ux + vy*uy
+  modv = np.sqrt(vx*vx + vy*vy)
+  modu = np.sqrt(ux*ux + uy*uy)
 
-    # v = [vx,vy] = posX1, posY1
-    # u = [ux,uy] = posX2, posY2
-
-    vx = posX1[i]
-    vy = posY1[i]
-    ux = posX2[i]
-    uy = posY2[i]
-
-    vu = vx*ux + vy*uy
-    modv = sqrt(vx*vx + vy*vy)
-    modu = sqrt(ux*ux + uy*uy)
-
-    try:
-        a = arccos(vu/(modv*modu))/pi*180.
-        adiff = a
-    except:
-        pass
-
-    tim_diffs.append(tdiff)
-    ang_diffs.append(adiff)
+  ang_diffs = np.arccos(vu/(modv*modu))/pi*180.
 
   # Plot 2D histogram
 
@@ -87,7 +59,7 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
   param = 2.2
   xxx = linspace(0,param,100)
   yyy = []
-  for i in range(len(xxx)):
+  for i in xrange(len(xxx)):
     yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(param*param)))
 
   if show_cut:
@@ -95,10 +67,9 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
 
   counter_above = 0
   counter_below = 0
-  for i in range(len(tim_diffs)):
+  for i in xrange(len(tim_diffs)):
     t = tim_diffs[i]
     a = ang_diffs[i]
-    newt = 0
     try:
       newa = 180-80*sqrt(1.-t*t/(param*param))
       if a>newa: counter_above += 1
@@ -124,13 +95,6 @@ def plot_Da_vs_Dt_exp(datafile, result_figure_path):
 
   tmp = loadtxt(datafile)
   print size(tmp)
-
-  posX1 = tmp[:,0]
-  posY1 = tmp[:,1]
-  posZ1 = tmp[:,2]
-  posX2 = tmp[:,3]
-  posY2 = tmp[:,4]
-  posZ2 = tmp[:,5]
 
   tim_diffs = tmp[:,6]
   ang_diffs = tmp[:,7]

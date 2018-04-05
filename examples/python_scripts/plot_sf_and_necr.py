@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt2
 from numpy import *
 from matplotlib import rcParams, rcParamsDefault
-from matplotlib.colors import LogNorm
 import argparse
 
 from nema_common import *

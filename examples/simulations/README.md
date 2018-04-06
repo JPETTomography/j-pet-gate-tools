@@ -1,10 +1,5 @@
 # Description of simulations catalogue content
 
-digitizers
-----------
-
-  catalogue with digitizers macros
-
 geometries
 ----------
 

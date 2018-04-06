@@ -1,0 +1,223 @@
+#  NEMA IEC 2001 IQ SOURCE GAMMA
+
+/gate/source/addSource                        upperinterior_hot
+/gate/source/upperinterior_hot/gps/centre     0.0 -3.5 0.0 cm
+/gate/source/upperinterior_hot/gps/type       Volume
+/gate/source/upperinterior_hot/gps/shape      Cylinder
+/gate/source/upperinterior_hot/gps/radius     14.7 cm
+/gate/source/upperinterior_hot/gps/halfz      10.7 cm
+/gate/source/upperinterior_hot/setActivity    36028186 Bq
+/gate/source/upperinterior_hot/setType        backtoback
+/gate/source/upperinterior_hot/gps/particle   gamma
+/gate/source/upperinterior_hot/gps/ene/mono   511. keV
+/gate/source/upperinterior_hot/gps/angtype    iso
+/gate/source/upperinterior_hot/gps/Forbid     NEMA_IQ
+/gate/source/upperinterior_hot/gps/Forbid     NEMA_IQ_cold
+/gate/source/upperinterior_hot/gps/Forbid     centercyl
+/gate/source/upperinterior_hot/gps/Forbid     centercylin
+/gate/source/upperinterior_hot/gps/Forbid     sphere10
+/gate/source/upperinterior_hot/gps/Forbid     sphere10in
+/gate/source/upperinterior_hot/gps/Forbid     fill10
+/gate/source/upperinterior_hot/gps/Forbid     fill10in
+/gate/source/upperinterior_hot/gps/Forbid     sphere13
+/gate/source/upperinterior_hot/gps/Forbid     sphere13in
+/gate/source/upperinterior_hot/gps/Forbid     fill13
+/gate/source/upperinterior_hot/gps/Forbid     fill13in
+/gate/source/upperinterior_hot/gps/Forbid     sphere17
+/gate/source/upperinterior_hot/gps/Forbid     sphere17in
+/gate/source/upperinterior_hot/gps/Forbid     fill17
+/gate/source/upperinterior_hot/gps/Forbid     fill17in
+/gate/source/upperinterior_hot/gps/Forbid     sphere37
+/gate/source/upperinterior_hot/gps/Forbid     sphere37in
+/gate/source/upperinterior_hot/gps/Forbid     fill37
+/gate/source/upperinterior_hot/gps/Forbid     fill37in
+/gate/source/upperinterior_hot/gps/Forbid     sphere22
+/gate/source/upperinterior_hot/gps/Forbid     sphere22in
+/gate/source/upperinterior_hot/gps/Forbid     fill22
+/gate/source/upperinterior_hot/gps/Forbid     fill22in
+/gate/source/upperinterior_hot/gps/Forbid     sphere28
+/gate/source/upperinterior_hot/gps/Forbid     sphere28in
+/gate/source/upperinterior_hot/gps/Forbid     fill28
+/gate/source/upperinterior_hot/gps/Forbid     fill28in
+/gate/source/upperinterior_hot/gps/Forbid     boxinterior
+/gate/source/upperinterior_hot/gps/Forbid     LLinterior
+/gate/source/upperinterior_hot/gps/Forbid     LRinterior
+/gate/source/upperinterior_hot/gps/Forbid     outershell1
+/gate/source/upperinterior_hot/gps/Forbid     outershell2
+/gate/source/upperinterior_hot/gps/Forbid     outershell3
+/gate/source/upperinterior_hot/gps/Forbid     outershell4
+/gate/source/upperinterior_hot/dump           35
+
+/gate/source/addSource                        LRinterior_hot
+/gate/source/LRinterior_hot/gps/centre        -7.0 -3.5 0.0 cm
+/gate/source/LRinterior_hot/gps/type          Volume
+/gate/source/LRinterior_hot/gps/shape         Cylinder
+/gate/source/LRinterior_hot/gps/radius        7.7 cm
+/gate/source/LRinterior_hot/gps/halfz         10.7 cm
+/gate/source/LRinterior_hot/setActivity       5281545 Bq
+/gate/source/LRinterior_hot/setType           backtoback
+/gate/source/LRinterior_hot/gps/particle      gamma
+/gate/source/LRinterior_hot/gps/ene/mono      511. keV
+/gate/source/LRinterior_hot/gps/angtype       iso
+/gate/source/LRinterior_hot/gps/Forbid        upperinterior
+/gate/source/LRinterior_hot/gps/Forbid        boxinterior
+/gate/source/LRinterior_hot/gps/Forbid        centercyl
+/gate/source/LRinterior_hot/gps/Forbid        centercylin
+/gate/source/LRinterior_hot/gps/Forbid        sphere17
+/gate/source/LRinterior_hot/gps/Forbid        sphere17in
+/gate/source/LRinterior_hot/gps/Forbid        fill17
+/gate/source/LRinterior_hot/gps/Forbid        fill17in
+/gate/source/LRinterior_hot/gps/Forbid        sphere22
+/gate/source/LRinterior_hot/gps/Forbid        sphere22in
+/gate/source/LRinterior_hot/gps/Forbid        fill22
+/gate/source/LRinterior_hot/gps/Forbid        fill22in
+/gate/source/LRinterior_hot/dump              12
+
+/gate/source/addSource                        LLinterior_hot
+/gate/source/LLinterior_hot/gps/centre        7.0 -3.5 0.0 cm
+/gate/source/LLinterior_hot/gps/type          Volume
+/gate/source/LLinterior_hot/gps/shape         Cylinder
+/gate/source/LLinterior_hot/gps/radius        7.7 cm
+/gate/source/LLinterior_hot/gps/halfz         10.7 cm
+/gate/source/LLinterior_hot/setActivity       5281545 Bq
+/gate/source/LLinterior_hot/setType           backtoback
+/gate/source/LLinterior_hot/gps/particle      gamma
+/gate/source/LLinterior_hot/gps/ene/mono      511. keV
+/gate/source/LLinterior_hot/gps/angtype       iso
+/gate/source/LLinterior_hot/gps/Forbid        upperinterior
+/gate/source/LLinterior_hot/gps/Forbid        boxinterior
+/gate/source/LLinterior_hot/gps/Forbid        centercyl
+/gate/source/LLinterior_hot/gps/Forbid        centercylin
+/gate/source/LLinterior_hot/gps/Forbid        sphere28
+/gate/source/LLinterior_hot/gps/Forbid        sphere28in
+/gate/source/LLinterior_hot/gps/Forbid        fill28
+/gate/source/LLinterior_hot/gps/Forbid        fill28in
+/gate/source/LLinterior_hot/gps/Forbid        sphere37
+/gate/source/LLinterior_hot/gps/Forbid        sphere37in
+/gate/source/LLinterior_hot/gps/Forbid        fill37
+/gate/source/LLinterior_hot/gps/Forbid        fill37in
+/gate/source/LLinterior_hot/dump              12
+
+/gate/source/addSource                        interiorbox_hot
+/gate/source/interiorbox_hot/gps/centre       0.0 -7.35. 0.0 cm
+/gate/source/interiorbox_hot/gps/type         Volume
+/gate/source/interiorbox_hot/gps/shape        Para
+/gate/source/interiorbox_hot/gps/halfx        7. cm
+/gate/source/interiorbox_hot/gps/halfy        3.85 cm
+/gate/source/interiorbox_hot/gps/halfz        10.7 cm
+/gate/source/interiorbox_hot/setActivity      12090338 Bq
+/gate/source/interiorbox_hot/setType          backtoback
+/gate/source/interiorbox_hot/gps/particle     gamma
+/gate/source/interiorbox_hot/gps/ene/mono     511. keV
+/gate/source/interiorbox_hot/gps/angtype      iso
+/gate/source/interiorbox_hot/gps/Forbid       sphere22
+/gate/source/interiorbox_hot/gps/Forbid       sphere22in
+/gate/source/interiorbox_hot/gps/Forbid       fill22
+/gate/source/interiorbox_hot/gps/Forbid       fill22in
+/gate/source/interiorbox_hot/gps/Forbid       sphere28
+/gate/source/interiorbox_hot/gps/Forbid       sphere28in
+/gate/source/interiorbox_hot/gps/Forbid       fill28
+/gate/source/interiorbox_hot/gps/Forbid       fill28in
+/gate/source/interiorbox_hot/dump             8
+
+# 10 mm Sphere
+/gate/source/addSource sphere10mm             gps
+/gate/source/sphere10mm/gps/centre            2.86 4.95367 3.7 cm
+/gate/source/sphere10mm/gps/type              Volume
+/gate/source/sphere10mm/gps/shape             Sphere
+/gate/source/sphere10mm/gps/radius            0.5 cm
+/gate/source/sphere10mm/setActivity           11100. Bq
+/gate/source/sphere10mm/setType               backtoback
+/gate/source/sphere10mm/gps/particle          gamma
+/gate/source/sphere10mm/gps/ene/mono          511. keV
+/gate/source/sphere10mm/gps/angtype           iso
+
+# 10 mm Fill Capillary
+/gate/source/addSource capillary10mm          gps
+/gate/source/capillary10mm/gps/centre         2.86 4.95367 7.5 cm
+/gate/source/capillary10mm/gps/type           Volume
+/gate/source/capillary10mm/gps/shape          Cylinder
+/gate/source/capillary10mm/gps/radius         0.25 cm
+/gate/source/capillary10mm/gps/halfz          3.2 cm
+/gate/source/capillary10mm/setActivity        26641. Bq
+/gate/source/capillary10mm/setType            backtoback
+/gate/source/capillary10mm/gps/particle       gamma
+/gate/source/capillary10mm/gps/ene/mono       511. keV
+/gate/source/capillary10mm/gps/angtype        iso
+
+# 13 mm Sphere
+/gate/source/addSource sphere13mm             gps
+/gate/source/sphere13mm/gps/centre            -2.86 4.95367 3.7 cm
+/gate/source/sphere13mm/gps/type              Volume
+/gate/source/sphere13mm/gps/shape             Sphere
+/gate/source/sphere13mm/gps/radius            0.65 cm
+/gate/source/sphere13mm/setActivity           24387. Bq
+/gate/source/sphere13mm/setType               backtoback
+/gate/source/sphere13mm/gps/particle          gamma
+/gate/source/sphere13mm/gps/ene/mono          511. keV
+/gate/source/sphere13mm/gps/angtype           iso
+
+# 13 mm Fill Capillary
+/gate/source/addSource capillary13mm          gps
+/gate/source/capillary13mm/gps/centre         -2.86 4.95367 7.5875 cm
+/gate/source/capillary13mm/gps/type           Volume
+/gate/source/capillary13mm/gps/shape          Cylinder
+/gate/source/capillary13mm/gps/radius         0.25 cm
+/gate/source/capillary13mm/gps/halfz          3.1125 cm
+/gate/source/capillary13mm/setActivity        25912. Bq
+/gate/source/capillary13mm/setType            backtoback
+/gate/source/capillary13mm/gps/particle       gamma
+/gate/source/capillary13mm/gps/ene/mono       511. keV
+/gate/source/capillary13mm/gps/angtype        iso
+
+# 17 mm Sphere
+/gate/source/addSource sphere17mm             gps
+/gate/source/sphere17mm/gps/centre            -5.72 0. 3.7 cm
+/gate/source/sphere17mm/gps/type              Volume
+/gate/source/sphere17mm/gps/shape             Sphere
+/gate/source/sphere17mm/gps/radius            0.85 cm
+/gate/source/sphere17mm/setActivity           54536. Bq
+/gate/source/sphere17mm/setType               backtoback
+/gate/source/sphere17mm/gps/particle          gamma
+/gate/source/sphere17mm/gps/ene/mono          511. keV
+/gate/source/sphere17mm/gps/angtype           iso
+
+# 17 mm Fill Capillary
+/gate/source/addSource capillary17mm          gps
+/gate/source/capillary17mm/gps/centre         -5.72 0. 7.675 cm
+/gate/source/capillary17mm/gps/type           Volume
+/gate/source/capillary17mm/gps/shape          Cylinder
+/gate/source/capillary17mm/gps/radius         0.25 cm
+/gate/source/capillary17mm/gps/halfz          3.025 cm
+/gate/source/capillary17mm/setActivity        25184. Bq
+/gate/source/capillary17mm/setType            backtoback
+/gate/source/capillary17mm/gps/particle       gamma
+/gate/source/capillary17mm/gps/ene/mono       511. keV
+/gate/source/capillary17mm/gps/angtype        iso
+
+# 22 mm Sphere
+/gate/source/addSource sphere22mm             gps
+/gate/source/sphere22mm/gps/centre            -2.86 -4.95367 3.7 cm
+/gate/source/sphere22mm/gps/type              Volume
+/gate/source/sphere22mm/gps/shape             Sphere
+/gate/source/sphere22mm/gps/radius            1.1 cm
+/gate/source/sphere22mm/setActivity           118196. Bq
+/gate/source/sphere22mm/setType               backtoback
+/gate/source/sphere22mm/gps/particle          gamma
+/gate/source/sphere22mm/gps/ene/mono          511. keV
+/gate/source/sphere22mm/gps/angtype           iso
+
+# 22 mm Fill Capillary
+/gate/source/addSource capillary22mm          gps
+/gate/source/capillary22mm/gps/centre         -2.86 -4.95367 7.8 cm
+/gate/source/capillary22mm/gps/type           Volume
+/gate/source/capillary22mm/gps/shape          Cylinder
+/gate/source/capillary22mm/gps/radius         0.25 cm
+/gate/source/capillary22mm/gps/halfz          2.9 cm
+/gate/source/capillary22mm/setActivity        24143. Bq
+/gate/source/capillary22mm/setType            backtoback
+/gate/source/capillary22mm/gps/particle       gamma
+/gate/source/capillary22mm/gps/ene/mono       511. keV
+/gate/source/capillary22mm/gps/angtype        iso
+
+/gate/source/list

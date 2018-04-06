@@ -45,9 +45,9 @@ int main (int argc, char* argv[]) {
 	po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");
 
 	desc.add_options()
-    ("help", "produce help message")
+	("help", "produce help message")
 	("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
-    ("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.01 MeV)")
+	("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.01 MeV)")
 	("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
 	("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
 	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 3)")

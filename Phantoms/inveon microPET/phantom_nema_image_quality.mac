@@ -1,0 +1,575 @@
+# NEMA Specification NU 4-2008: Image Quality Phantom
+# Created by Geron Bindseil, Western University, 2012.
+
+#Total phantom for moving the entire phantom at once
+/gate/world/daughters/name NEMA_IQ
+/gate/world/daughters/insert cylinder
+/gate/NEMA_IQ/setMaterial Air
+/gate/NEMA_IQ/geometry/setRmax   16.75 mm
+/gate/NEMA_IQ/geometry/setRmin   0. mm
+/gate/NEMA_IQ/geometry/setHeight 80. mm
+/gate/NEMA_IQ/placement/setTranslation 0. 0. 0. mm
+/gate/NEMA_IQ/vis/forceWireframe
+/gate/NEMA_IQ/vis/setColor white
+/gate/NEMA_IQ/vis/setVisible 0
+
+#Body hollow part (top) that is attached to the fixed top cover
+/gate/NEMA_IQ/daughters/name body_hollow
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/body_hollow/setMaterial Plexiglass
+/gate/body_hollow/geometry/setRmax   16.75 mm
+/gate/body_hollow/geometry/setRmin   15. mm
+/gate/body_hollow/geometry/setHeight 30. mm
+/gate/body_hollow/placement/setTranslation 0. 0. 15. mm
+/gate/body_hollow/vis/forceWireframe
+/gate/body_hollow/vis/setColor green
+
+#Water contained in the chamber
+/gate/NEMA_IQ/daughters/name body_hollow_water
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/body_hollow_water/setMaterial Water
+/gate/body_hollow_water/geometry/setRmax   15. mm
+/gate/body_hollow_water/geometry/setRmin   0. mm
+/gate/body_hollow_water/geometry/setHeight 30. mm
+/gate/body_hollow_water/placement/setTranslation 0. 0. 15. mm
+/gate/body_hollow_water/vis/forceWireframe
+/gate/body_hollow_water/vis/setColor white
+
+#Now the twin cold chambers (chamber 1 has Air, chamber 2 has Water)
+
+#Fixed top cover chamber #1 sitting in the water
+/gate/body_hollow_water/daughters/name top_cover_chamber_1
+/gate/body_hollow_water/daughters/insert cylinder
+/gate/top_cover_chamber_1/setMaterial Plexiglass
+/gate/top_cover_chamber_1/geometry/setRmax   5. mm
+/gate/top_cover_chamber_1/geometry/setRmin   0. mm
+/gate/top_cover_chamber_1/geometry/setHeight 15. mm
+/gate/top_cover_chamber_1/placement/setTranslation 7.5 0. 7.5 mm
+/gate/top_cover_chamber_1/vis/forceWireframe
+/gate/top_cover_chamber_1/vis/setColor white
+
+#Fill chamber #1 with air
+/gate/top_cover_chamber_1/daughters/name top_cover_chamber_1_contents
+/gate/top_cover_chamber_1/daughters/insert cylinder
+/gate/top_cover_chamber_1_contents/setMaterial Air
+/gate/top_cover_chamber_1_contents/geometry/setRmax   4. mm
+/gate/top_cover_chamber_1_contents/geometry/setRmin   0. mm
+/gate/top_cover_chamber_1_contents/geometry/setHeight 14. mm
+/gate/top_cover_chamber_1_contents/placement/setTranslation 0. 0. 0.5 mm
+/gate/top_cover_chamber_1_contents/vis/forceWireframe
+/gate/top_cover_chamber_1_contents/vis/setColor white
+
+#Fixed top cover chamber #2 sitting in the water
+/gate/body_hollow_water/daughters/name top_cover_chamber_2
+/gate/body_hollow_water/daughters/insert cylinder
+/gate/top_cover_chamber_2/setMaterial Plexiglass
+/gate/top_cover_chamber_2/geometry/setRmax   5. mm
+/gate/top_cover_chamber_2/geometry/setRmin   0. mm
+/gate/top_cover_chamber_2/geometry/setHeight 15. mm
+/gate/top_cover_chamber_2/placement/setTranslation -7.5 0. 7.5 mm
+/gate/top_cover_chamber_2/vis/forceWireframe
+/gate/top_cover_chamber_2/vis/setColor white
+
+#Fill chamber #2 with water
+/gate/top_cover_chamber_2/daughters/name top_cover_chamber_2_contents
+/gate/top_cover_chamber_2/daughters/insert cylinder
+/gate/top_cover_chamber_2_contents/setMaterial Water
+/gate/top_cover_chamber_2_contents/geometry/setRmax   4. mm
+/gate/top_cover_chamber_2_contents/geometry/setRmin   0. mm
+/gate/top_cover_chamber_2_contents/geometry/setHeight 14. mm
+/gate/top_cover_chamber_2_contents/placement/setTranslation 0. 0. 0.5 mm
+/gate/top_cover_chamber_2_contents/vis/forceWireframe
+/gate/top_cover_chamber_2_contents/vis/setColor white
+
+#Fixed Top Cover
+/gate/NEMA_IQ/daughters/name fixed_top_cover
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/fixed_top_cover/setMaterial Plexiglass
+/gate/fixed_top_cover/geometry/setRmax   16.75 mm
+/gate/fixed_top_cover/geometry/setRmin   0. mm
+/gate/fixed_top_cover/geometry/setHeight 5. mm
+/gate/fixed_top_cover/placement/setTranslation 0. 0. 32.5 mm
+/gate/fixed_top_cover/vis/forceWireframe
+/gate/fixed_top_cover/vis/setColor green
+
+#Now define the screw 3 large shafts contained in the fixed top cover (excludes head and gasket)
+
+#Shaft 1
+/gate/fixed_top_cover/daughters/name shaft_1
+/gate/fixed_top_cover/daughters/insert cylinder
+/gate/shaft_1/setMaterial Nylon
+/gate/shaft_1/geometry/setRmax   1.75 mm
+/gate/shaft_1/geometry/setRmin   0. mm
+/gate/shaft_1/geometry/setHeight 5. mm
+/gate/shaft_1/placement/setTranslation 7.5 0. 0. mm
+/gate/shaft_1/vis/forceWireframe
+/gate/shaft_1/vis/setColor blue
+
+#Shaft 2
+/gate/fixed_top_cover/daughters/name shaft_2
+/gate/fixed_top_cover/daughters/insert cylinder
+/gate/shaft_2/setMaterial Nylon
+/gate/shaft_2/geometry/setRmax   1.75 mm
+/gate/shaft_2/geometry/setRmin   0. mm
+/gate/shaft_2/geometry/setHeight 5. mm
+/gate/shaft_2/placement/setTranslation -7.5 0. 0. mm
+/gate/shaft_2/vis/forceWireframe
+/gate/shaft_2/vis/setColor blue
+
+#Shaft 3
+/gate/fixed_top_cover/daughters/name shaft_3
+/gate/fixed_top_cover/daughters/insert cylinder
+/gate/shaft_3/setMaterial Nylon
+/gate/shaft_3/geometry/setRmax   1.75 mm
+/gate/shaft_3/geometry/setRmin   0. mm
+/gate/shaft_3/geometry/setHeight 5. mm
+/gate/shaft_3/placement/setTranslation 0. 7.5 0. mm
+/gate/shaft_3/vis/forceWireframe
+/gate/shaft_3/vis/setColor blue
+
+#Now make the o-rings and screw heads associated with these 3 large screws on the top fixed cover
+#Screw shaft protrudes 1.5 mm out of the main phantom, so make those separately from the heads
+
+#O-ring 1
+/gate/NEMA_IQ/daughters/name o_ring_1
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/o_ring_1/setMaterial Buna
+/gate/o_ring_1/geometry/setRmax   3.65 mm
+/gate/o_ring_1/geometry/setRmin   2. mm
+/gate/o_ring_1/geometry/setHeight 1.5 mm
+/gate/o_ring_1/placement/setTranslation 7.5 0. 35.75 mm
+/gate/o_ring_1/vis/forceWireframe
+/gate/o_ring_1/vis/setColor red
+
+#O-ring 2
+/gate/NEMA_IQ/daughters/name o_ring_2
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/o_ring_2/setMaterial Buna
+/gate/o_ring_2/geometry/setRmax   3.65 mm
+/gate/o_ring_2/geometry/setRmin   2. mm
+/gate/o_ring_2/geometry/setHeight 1.5 mm
+/gate/o_ring_2/placement/setTranslation -7.5 0. 35.75 mm
+/gate/o_ring_2/vis/forceWireframe
+/gate/o_ring_2/vis/setColor red
+
+#O-ring 3
+/gate/NEMA_IQ/daughters/name o_ring_3
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/o_ring_3/setMaterial Buna
+/gate/o_ring_3/geometry/setRmax   3.65 mm
+/gate/o_ring_3/geometry/setRmin   2. mm
+/gate/o_ring_3/geometry/setHeight 1.5 mm
+/gate/o_ring_3/placement/setTranslation 0. 7.5 35.75 mm
+/gate/o_ring_3/vis/forceWireframe
+/gate/o_ring_3/vis/setColor red
+
+#Screw head 1 protruding shaft
+/gate/NEMA_IQ/daughters/name screw_head_shaft_1
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_shaft_1/setMaterial Nylon
+/gate/screw_head_shaft_1/geometry/setRmax   1.75 mm
+/gate/screw_head_shaft_1/geometry/setRmin   0. mm
+/gate/screw_head_shaft_1/geometry/setHeight 1.5 mm
+/gate/screw_head_shaft_1/placement/setTranslation 7.5 0. 35.75 mm
+/gate/screw_head_shaft_1/vis/forceWireframe
+/gate/screw_head_shaft_1/vis/setColor blue
+
+#Screw head 2 protruding shaft
+/gate/NEMA_IQ/daughters/name screw_head_shaft_2
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_shaft_2/setMaterial Nylon
+/gate/screw_head_shaft_2/geometry/setRmax   1.75 mm
+/gate/screw_head_shaft_2/geometry/setRmin   0. mm
+/gate/screw_head_shaft_2/geometry/setHeight 1.5 mm
+/gate/screw_head_shaft_2/placement/setTranslation -7.5 0. 35.75 mm
+/gate/screw_head_shaft_2/vis/forceWireframe
+/gate/screw_head_shaft_2/vis/setColor blue
+
+#Screw head 3 protruding shaft
+/gate/NEMA_IQ/daughters/name screw_head_shaft_3
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_shaft_3/setMaterial Nylon
+/gate/screw_head_shaft_3/geometry/setRmax   1.75 mm
+/gate/screw_head_shaft_3/geometry/setRmin   0. mm
+/gate/screw_head_shaft_3/geometry/setHeight 1.5 mm
+/gate/screw_head_shaft_3/placement/setTranslation 0. 7.5 35.75 mm
+/gate/screw_head_shaft_3/vis/forceWireframe
+/gate/screw_head_shaft_3/vis/setColor blue
+
+#Screw head 1
+/gate/NEMA_IQ/daughters/name screw_head_1
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_1/setMaterial Nylon
+/gate/screw_head_1/geometry/setRmax   4.2 mm
+/gate/screw_head_1/geometry/setRmin   0. mm
+/gate/screw_head_1/geometry/setHeight 2.3 mm
+/gate/screw_head_1/placement/setTranslation 7.5 0. 37.65 mm
+/gate/screw_head_1/vis/forceWireframe
+/gate/screw_head_1/vis/setColor blue
+
+#Screw head 2
+/gate/NEMA_IQ/daughters/name screw_head_2
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_2/setMaterial Nylon
+/gate/screw_head_2/geometry/setRmax   4.2 mm
+/gate/screw_head_2/geometry/setRmin   0. mm
+/gate/screw_head_2/geometry/setHeight 2.3 mm
+/gate/screw_head_2/placement/setTranslation -7.5 0. 37.65 mm
+/gate/screw_head_2/vis/forceWireframe
+/gate/screw_head_2/vis/setColor blue
+
+#Screw head 3
+/gate/NEMA_IQ/daughters/name screw_head_3
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_3/setMaterial Nylon
+/gate/screw_head_3/geometry/setRmax   4.2 mm
+/gate/screw_head_3/geometry/setRmin   0. mm
+/gate/screw_head_3/geometry/setHeight 2.3 mm
+/gate/screw_head_3/placement/setTranslation 0. 7.5 37.65 mm
+/gate/screw_head_3/vis/forceWireframe
+/gate/screw_head_3/vis/setColor blue
+
+#Done with the top half of the phantom.
+#Now do the bottom half which is solid plexiglass with holes of various sizes and a filling cap.
+#Do this by making a solid body of Plexiglass and cutting holes in it.
+
+#Solid lower body
+/gate/NEMA_IQ/daughters/name body_solid
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/body_solid/setMaterial Plexiglass
+/gate/body_solid/geometry/setRmax   16.75 mm
+/gate/body_solid/geometry/setRmin   0. mm
+/gate/body_solid/geometry/setHeight 28. mm
+/gate/body_solid/placement/setTranslation 0. 0. -14. mm
+/gate/body_solid/vis/forceWireframe
+/gate/body_solid/vis/setColor green
+
+#Now make the 5 differently-sized holes filled with water & activity.
+
+#Hole 1-mm-diameter
+/gate/body_solid/daughters/name hole_1
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_1/setMaterial Water
+/gate/hole_1/geometry/setRmax   0.5 mm
+/gate/hole_1/geometry/setRmin   0. mm
+/gate/hole_1/geometry/setHeight 20. mm
+/gate/hole_1/placement/setTranslation -2.16 -6.66 4. mm
+/gate/hole_1/vis/forceWireframe
+/gate/hole_1/vis/setColor white
+
+#Hole 2-mm-diameter
+/gate/body_solid/daughters/name hole_2
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_2/setMaterial Water 
+/gate/hole_2/geometry/setRmax   1. mm
+/gate/hole_2/geometry/setRmin   0. mm
+/gate/hole_2/geometry/setHeight 20. mm
+/gate/hole_2/placement/setTranslation 5.66 -4.11 4. mm
+/gate/hole_2/vis/forceWireframe
+/gate/hole_2/vis/setColor white
+
+#Hole 3-mm-diameter
+/gate/body_solid/daughters/name hole_3
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_3/setMaterial Water
+/gate/hole_3/geometry/setRmax   1.5 mm
+/gate/hole_3/geometry/setRmin   0. mm
+/gate/hole_3/geometry/setHeight 20. mm
+/gate/hole_3/placement/setTranslation 5.66 4.11 4. mm
+/gate/hole_3/vis/forceWireframe
+/gate/hole_3/vis/setColor white
+
+#Hole 4-mm-diameter
+/gate/body_solid/daughters/name hole_4
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_4/setMaterial Water
+/gate/hole_4/geometry/setRmax   2. mm
+/gate/hole_4/geometry/setRmin   0. mm
+/gate/hole_4/geometry/setHeight 20. mm
+/gate/hole_4/placement/setTranslation -2.16 6.66 4. mm
+/gate/hole_4/vis/forceWireframe
+/gate/hole_4/vis/setColor white
+
+#Hole 5-mm-diameter
+/gate/body_solid/daughters/name hole_5
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_5/setMaterial Water
+/gate/hole_5/geometry/setRmax   2.5 mm
+/gate/hole_5/geometry/setRmin   0. mm
+/gate/hole_5/geometry/setHeight 20. mm
+/gate/hole_5/placement/setTranslation -7. 0. 4. mm
+/gate/hole_5/vis/forceWireframe
+/gate/hole_5/vis/setColor white
+
+#Wide hole at the end of the bottom lid.
+/gate/body_solid/daughters/name wide_hole_lid
+/gate/body_solid/daughters/insert cylinder
+/gate/wide_hole_lid/setMaterial Water
+/gate/wide_hole_lid/geometry/setRmax   10. mm
+/gate/wide_hole_lid/geometry/setRmin   0. mm
+/gate/wide_hole_lid/geometry/setHeight 3. mm
+/gate/wide_hole_lid/placement/setTranslation 0. 0. -7.5 mm
+/gate/wide_hole_lid/vis/forceWireframe
+/gate/wide_hole_lid/vis/setColor white
+
+#Wide O-ring for bottom lid
+/gate/body_solid/daughters/name wide_o_ring
+/gate/body_solid/daughters/insert cylinder
+/gate/wide_o_ring/setMaterial Buna
+/gate/wide_o_ring/geometry/setRmax   12.825 mm
+/gate/wide_o_ring/geometry/setRmin   11.175 mm
+/gate/wide_o_ring/geometry/setHeight 1. mm
+/gate/wide_o_ring/placement/setTranslation 0. 0. -9 mm
+/gate/wide_o_ring/vis/forceWireframe
+/gate/wide_o_ring/vis/setColor red
+
+# Now make the 6 small nylon screws in the removable bottom cover.
+# The hole should be slightly deeper than the screw so add an air-filled region.
+# The shaft & screw cannot be repeated using the repeater because the Forbid
+# command in the source definition only removes the first volume from the source 
+# volume as of GATE 6.1
+
+# Small shaft 1
+/gate/body_solid/daughters/name small_shaft_1
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_1/setMaterial Nylon
+/gate/small_shaft_1/geometry/setRmax   1.45 mm
+/gate/small_shaft_1/geometry/setRmin   0. mm
+/gate/small_shaft_1/geometry/setHeight 9. mm
+/gate/small_shaft_1/placement/setTranslation 14. 0. -9.5 mm
+/gate/small_shaft_1/vis/forceSolid
+/gate/small_shaft_1/vis/setColor blue
+
+# Air-filled hole for screw shaft 1
+/gate/body_solid/daughters/name hole_shaft_1
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_1/setMaterial Air
+/gate/hole_shaft_1/geometry/setRmax   1.45 mm
+/gate/hole_shaft_1/geometry/setRmin   0. mm
+/gate/hole_shaft_1/geometry/setHeight 4.5 mm
+/gate/hole_shaft_1/placement/setTranslation 14. 0. -2.75 mm
+/gate/hole_shaft_1/vis/forceWireframe
+/gate/hole_shaft_1/vis/setColor white
+
+# Small shaft 2
+/gate/body_solid/daughters/name small_shaft_2
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_2/setMaterial Nylon
+/gate/small_shaft_2/geometry/setRmax   1.45 mm
+/gate/small_shaft_2/geometry/setRmin   0. mm
+/gate/small_shaft_2/geometry/setHeight 9. mm
+/gate/small_shaft_2/placement/setTranslation 7. 12.12 -9.5 mm
+/gate/small_shaft_2/vis/forceSolid
+/gate/small_shaft_2/vis/setColor blue
+
+# Air-filled hole for screw shaft 2
+/gate/body_solid/daughters/name hole_shaft_2
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_2/setMaterial Air
+/gate/hole_shaft_2/geometry/setRmax   1.45 mm
+/gate/hole_shaft_2/geometry/setRmin   0. mm
+/gate/hole_shaft_2/geometry/setHeight 4.5 mm
+/gate/hole_shaft_2/placement/setTranslation 7. 12.12 -2.75 mm
+/gate/hole_shaft_2/vis/forceWireframe
+/gate/hole_shaft_2/vis/setColor white
+
+# Small shaft 3
+/gate/body_solid/daughters/name small_shaft_3
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_3/setMaterial Nylon
+/gate/small_shaft_3/geometry/setRmax   1.45 mm
+/gate/small_shaft_3/geometry/setRmin   0. mm
+/gate/small_shaft_3/geometry/setHeight 9. mm
+/gate/small_shaft_3/placement/setTranslation -7. 12.12 -9.5 mm
+/gate/small_shaft_3/vis/forceSolid
+/gate/small_shaft_3/vis/setColor blue
+
+# Air-filled hole for screw shaft 3
+/gate/body_solid/daughters/name hole_shaft_3
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_3/setMaterial Air
+/gate/hole_shaft_3/geometry/setRmax   1.45 mm
+/gate/hole_shaft_3/geometry/setRmin   0. mm
+/gate/hole_shaft_3/geometry/setHeight 4.5 mm
+/gate/hole_shaft_3/placement/setTranslation -7. 12.12 -2.75 mm
+/gate/hole_shaft_3/vis/forceWireframe
+/gate/hole_shaft_3/vis/setColor white
+
+# Small shaft 4
+/gate/body_solid/daughters/name small_shaft_4
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_4/setMaterial Nylon
+/gate/small_shaft_4/geometry/setRmax   1.45 mm
+/gate/small_shaft_4/geometry/setRmin   0. mm
+/gate/small_shaft_4/geometry/setHeight 9. mm
+/gate/small_shaft_4/placement/setTranslation -14. 0. -9.5 mm
+/gate/small_shaft_4/vis/forceSolid
+/gate/small_shaft_4/vis/setColor blue
+
+# Air-filled hole for screw shaft 4
+/gate/body_solid/daughters/name hole_shaft_4
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_4/setMaterial Air
+/gate/hole_shaft_4/geometry/setRmax   1.45 mm
+/gate/hole_shaft_4/geometry/setRmin   0. mm
+/gate/hole_shaft_4/geometry/setHeight 4.5 mm
+/gate/hole_shaft_4/placement/setTranslation -14. 0. -2.75 mm
+/gate/hole_shaft_4/vis/forceWireframe
+/gate/hole_shaft_4/vis/setColor white
+
+# Small shaft 5
+/gate/body_solid/daughters/name small_shaft_5
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_5/setMaterial Nylon
+/gate/small_shaft_5/geometry/setRmax   1.45 mm
+/gate/small_shaft_5/geometry/setRmin   0. mm
+/gate/small_shaft_5/geometry/setHeight 9. mm
+/gate/small_shaft_5/placement/setTranslation -7. -12.12 -9.5 mm
+/gate/small_shaft_5/vis/forceSolid
+/gate/small_shaft_5/vis/setColor blue
+
+# Air-filled hole for screw shaft 5
+/gate/body_solid/daughters/name hole_shaft_5
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_5/setMaterial Air
+/gate/hole_shaft_5/geometry/setRmax   1.45 mm
+/gate/hole_shaft_5/geometry/setRmin   0. mm
+/gate/hole_shaft_5/geometry/setHeight 4.5 mm
+/gate/hole_shaft_5/placement/setTranslation -7. -12.12 -2.75 mm
+/gate/hole_shaft_5/vis/forceWireframe
+/gate/hole_shaft_5/vis/setColor white
+
+# Small shaft 6
+/gate/body_solid/daughters/name small_shaft_6
+/gate/body_solid/daughters/insert cylinder
+/gate/small_shaft_6/setMaterial Nylon
+/gate/small_shaft_6/geometry/setRmax   1.45 mm
+/gate/small_shaft_6/geometry/setRmin   0. mm
+/gate/small_shaft_6/geometry/setHeight 9. mm
+/gate/small_shaft_6/placement/setTranslation 7. -12.12 -9.5 mm
+/gate/small_shaft_6/vis/forceSolid
+/gate/small_shaft_6/vis/setColor blue
+
+# Air-filled hole for screw shaft 6
+/gate/body_solid/daughters/name hole_shaft_6
+/gate/body_solid/daughters/insert cylinder
+/gate/hole_shaft_6/setMaterial Air
+/gate/hole_shaft_6/geometry/setRmax   1.45 mm
+/gate/hole_shaft_6/geometry/setRmin   0. mm
+/gate/hole_shaft_6/geometry/setHeight 4.5 mm
+/gate/hole_shaft_6/placement/setTranslation 7. -12.12 -2.75 mm
+/gate/hole_shaft_6/vis/forceWireframe
+/gate/hole_shaft_6/vis/setColor white
+
+# Now make the screw heads heads (can use repeater here because outside source
+# definition volume).
+
+# Small screw head
+/gate/NEMA_IQ/daughters/name small_screw_head
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/small_screw_head/setMaterial Nylon
+/gate/small_screw_head/geometry/setRmax   2.25 mm
+/gate/small_screw_head/geometry/setRmin   0. mm
+/gate/small_screw_head/geometry/setHeight 2.3 mm
+/gate/small_screw_head/placement/setTranslation 14. 0. -29.15 mm
+/gate/small_screw_head/vis/forceSolid
+/gate/small_screw_head/vis/setColor blue
+
+# Now repeat this head 6 times
+/gate/small_screw_head/repeaters/insert ring
+/gate/small_screw_head/ring/setRepeatNumber 6
+
+# Now make a central large shaft, o-ring and screw head in the removable bottom cover
+
+#Shaft 4
+/gate/body_solid/daughters/name shaft_4
+/gate/body_solid/daughters/insert cylinder
+/gate/shaft_4/setMaterial Nylon
+/gate/shaft_4/geometry/setRmax   1.75 mm
+/gate/shaft_4/geometry/setRmin   0. mm
+/gate/shaft_4/geometry/setHeight 5. mm
+/gate/shaft_4/placement/setTranslation 0. 0. -11.5 mm
+/gate/shaft_4/vis/forceSolid
+/gate/shaft_4/vis/setColor blue
+
+#O-ring 4
+/gate/NEMA_IQ/daughters/name o_ring_4
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/o_ring_4/setMaterial Buna
+/gate/o_ring_4/geometry/setRmax   3.65 mm
+/gate/o_ring_4/geometry/setRmin   2. mm
+/gate/o_ring_4/geometry/setHeight 1.5 mm
+/gate/o_ring_4/placement/setTranslation 0. 0. -28.75 mm
+/gate/o_ring_4/vis/forceSolid
+/gate/o_ring_4/vis/setColor red
+
+#Screw head 4
+/gate/NEMA_IQ/daughters/name screw_head_4
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_4/setMaterial Nylon
+/gate/screw_head_4/geometry/setRmax   4.2 mm
+/gate/screw_head_4/geometry/setRmin   0. mm
+/gate/screw_head_4/geometry/setHeight 2.3 mm
+/gate/screw_head_4/placement/setTranslation 0. 0. -30.65 mm
+/gate/screw_head_4/vis/forceSolid
+/gate/screw_head_4/vis/setColor blue
+
+#Screw head 4 protruding shaft
+/gate/NEMA_IQ/daughters/name screw_head_shaft_4
+/gate/NEMA_IQ/daughters/insert cylinder
+/gate/screw_head_shaft_4/setMaterial Nylon
+/gate/screw_head_shaft_4/geometry/setRmax   1.75 mm
+/gate/screw_head_shaft_4/geometry/setRmin   0. mm
+/gate/screw_head_shaft_4/geometry/setHeight 1.5 mm
+/gate/screw_head_shaft_4/placement/setTranslation 0. 0. -28.75 mm
+/gate/screw_head_shaft_4/vis/forceWireframe
+/gate/screw_head_shaft_4/vis/setColor blue
+
+# Refreshes the viewer
+/gate/geometry/rebuild
+
+#Attach all volumes as sensitive detectors
+/gate/body_hollow/attachPhantomSD
+/gate/body_hollow_water/attachPhantomSD
+/gate/body_solid/attachPhantomSD
+/gate/fixed_top_cover/attachPhantomSD
+/gate/hole_1/attachPhantomSD
+/gate/hole_2/attachPhantomSD
+/gate/hole_3/attachPhantomSD
+/gate/hole_4/attachPhantomSD
+/gate/hole_5/attachPhantomSD
+/gate/hole_shaft_1/attachPhantomSD
+/gate/hole_shaft_2/attachPhantomSD
+/gate/hole_shaft_3/attachPhantomSD
+/gate/hole_shaft_4/attachPhantomSD
+/gate/hole_shaft_5/attachPhantomSD
+/gate/hole_shaft_6/attachPhantomSD
+/gate/o_ring_1/attachPhantomSD
+/gate/o_ring_2/attachPhantomSD
+/gate/o_ring_3/attachPhantomSD
+/gate/o_ring_4/attachPhantomSD
+/gate/screw_head_1/attachPhantomSD
+/gate/screw_head_2/attachPhantomSD
+/gate/screw_head_3/attachPhantomSD
+/gate/screw_head_4/attachPhantomSD
+/gate/screw_head_shaft_1/attachPhantomSD
+/gate/screw_head_shaft_2/attachPhantomSD
+/gate/screw_head_shaft_3/attachPhantomSD
+/gate/screw_head_shaft_4/attachPhantomSD
+/gate/shaft_1/attachPhantomSD
+/gate/shaft_2/attachPhantomSD
+/gate/shaft_3/attachPhantomSD
+/gate/shaft_4/attachPhantomSD
+/gate/small_screw_head/attachPhantomSD
+/gate/small_shaft_1/attachPhantomSD
+/gate/small_shaft_2/attachPhantomSD
+/gate/small_shaft_3/attachPhantomSD
+/gate/small_shaft_4/attachPhantomSD
+/gate/small_shaft_5/attachPhantomSD
+/gate/small_shaft_6/attachPhantomSD
+/gate/top_cover_chamber_1/attachPhantomSD
+/gate/top_cover_chamber_1_contents/attachPhantomSD
+/gate/top_cover_chamber_2/attachPhantomSD
+/gate/top_cover_chamber_2_contents/attachPhantomSD
+/gate/wide_hole_lid/attachPhantomSD
+/gate/wide_o_ring/attachPhantomSD

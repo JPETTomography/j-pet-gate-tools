@@ -1,0 +1,27 @@
+#################
+#               #
+#  S O U R C E  #
+#               #
+#################
+
+# For NEMA NU 4-2008 MOUSE SCATTER phantom
+# Information from NEMA NU-4 2008 standard
+
+# SET ACTIVITY
+/gate/source/addSource F18LineSource
+/gate/source/F18LineSource/setActivity 1000000. becquerel
+/gate/source/F18LineSource/gps/particle e+
+/gate/source/F18LineSource/setForcedUnstableFlag true
+/gate/source/F18LineSource/setForcedHalfLife 6586.2 s
+/gate/source/F18LineSource/gps/energytype Fluor18
+
+# SET GEOMETRY
+/gate/source/F18LineSource/gps/type Volume
+/gate/source/F18LineSource/gps/shape Cylinder
+/gate/source/F18LineSource/gps/radius 0.6 mm
+/gate/source/F18LineSource/gps/halfz 35. mm
+/gate/source/F18LineSource/gps/angtype iso
+/gate/source/F11LineSource/gps/centre 0. -10. 0. mm
+
+/gate/source/list
+

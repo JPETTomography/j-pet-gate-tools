@@ -1,0 +1,24 @@
+# NEMA Specification NU 4-2008: Mouse-Sized Scatter Phantom
+# Created by Geron Bindseil, Western University, 2012.
+
+# NEMA: Mouse Scatter
+/gate/world/daughters/name NEMA
+/gate/world/daughters/insert cylinder
+/gate/NEMA/setMaterial Polyethylene
+/gate/NEMA/geometry/setRmax   12.5 mm
+/gate/NEMA/geometry/setHeight 70. mm
+/gate/NEMA/placement/setTranslation 0. 0. 0. mm
+/gate/NEMA/vis/forceSolid
+/gate/NEMA/vis/setColor white
+
+# HOLE
+/gate/NEMA/daughters/name HOLE
+/gate/NEMA/daughters/insert cylinder
+/gate/HOLE/setMaterial Water
+/gate/HOLE/geometry/setRmax 1.6 mm
+/gate/HOLE/geometry/setHeight 70. mm
+/gate/HOLE/placement/setTranslation 0. -10. 0. mm
+/gate/world/vis/setVisible 0
+
+/gate/NEMA/attachPhantomSD
+/gate/HOLE/attachPhantomSD

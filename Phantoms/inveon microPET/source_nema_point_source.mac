@@ -1,0 +1,30 @@
+#################
+#               #
+#  S O U R C E  #
+#               #
+#################
+
+# For NEMA: Point Source
+# Information from NEMA NU-4 2008 standard
+# Assume Sodium-22 Point Source with Radioactive Decay
+# To use the ion source, you must enable the physics process RadioactiveDecay
+
+# SET ACTIVITY
+/gate/source/addSource Na22Source
+/gate/source/Na22Source/setActivity 220000. becquerel
+/gate/source/Na22Source/gps/particle ion
+/gate/source/Na22Source/gps/ion 11 22 0 0
+/gate/source/Na22Source/gps/monoenergy 0. keV
+/gate/source/Na22Source/setForcedUnstableFlag true
+/gate/source/Na22Source/setForcedHalfLife 82078747. s
+
+
+# SET GEOMETRY
+/gate/source/Na22Source/gps/type Volume
+/gate/source/Na22Source/gps/shape Sphere
+/gate/source/Na22Source/gps/radius 0.125 mm
+/gate/source/Na22Source/gps/angtype iso
+/gate/source/Na22Source/gps/centre 0. 0. 0. mm
+
+/gate/source/list
+

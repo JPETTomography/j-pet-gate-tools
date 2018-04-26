@@ -26,7 +26,8 @@ goja-tools
 ----------
 
   Additional tools for goja output, including the conversion of data, simulated for 
-  3-layer geometry, into 1-layer, as well as smearing of Z-coordinates and times of hits
+  3-layer geometry, into 1-layer, as well as smearing of Z-coordinates and times of hits 
+  according to the readout.
 
 jplot
 -----

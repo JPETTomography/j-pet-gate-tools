@@ -2,7 +2,7 @@
 
 A tool which allows smearing both hits for each event/coincidence of back-to-back gamma quanta emission from the source 
 inside J-PET scanner, according to the type of the readout (photomultiplier). It proceeds 
-[list mode ASCII data file](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/examples/goja 
+[list mode ASCII data file](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/goja#goja-output 
 "see the description here") sequentially, line by line.
 
 Compilation and usage

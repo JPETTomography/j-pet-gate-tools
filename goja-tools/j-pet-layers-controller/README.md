@@ -1,6 +1,6 @@
 # J-PET layers controller
 
-Transforms list-mode ASCII data from 3-layer scanner geometry (see [GOJA output](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/examples/goja "GOJA output") description) into 1-layer.
+Transforms list-mode ASCII data from 3-layer scanner geometry (see [GOJA output](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/goja#goja-output "GOJA output") description) into 1-layer.
 
 The default parameters implies [big barrell](http://koza.if.uj.edu.pl/petwiki/index.php/Simulated_geometries#Laboratory_geometry_-_3_layers.2C_192_strips_.28big_barell.29 "JPET Wiki") geometry, with the options to perform TOF adjustment (since LORs, redefined to 1-layer, are of different lengths). An arbitrary layer ID which the data will be remapped to could be chosen, with the 1st one as the default.
 
@@ -29,4 +29,4 @@ The flag ```-with_tof``` forces all hit times to be recalculated in order to mat
 ```
 $ python -W ignore reduce_multilayer.py SOME_INPUT_ASCII_DATA -l 0 -with_tof
 ```
-(!) IMPORTANT: the application implies that hit times are in ps, and not ns, as described in [GOJA description](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/examples/goja "see GOJA output").
+(!) IMPORTANT: the application implies that hit times are in ps, and not ns, as described in [GOJA description](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/goja "see GOJA output").

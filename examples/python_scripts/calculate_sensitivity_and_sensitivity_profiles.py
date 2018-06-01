@@ -75,6 +75,9 @@ if __name__ == "__main__":
     elif "L100" in geometry:
         N = 100.
         L = 100.
+    elif "L200" in geometry:
+        N = 200.
+        L = 200.
 
     norm_factor = activity/N # activity per slice
 
@@ -86,11 +89,16 @@ if __name__ == "__main__":
     sourcePosZ = tmp[:,15]
     time = loadtxt(coincidences_directory + geometry + suffix_realtime)
 
-    true_coincidences = 0
+    coincidences_true = 0
+    coincidences_acci = 0
     for t in type_of_coincidence:
-      if t==1: true_coincidences+=1
+      if t==1: coincidences_true+=1
+      if t==4: coincidences_acci+=1
 
-    sensitivity = true_coincidences/time/activity
+    sensitivity = coincidences_true/time/activity
+    ratio_acci = coincidences_acci/len(type_of_coincidence)*100.
+
+    print("\tsensitivity=" + str(sensitivity) + ", ratio_acci=" + str(ratio_acci))
 
     sourcePosZ_true = []
     sourcePosZ_true_PMT = []
@@ -114,3 +122,4 @@ if __name__ == "__main__":
     savetxt(workdir_Sensitivity + geometry + "_sensitivity.txt", [sensitivity])
     savetxt(workdir_Sensitivity + geometry + "_sensitivity_profiles.txt",
             array([sensitivity_profile, sensitivity_profile_PMT]).T)
+    savetxt(workdir_Sensitivity + geometry + "_ratio_acci.txt", [ratio_acci])

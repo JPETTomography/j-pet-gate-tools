@@ -118,6 +118,9 @@ if __name__ == "__main__":
     elif "L100" in geometry:
         datacolor = 'y'
         new_label += ", L = 100 cm"
+    elif "L200" in geometry:
+        datacolor = 'g'
+        new_label += ", L = 200 cm"
 
     float_activities.append(float_activity)
     NECRs_sin.append(NECR_sin)

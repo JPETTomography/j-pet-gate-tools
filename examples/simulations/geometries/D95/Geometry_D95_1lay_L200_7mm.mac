@@ -11,7 +11,7 @@
 /gate/world/daughters/insert box
 /gate/detector/geometry/setXLength 20 mm
 /gate/detector/geometry/setYLength 7 mm
-/gate/detector/geometry/setZLength 102 cm
+/gate/detector/geometry/setZLength 202 cm
 /gate/detector/setMaterial Air
 /gate/detector/placement/setTranslation  484.6 0 0 mm
 /gate/detector/vis/forceWireframe
@@ -24,7 +24,7 @@
 /gate/crystal/placement/setTranslation 0 0 0 cm
 /gate/crystal/geometry/setXLength 20 mm
 /gate/crystal/geometry/setYLength 7 mm
-/gate/crystal/geometry/setZLength 100 cm
+/gate/crystal/geometry/setZLength 200 cm
 /gate/crystal/setMaterial EJ230
 /gate/crystal/vis/forceSolid
 /gate/crystal/vis/setColor white
@@ -34,7 +34,7 @@
 
 /gate/detector/daughters/name pmt1
 /gate/detector/daughters/insert box
-/gate/pmt1/placement/setTranslation 0. 0. 50.5 cm
+/gate/pmt1/placement/setTranslation 0. 0. 100.5 cm
 /gate/pmt1/geometry/setXLength 20 mm
 /gate/pmt1/geometry/setYLength 7 mm
 /gate/pmt1/geometry/setZLength 1 cm
@@ -44,7 +44,7 @@
 
 /gate/detector/daughters/name pmt2
 /gate/detector/daughters/insert box
-/gate/pmt2/placement/setTranslation 0. 0. -50.5 cm
+/gate/pmt2/placement/setTranslation 0. 0. -100.5 cm
 /gate/pmt2/geometry/setXLength 20 mm
 /gate/pmt2/geometry/setYLength 7 mm
 /gate/pmt2/geometry/setZLength 1 cm

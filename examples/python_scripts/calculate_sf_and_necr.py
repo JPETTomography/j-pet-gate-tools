@@ -103,6 +103,8 @@ def perform_analysis(activity, filepath, workdir):
       L = 50.
   elif "L100" in filepath:
       L = 100.
+  elif "L200" in filepath:
+      L = 200.
   else:
       L = 50.
 
@@ -321,13 +323,16 @@ def perform_analysis(activity, filepath, workdir):
   NECR_sin = NECR_sin/1000. # cps -> kcps
   NECR_ctr = NECR_ctr/1000. # cps -> kcps
 
+  ratio_acci = N_acci/float(N_all)
+
   # Printing calculated values
   data_for_single_activity = str(float_activity) + "\t"
   data_for_single_activity += str(SF_sin) + "\t" + str(SF_ctr) + "\t"
   data_for_single_activity += str(NECR_sin) + "\t" + str(NECR_ctr) + "\t"
   data_for_single_activity += str(T) + "\t" + str(S) + "\t"
   data_for_single_activity += str(N_true) + "\t" + str(N_dsca) + "\t" + str(N_psca) + "\t" + str(N_acci) + "\t"
-  data_for_single_activity += str(time)
+  data_for_single_activity += str(time) + "\t"
+  data_for_single_activity += str(ratio_acci)
 
   print data_for_single_activity
 
@@ -443,10 +448,6 @@ if __name__ == "__main__":
 
   directory = args.coincidences_directory
 
-  activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800",
-                "0900","1000","1100","1200","1300","1400","1500","1600","1700",
-                "1800","1900","2000"]
-
   create_work_directories()
 
   for geometry in geometries_NECR:
@@ -459,8 +460,8 @@ if __name__ == "__main__":
     if (os.path.isfile(workdir + "necr_dependency.txt")):
       os.system("rm " + workdir + "necr_dependency.txt")
 
-    for i in xrange(len(activities)):
+    for i in xrange(len(activities_NECR)):
 
-      activity = activities[i]
+      activity = activities_NECR[i]
       filepath = directory + geometry + "_" + activity
       perform_analysis(activity, filepath, workdir)

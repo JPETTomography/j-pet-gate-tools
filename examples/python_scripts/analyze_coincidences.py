@@ -9,8 +9,10 @@ from matplotlib.colors import LogNorm
 from math import *
 import argparse
 
+OUTPUT_FORMAT = ".png"
+
 # Plot using data from GATE simulations
-def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
+def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], toc=0):
 
   # Load data from file
 
@@ -22,6 +24,37 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
   posX2 = tmp[:,4]
   posY2 = tmp[:,5]
   times2 = tmp[:,7]
+  type_of_coincidence = tmp[:,12]
+
+  if toc != 0:
+    tmp_posX1 = []
+    tmp_posY1 = []
+    tmp_times1 = []
+    tmp_posX2 = []
+    tmp_posY2 = []
+    tmp_times2 = []
+    for i in xrange(len(type_of_coincidence)):
+      if type_of_coincidence[i]==toc:
+        tmp_posX1.append(posX1[i])
+        tmp_posY1.append(posY1[i])
+        tmp_times1.append(times1[i])
+        tmp_posX2.append(posX2[i])
+        tmp_posY2.append(posY2[i])
+        tmp_times2.append(times2[i])
+    posX1 = array(tmp_posX1)
+    posY1 = array(tmp_posY1)
+    times1 = array(tmp_times1)
+    posX2 = array(tmp_posX2)
+    posY2 = array(tmp_posY2)
+    times2 = array(tmp_times2)
+
+  label = ""
+  if toc==1: label = "_true"
+  elif toc==2: label = "_psca"
+  elif toc==3: label = "_dsca"
+  elif toc==4: label = "_acci"
+
+  print len(posX1)
 
   # Calculate vectors of times and angles differences
 
@@ -84,7 +117,7 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180]):
 
   plt.xlabel("Time difference [ns]")
   plt.ylabel("Angle difference [deg.]")
-  plt.savefig(result_figure_path, bbox_inches='tight')
+  plt.savefig(result_figure_path + label + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -118,7 +151,7 @@ def plot_Da_vs_Dt_exp(datafile, result_figure_path):
 
   plt.xlabel("Time difference [ps]")
   plt.ylabel("Angle difference [deg.]")
-  plt.savefig(result_figure_path, bbox_inches='tight')
+  plt.savefig(result_figure_path + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -147,7 +180,7 @@ def plot_sourcePosX_vs_sourcePosY(goja_output_file, result_figure_path):
 
   plt.xlabel("sourcePosX [cm]")
   plt.ylabel("sourcePosY [cm]")
-  plt.savefig(result_figure_path, bbox_inches='tight')
+  plt.savefig(result_figure_path + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -191,13 +224,13 @@ if __name__ == "__main__":
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
                       type=str,
-                      default="./DA_vs_DT.png",
+                      default="./DA_vs_DT",
                       help='path to the output figure')
 
   parser.add_argument('-osxsy', '--output-sposx-sposy',
                       dest='path_output_sposx_sposy',
                       type=str,
-                      default="./sourcePosX_vs_sourcePosY.png",
+                      default="./sourcePosX_vs_sourcePosY",
                       help='path to the output figure sourcePosX vs. sourcePosY')
 
   parser.add_argument('-sc', '--show-cut',
@@ -209,7 +242,11 @@ if __name__ == "__main__":
 
   if args.mode == "plot":
     plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut)
-    plot_sourcePosX_vs_sourcePosY(args.path_coincidences_file, args.path_output_sposx_sposy)
+    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=1)
+    #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=2)
+    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=3)
+    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=4)
+    #plot_sourcePosX_vs_sourcePosY(args.path_coincidences_file, args.path_output_sposx_sposy)
 
   elif args.mode == "stats":
     calculate_ratios(args.path_coincidences_file)

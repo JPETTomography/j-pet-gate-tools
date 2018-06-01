@@ -117,7 +117,7 @@ void EventAnalysis::print_coincidences() {
 	cout << verify_type_of_coincidence(h1, h2) << "\t";
 
 	cout.precision(2);
-	cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << endl;
+	cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
 	cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << endl;
 
 }

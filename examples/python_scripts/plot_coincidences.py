@@ -151,6 +151,27 @@ def plot_sourcePosX_vs_sourcePosY(goja_output_file, result_figure_path):
   plt.clf()
   plt.close()
 
+def calculate_ratios(goja_output_file):
+
+  filename = goja_output_file.split("/")[-1]
+
+  tmp = loadtxt(goja_output_file)
+
+  type_of_coincidence = tmp[:,12]
+
+  N_true = 0
+  N_acci = 0
+  N_all = len(type_of_coincidence)
+
+  for i in xrange(N_all):
+    if type_of_coincidence[i]==1: N_true += 1
+    elif type_of_coincidence[i]==4: N_acci += 1
+
+  ratio_acci = float(N_acci)/float(N_all)*100.
+  ratio_acci_to_true = float(N_acci)/float(N_true)*100.
+
+  print("filename={0}, ratio_acci={1:.2f}, ratio_acci_to_true={2:.2f}".format(filename, ratio_acci, ratio_acci_to_true))
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Plot DA (angles differences) vs. DT (times differences) using the coincidecnes file.',
@@ -160,6 +181,12 @@ if __name__ == "__main__":
                       dest='path_coincidences_file',
                       type=str,
                       help='path to the coincidences file obtained using the GOJA tool')
+
+  parser.add_argument('-m', '--mode',
+                      dest='mode',
+                      type=str,
+                      default="plot",
+                      help='mode of the script: plot or stats')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
@@ -180,5 +207,9 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
 
-  plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut)
-  plot_sourcePosX_vs_sourcePosY(args.path_coincidences_file, args.path_output_sposx_sposy)
+  if args.mode == "plot":
+    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut)
+    plot_sourcePosX_vs_sourcePosY(args.path_coincidences_file, args.path_output_sposx_sposy)
+
+  elif args.mode == "stats":
+    calculate_ratios(args.path_coincidences_file)

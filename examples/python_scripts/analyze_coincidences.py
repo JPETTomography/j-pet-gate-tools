@@ -170,7 +170,7 @@ def calculate_ratios(goja_output_file):
   ratio_acci = float(N_acci)/float(N_all)*100.
   ratio_acci_to_true = float(N_acci)/float(N_true)*100.
 
-  print("filename={0}, ratio_acci={1:.2f}, ratio_acci_to_true={2:.2f}".format(filename, ratio_acci, ratio_acci_to_true))
+  print("filename={0}, ratio_acci={1:.2f}%, ratio_acci_to_true={2:.2f}%".format(filename, ratio_acci, ratio_acci_to_true))
 
 if __name__ == "__main__":
 

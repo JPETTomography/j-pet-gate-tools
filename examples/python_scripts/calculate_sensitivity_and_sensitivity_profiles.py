@@ -48,6 +48,12 @@ if __name__ == "__main__":
                       default="/home/pkowalski/Pulpit/PMB_realtime_sensitivity/",
                       help='path to dir with the GOJA sensitivity results')
 
+  parser.add_argument('-sw', '--slice-width',
+                      dest='slice_width',
+                      type=float,
+                      default=1.0,
+                      help='width of the virtual slice')
+
   args = parser.parse_args()
 
   if not args.coincidences_directory:
@@ -64,22 +70,16 @@ if __name__ == "__main__":
 
   for geometry in geometries_sensitivity:
 
-    N = 0
     L = 0
     if "L020" in geometry:
-        N = 20.
         L = 20.
     elif "L050" in geometry:
-        N = 50.
         L = 50.
     elif "L100" in geometry:
-        N = 100.
         L = 100.
     elif "L200" in geometry:
-        N = 200.
         L = 200.
-
-    norm_factor = activity/N # activity per slice
+    N = L/args.slice_width # number of slices
 
     file_to_load = coincidences_directory + geometry + suffix_coincidences
     print(file_to_load)
@@ -95,8 +95,8 @@ if __name__ == "__main__":
       if t==1: coincidences_true+=1
       if t==4: coincidences_acci+=1
 
-    sensitivity = coincidences_true/time/activity
-    ratio_acci = coincidences_acci/len(type_of_coincidence)*100.
+    sensitivity = float(coincidences_true)/time/activity
+    ratio_acci = float(coincidences_acci)/float(len(type_of_coincidence))*100.
 
     print("\tsensitivity=" + str(sensitivity) + ", ratio_acci=" + str(ratio_acci))
 
@@ -114,8 +114,14 @@ if __name__ == "__main__":
     hist = histogram(sourcePosZ_true, bins=pos_bins)
     hist_PMT = histogram(sourcePosZ_true_PMT, bins=pos_bins)
 
-    sensitivity_profile = hist[0]/norm_factor/time
-    sensitivity_profile_PMT = hist_PMT[0]/norm_factor/time
+    # activity per slice (source has only 70 cm length)
+    if L<=70:
+      norm_factor = activity/N*time
+    else:
+      norm_factor = activity/(70./args.slice_width)*time
+
+    sensitivity_profile = hist[0]/norm_factor
+    sensitivity_profile_PMT = hist_PMT[0]/norm_factor
 
     create_work_directories()
 

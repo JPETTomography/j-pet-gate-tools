@@ -11,7 +11,7 @@ c_scin = 12.6 # [cm/s]
 
 # Technical constants:
 
-## NEMA_SF_NECR_CUT
+## NEMA_DISPLACEMENT_CUT
 #
 #  Cut from the NEMA norm: when sinograms are analyzed, all LORs with
 #  displacement larger than this threshold may be removed from the dataset.

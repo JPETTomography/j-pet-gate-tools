@@ -16,8 +16,10 @@ SLICE_WIDTH = 2. # in cm
 BINS_DISPLACEMENTS = 100
 BINS_ANGLES = 90
 
-suffix_coincidences = "_NECR_COINCIDENCES_short"
-suffix_realtime = "_NECR_REALTIME_short"
+SUFFIX_COINCIDENCES = "_NECR_COINCIDENCES_short"
+SUFFIX_REALTIME = "_NECR_REALTIME_short"
+
+CALCULATE_SF = False
 
 class sinogram:
 
@@ -118,7 +120,7 @@ def perform_analysis(activity, filepath, workdir):
   # Loading coincidences from the file
   #===========================================
 
-  coincidences = loadtxt(filepath + suffix_coincidences)
+  coincidences = loadtxt(filepath + SUFFIX_COINCIDENCES)
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
   posZ1 = coincidences[:,2]
@@ -134,7 +136,7 @@ def perform_analysis(activity, filepath, workdir):
   #===========================================
 
   time = 0.
-  realtime_path = filepath + suffix_realtime
+  realtime_path = filepath + SUFFIX_REALTIME
   if os.path.exists(realtime_path):
     time = loadtxt(realtime_path)
   else:
@@ -312,7 +314,10 @@ def perform_analysis(activity, filepath, workdir):
 
   #===========================================
 
-  float_activity = float(activity)/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
+  if not CALCULATE_SF:
+    float_activity = float(activity)/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
+  else:
+    float_activity = 0.001/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
 
   SF_sin = S/(S+T)*100. # sin - sinogram
   SF_ctr = float(N_dsca+N_psca)/(N_dsca+N_psca+N_true)*100. # ctr - counter
@@ -408,27 +413,34 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Calculate sensitivity and sensitivity profiles using the GOJA results.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  parser.add_argument('--coincidences-directory',
+  parser.add_argument('-cd', '--coincidences-directory',
                       dest='coincidences_directory',
                       type=str,
                       default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/N0_1000_short/",
                       help='path to dir with the GOJA sensitivity results')
 
-  parser.add_argument('--slice-width',
+  parser.add_argument('-sw', '--slice-width',
                       dest='slice_width',
                       type=float,
                       default=SLICE_WIDTH,
-                      help='with of the virtual slice')
-  parser.add_argument('--bins-displacements',
+                      help='width of the virtual slice')
+
+  parser.add_argument('-bd', '--bins-displacements',
                       dest='bins_displacements',
                       type=float,
                       default=BINS_DISPLACEMENTS,
                       help='nr of bins for displacements')
-  parser.add_argument('--bins-angles',
+
+  parser.add_argument('-ba' ,'--bins-angles',
                       dest='bins_angles',
                       type=float,
                       default=BINS_ANGLES,
                       help='nr of bins for angles')
+
+  parser.add_argument('--scatter-fraction',
+                      dest='scatter_fraction',
+                      action='store_true',
+                      help='use to calculate the SF using the set of 1 kBq simulations')
 
   args = parser.parse_args()
 
@@ -441,6 +453,12 @@ if __name__ == "__main__":
   elif not is_coincidences_directory_valid(args.coincidences_directory):
     print "Directory " + args.coincidences_directory + " is not valid. It should contain coincidences files with proper names. Check --help option."
     sys.exit()
+
+  if args.scatter_fraction:
+    CALCULATE_SF = True
+    SUFFIX_COINCIDENCES = "SF_COINCIDENCES_short"
+    SUFFIX_REALTIME = "SF_REALTIME_short"
+    activities_NECR = [""]
 
   SLICE_WIDTH = args.slice_width
   BINS_DISPLACEMENTS = args.bins_displacements

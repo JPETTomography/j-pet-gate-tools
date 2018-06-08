@@ -49,19 +49,29 @@ strips = {
   200: strip200
 }
 
-geometries_sensitivity = ["D75_1lay_L020_7mm", "D75_1lay_L050_7mm", "D75_1lay_L100_7mm", "D75_1lay_L200_7mm",
-                          "D75_2lay_L020_7mm", "D75_2lay_L050_7mm", "D75_2lay_L100_7mm", "D75_2lay_L200_7mm",
-                          "D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_1lay_L200_7mm",
-                          "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm", "D85_2lay_L200_7mm",
-                          "D95_1lay_L020_7mm", "D95_1lay_L050_7mm", "D95_1lay_L100_7mm", "D95_1lay_L200_7mm",
-                          "D95_2lay_L020_7mm", "D95_2lay_L050_7mm", "D95_2lay_L100_7mm", "D95_2lay_L200_7mm"]
+geometries_sensitivity = [
+  "D75_1lay_L020_7mm", "D85_1lay_L020_7mm", "D95_1lay_L020_7mm",
+  "D75_2lay_L020_7mm", "D85_2lay_L020_7mm", "D95_2lay_L020_7mm",
+  "D75_1lay_L050_7mm", "D85_1lay_L050_7mm", "D95_1lay_L050_7mm",
+  "D75_2lay_L050_7mm", "D85_2lay_L050_7mm", "D95_2lay_L050_7mm",
+  "D75_1lay_L100_7mm", "D85_1lay_L100_7mm", "D95_1lay_L100_7mm",
+  "D75_2lay_L100_7mm", "D85_2lay_L100_7mm", "D95_2lay_L100_7mm",
+  "D75_1lay_L200_7mm", "D85_1lay_L200_7mm", "D95_1lay_L200_7mm",
+  "D75_2lay_L200_7mm", "D85_2lay_L200_7mm", "D95_2lay_L200_7mm"
+]
 
-geometries_NECR = ["D85_1lay_L020_7mm", "D85_1lay_L050_7mm", "D85_1lay_L100_7mm", "D85_1lay_L200_7mm",
-                   "D85_2lay_L020_7mm", "D85_2lay_L050_7mm", "D85_2lay_L100_7mm", "D85_2lay_L200_7mm"]
+geometries_NECR = [
+  "D85_1lay_L020_7mm", "D85_2lay_L020_7mm",
+  "D85_1lay_L050_7mm", "D85_2lay_L050_7mm",
+  "D85_1lay_L100_7mm", "D85_2lay_L100_7mm",
+  "D85_1lay_L200_7mm", "D85_2lay_L200_7mm",
+]
 
-activities_NECR = ["0001","0100","0200","0300","0400","0500","0600","0700","0800",
-                   "0900","1000","1100","1200","1300","1400","1500","1600","1700",
-                   "1800","1900","2000"]
+activities_NECR = [
+  "0001", "0100", "0200", "0300", "0400", "0500", "0600", "0700",
+  "0800", "0900", "1000", "1100", "1200", "1300", "1400", "1500",
+  "1600", "1700", "1800", "1900", "2000"
+]
 
 # Workdir directories:
 workdir_Results = "./Results/"

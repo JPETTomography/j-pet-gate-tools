@@ -8,8 +8,45 @@ from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from math import *
 import argparse
+from scipy import interpolate
+
+from nema_common import *
 
 OUTPUT_FORMAT = ".png"
+ELLIPSE_PARAM = 2.2
+
+def calculate_differences(tim1, tim2, posx1, posy1, posx2, posy2):
+
+  tim_diffs = absolute(tim1 - tim2)/1e3 # in ns
+
+  vx = posx1
+  vy = posy1
+  ux = posx2
+  uy = posy2
+
+  vu = vx*ux + vy*uy
+  modv = np.sqrt(vx*vx + vy*vy)
+  modu = np.sqrt(ux*ux + uy*uy)
+
+  ang_diffs = np.arccos(vu/(modv*modu))/pi*180.
+
+  return [tim_diffs, ang_diffs]
+
+def calculate_counters(tim_diffs, ang_diffs, param):
+
+  counter_above = 0
+  counter_below = 0
+  for i in xrange(len(tim_diffs)):
+    t = tim_diffs[i]
+    a = ang_diffs[i]
+    try:
+      newa = 180-80*sqrt(1.-t*t/(param*param))
+      if a>newa: counter_above += 1
+      else: counter_below += 1
+    except:
+      pass
+
+  return [counter_above, counter_below]
 
 # Plot using data from GATE simulations
 def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], toc=0):
@@ -58,18 +95,7 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], 
 
   # Calculate vectors of times and angles differences
 
-  tim_diffs = absolute(times1 - times2)/1e3 # in ns
-
-  vx = posX1
-  vy = posY1
-  ux = posX2
-  uy = posY2
-
-  vu = vx*ux + vy*uy
-  modv = np.sqrt(vx*vx + vy*vy)
-  modu = np.sqrt(ux*ux + uy*uy)
-
-  ang_diffs = np.arccos(vu/(modv*modu))/pi*180.
+  [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
 
   # Plot 2D histogram
 
@@ -89,26 +115,15 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], 
   plt.colorbar()
 
   # Ellipse curve
-  param = 2.2
-  xxx = linspace(0,param,100)
+  xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
   for i in xrange(len(xxx)):
-    yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(param*param)))
+    yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(ELLIPSE_PARAM*ELLIPSE_PARAM)))
 
   if show_cut:
     plt.plot(xxx, yyy, color='r', linewidth=2)
 
-  counter_above = 0
-  counter_below = 0
-  for i in xrange(len(tim_diffs)):
-    t = tim_diffs[i]
-    a = ang_diffs[i]
-    try:
-      newa = 180-80*sqrt(1.-t*t/(param*param))
-      if a>newa: counter_above += 1
-      else: counter_below += 1
-    except:
-      pass
+  [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs, ELLIPSE_PARAM)
   print "Number of events above the cut: ", counter_above
   print "Number of events below the cut: ", counter_below
   print "Percentage of cut events: ", float(counter_below)/(counter_above+counter_below)*100.
@@ -205,6 +220,78 @@ def calculate_ratios(goja_output_file):
 
   print("filename={0}, ratio_acci={1:.2f}%, ratio_acci_to_true={2:.2f}%".format(filename, ratio_acci, ratio_acci_to_true))
 
+def calculate_reduction_for_necr_simulations(necr_simulations):
+
+  for g in geometries_NECR:
+    sls_file = workdir_NECR + g + "/second_lvl_selection.txt"
+    if os.path.exists(sls_file):
+      os.system('rm ' + sls_file)
+    for a in activities_NECR:
+      coincidences_file = necr_simulations + "/" + g + "_" + a + "_NECR_COINCIDENCES_short"
+      tmp = loadtxt(coincidences_file)
+      posX1 = tmp[:,0]
+      posY1 = tmp[:,1]
+      times1 = tmp[:,3]
+      posX2 = tmp[:,4]
+      posY2 = tmp[:,5]
+      times2 = tmp[:,7]
+      [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
+      [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs, ELLIPSE_PARAM)
+      with open(sls_file, "a") as myfile:
+        myfile.write("{0}\t{1}\t{2}\n".format(counter_above, counter_below, counter_above+counter_below))
+      print g + "\t" + a + "\t" + str(counter_above) + "\t" + str(counter_below) + "\t" + str(counter_above+counter_below)
+
+def plot_reduction_for_necr_simulations():
+
+  rcParams['font.size'] = 24
+  rcParams['legend.fontsize'] = 18
+
+  activities = []
+  for a in activities_NECR:
+    activities.append(float(a)/22000.*1000) # in kBq/cc
+  new_activities = linspace(activities[0],activities[-1],100)
+
+  fig = plt.figure(figsize=(8, 6))
+  ax = fig.add_subplot(111)
+
+  plt.ylim(ymin=0,ymax=80)
+  plt.xlim(xmin=0,xmax=90)
+
+  for g in geometries_NECR:
+
+    lab = ""
+    c = ""
+    l = ""
+    if "1lay" in g:
+      lab += "1 layer, "
+      c = 'k'
+    elif "2lay" in g:
+      lab += "2 layers, "
+      c = 'r'
+    if "L020" in g:
+      lab += "L = 20 cm"
+      l = '--'
+    elif "L050" in g:
+      lab += "L = 50 cm"
+      l = '-'
+    elif "L100" in g:
+      lab += "L = 100 cm"
+      l = '-.'
+
+    sls_file = workdir_NECR + g + "/second_lvl_selection.txt"
+    if os.path.exists(sls_file):
+      tmp = loadtxt(sls_file)
+      counter_above = tmp[:,0]
+      counter_below = tmp[:,1]
+      reduction = counter_below/(counter_above+counter_below)*100.
+      new_reduction = interpolate.splev(new_activities, interpolate.splrep(activities, reduction, s=5), der=0)
+      plt.plot(new_activities, new_reduction, linestyle=l, color=c, label=lab)
+
+  plt.legend(loc=4)
+  plt.xlabel("Activity concentration [kBq/cc]")
+  plt.ylabel("Reduction [%]")
+  plt.savefig(workdir_NECR + "second_lvl_selection" + OUTPUT_FORMAT, bbox_inches='tight')
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Plot DA (angles differences) vs. DT (times differences) using the coincidecnes file.',
@@ -214,6 +301,11 @@ if __name__ == "__main__":
                       dest='path_coincidences_file',
                       type=str,
                       help='path to the coincidences file obtained using the GOJA tool')
+
+  parser.add_argument('-ns', '--necr-simulations',
+                      dest='necr_simulations',
+                      type=str,
+                      help='path to the base directory of the NECR simulations')
 
   parser.add_argument('-m', '--mode',
                       dest='mode',
@@ -258,3 +350,7 @@ if __name__ == "__main__":
 
   elif args.mode == "stats":
     calculate_ratios(args.path_coincidences_file)
+
+  elif args.mode == "necr":
+    calculate_reduction_for_necr_simulations(args.necr_simulations)
+    plot_reduction_for_necr_simulations()

@@ -238,10 +238,18 @@ if __name__ == "__main__":
                       action='store_true',
                       help='set if you want to show cut')
 
+  parser.add_argument('-of', '--outputformat',
+                      dest='outputformat',
+                      type=str,
+                      default="png",
+                      help='output format of images')
+
   args = parser.parse_args()
 
+  OUTPUT_FORMAT = "." + args.outputformat
+
   if args.mode == "plot":
-    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut)
+    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, ylim=[90,180])
     #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=1)
     #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=2)
     #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=3)

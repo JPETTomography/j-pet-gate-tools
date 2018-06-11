@@ -111,7 +111,7 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], 
 
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins), range=[[0, 3],[0, 180]])
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   # Ellipse curve
@@ -161,7 +161,7 @@ def plot_Da_vs_Dt_exp(datafile, result_figure_path):
 
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins)) #, range=[[0, 3],[0, 180]])
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   plt.xlabel("Time difference [ps]")
@@ -190,7 +190,7 @@ def plot_sourcePosX_vs_sourcePosY(goja_output_file, result_figure_path):
 
   H, xedges, yedges = histogram2d(sourcePosX, sourcePosY, bins=100)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   plt.xlabel("sourcePosX [cm]")

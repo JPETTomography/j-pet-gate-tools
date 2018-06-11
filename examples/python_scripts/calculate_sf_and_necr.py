@@ -18,6 +18,7 @@ BINS_ANGLES = 90
 
 SUFFIX_COINCIDENCES = "_NECR_COINCIDENCES_short"
 SUFFIX_REALTIME = "_NECR_REALTIME_short"
+OUTPUT_FORMAT = ""
 
 CALCULATE_SF = False
 
@@ -241,7 +242,7 @@ def perform_analysis(activity, filepath, workdir):
   plt.colorbar()
   plt.xlabel("Displacement [cm]")
   plt.ylabel("Angle [rad.]")
-  plt.savefig(workdir + "sinogram_final_" + activity + ".png")
+  plt.savefig(workdir + "sinogram_final_" + activity + OUTPUT_FORMAT)
   plt.clf()
 
   #===========================================
@@ -308,7 +309,7 @@ def perform_analysis(activity, filepath, workdir):
   plt.xlim(-12,12) # from NEMA cut
   plt.ylim(0,1.1*max(vecsum/1000.))
 
-  plt.savefig(workdir + "sumhist_"+activity+".png")
+  plt.savefig(workdir + "sumhist_" + activity + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
 
@@ -375,11 +376,11 @@ def perform_analysis(activity, filepath, workdir):
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(BINS_DISPLACEMENTS,BINS_ANGLES), range=[[0, 3],[0, 180]])
 
   fig = plt.figure(figsize=(8, 6))
-  fig.add_subplot(111)
-  plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
+  ax = fig.add_subplot(111)
+  plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low',
+  plt.imshow(H.T, interpolation='None', origin='low',
              extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]],
              aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
@@ -394,7 +395,8 @@ def perform_analysis(activity, filepath, workdir):
   plt.xlabel("Time difference [ns]")
   plt.ylabel("Angle difference [deg.]")
   #plt.show()
-  plt.savefig(workdir + "2D_differences_"+activity+".png")
+  plt.ylim(90,180)
+  plt.savefig(workdir + "2D_differences_" + activity + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -442,7 +444,15 @@ if __name__ == "__main__":
                       action='store_true',
                       help='use to calculate the SF using the set of 1 kBq simulations')
 
+  parser.add_argument('-of', '--outputformat',
+                      dest='outputformat',
+                      type=str,
+                      default="png",
+                      help='output format of images')
+
   args = parser.parse_args()
+
+  OUTPUT_FORMAT = "." + args.outputformat
 
   if not args.coincidences_directory:
     print "No directory with coincidences provided. Analysis cannot be performed. Check --help option."
@@ -461,8 +471,8 @@ if __name__ == "__main__":
     activities_NECR = [""]
 
   SLICE_WIDTH = args.slice_width
-  BINS_DISPLACEMENTS = args.bins_displacements
-  BINS_ANGLES = args.bins_angles
+  BINS_DISPLACEMENTS = int(args.bins_displacements)
+  BINS_ANGLES = int(args.bins_angles)
 
   directory = args.coincidences_directory
 

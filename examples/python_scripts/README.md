@@ -3,6 +3,11 @@
 In the directory there are files for analysis of the GATE NEMA simulations
 of the J-PET detector.
 
+analyze_coincidences.py
+-----------------------
+
+  Generic tool for analyzing and plotting coincidences files.
+
 Sensitivity
 -----------
 

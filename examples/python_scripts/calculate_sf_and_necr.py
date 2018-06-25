@@ -21,6 +21,7 @@ SUFFIX_REALTIME = "_NECR_REALTIME_short"
 OUTPUT_FORMAT = ""
 
 CALCULATE_SF = False
+TEXT_OUTPUT_FILE = "necr_dependency.txt"
 
 class sinogram:
 
@@ -342,7 +343,7 @@ def perform_analysis(activity, filepath, workdir):
 
   print data_for_single_activity
 
-  with open(workdir + "necr_dependency.txt", "a") as necr_dependency:
+  with open(workdir + TEXT_OUTPUT_FILE, "a") as necr_dependency:
     necr_dependency.write(data_for_single_activity + '\n')
 
   #===========================================
@@ -466,6 +467,7 @@ if __name__ == "__main__":
 
   if args.scatter_fraction:
     CALCULATE_SF = True
+    TEXT_OUTPUT_FILE = "sf.txt"
     SUFFIX_COINCIDENCES = "SF_COINCIDENCES_short"
     SUFFIX_REALTIME = "SF_REALTIME_short"
     activities_NECR = [""]
@@ -485,8 +487,8 @@ if __name__ == "__main__":
     workdir = workdir_NECR + geometry + "/"
     if (not os.path.isdir(workdir)):
       os.system("mkdir " + workdir)
-    if (os.path.isfile(workdir + "necr_dependency.txt")):
-      os.system("rm " + workdir + "necr_dependency.txt")
+    if (os.path.isfile(workdir + TEXT_OUTPUT_FILE)):
+      os.system("rm " + workdir + TEXT_OUTPUT_FILE)
 
     for i in xrange(len(activities_NECR)):
 

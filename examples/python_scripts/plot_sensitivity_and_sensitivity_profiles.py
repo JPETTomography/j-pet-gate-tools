@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
       # Group specific settings
       if t in ["D75", "D85", "D95"]:
-        plt.ylim([0,25])
+        plt.ylim([0,23])
 
       label_blurred = ""
       if not args.blurred:

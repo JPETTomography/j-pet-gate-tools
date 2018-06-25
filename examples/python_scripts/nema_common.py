@@ -3,7 +3,7 @@
 
 import os
 import random
-from numpy import sqrt
+from numpy import *
 
 # Physical constants:
 
@@ -16,6 +16,12 @@ c_scin = 12.6 # [cm/s]
 #  Cut from the NEMA norm: when sinograms are analyzed, all LORs with
 #  displacement larger than this threshold may be removed from the dataset.
 NEMA_DISPLACEMENT_CUT = 12 # [cm]
+
+## ELLIPSE_PARAM
+#
+#  Parameter of the ellipse used as a threshold for the 2nd level of the
+#  2-level selection method (in space Da vs. Dt).
+ELLIPSE_PARAM = 2.2
 
 class strip:
 
@@ -83,8 +89,10 @@ def create_work_directories():
   if (not os.path.isdir(workdir_Results)): os.system("mkdir " + workdir_Results)
   if (not os.path.isdir(workdir_Sensitivity)): os.system("mkdir " + workdir_Sensitivity)
   if (not os.path.isdir(workdir_NECR)): os.system("mkdir " + workdir_NECR)
+  for g in geometries_NECR:
+    if (not os.path.isdir(workdir_NECR + "/" + g)): os.system("mkdir " + workdir_NECR + "/" + g)
 
-#Gaussian distribution. sourcePosZ is the mean, and sigma is the standard deviation.
+# Gaussian distribution. sourcePosZ is the mean, and sigma is the standard deviation.
 # L is the lenght of the scintillators.
 def blur_sourcePosZ(sourcePosZ,  sigma,  L):
 
@@ -93,6 +101,39 @@ def blur_sourcePosZ(sourcePosZ,  sigma,  L):
   #while result < -L/2. or result > L/2.:
     #result = random.gauss(sourcePosZ, sigma)
   return result
+
+def calculate_counters(tim_diffs, ang_diffs, param):
+
+  counter_above = 0
+  counter_below = 0
+  for i in xrange(len(tim_diffs)):
+    t = tim_diffs[i]
+    a = ang_diffs[i]
+    try:
+      newa = 180-80*sqrt(1.-t*t/(param*param))
+      if a>newa: counter_above += 1
+      else: counter_below += 1
+    except:
+      pass
+
+  return [counter_above, counter_below]
+
+def calculate_differences(tim1, tim2, posx1, posy1, posx2, posy2):
+
+  tim_diffs = absolute(tim1 - tim2)/1e3 # in ns
+
+  vx = posx1
+  vy = posy1
+  ux = posx2
+  uy = posy2
+
+  vu = vx*ux + vy*uy
+  modv = sqrt(vx*vx + vy*vy)
+  modu = sqrt(ux*ux + uy*uy)
+
+  ang_diffs = arccos(vu/(modv*modu))/pi*180.
+
+  return [tim_diffs, ang_diffs]
 
 if __name__ == "__main__":
 

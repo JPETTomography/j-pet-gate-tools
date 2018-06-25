@@ -4,6 +4,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt2
 from numpy import *
+from scipy import interpolate
 from matplotlib import rcParams, rcParamsDefault
 import argparse
 
@@ -119,7 +120,7 @@ def plot_reduction_for_necr_simulations():
       l = '-.'
     elif "L200" in g:
       lab += "L = 200 cm"
-      l = '..'
+      l = ':'
 
     sls_file = workdir_NECR + g + "/second_lvl_selection.txt"
     if os.path.exists(sls_file):

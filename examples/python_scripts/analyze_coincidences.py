@@ -13,19 +13,15 @@ from nema_common import *
 OUTPUT_FORMAT = ".png"
 
 # Plot using data from GATE simulations
-def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], toc=0):
+def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=0):
 
-  # Load data from file
-
-  tmp = loadtxt(goja_output_file)
-
-  posX1 = tmp[:,0]
-  posY1 = tmp[:,1]
-  times1 = tmp[:,3]
-  posX2 = tmp[:,4]
-  posY2 = tmp[:,5]
-  times2 = tmp[:,7]
-  type_of_coincidence = tmp[:,12]
+  posX1 = coincidences[:,0]
+  posY1 = coincidences[:,1]
+  times1 = coincidences[:,3]
+  posX2 = coincidences[:,4]
+  posY2 = coincidences[:,5]
+  times2 = coincidences[:,7]
+  type_of_coincidence = coincidences[:,12]
 
   if toc != 0:
     tmp_posX1 = []
@@ -101,15 +97,10 @@ def plot_Da_vs_Dt(goja_output_file, result_figure_path, show_cut, ylim=[0,180], 
   plt.close()
 
 # Plot using data from experiment
-def plot_Da_vs_Dt_exp(datafile, result_figure_path):
+def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
 
-  # Load data from file
-
-  tmp = loadtxt(datafile)
-  print size(tmp)
-
-  tim_diffs = tmp[:,6]
-  ang_diffs = tmp[:,7]
+  tim_diffs = coincidences[:,6]
+  ang_diffs = coincidences[:,7]
 
   # Plot 2D histogram
 
@@ -134,14 +125,10 @@ def plot_Da_vs_Dt_exp(datafile, result_figure_path):
   plt.clf()
   plt.close()
 
-def plot_sourcePosX_vs_sourcePosY(goja_output_file, result_figure_path):
+def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
 
-  # Load data from file
-
-  tmp = loadtxt(goja_output_file)
-
-  sourcePosX = tmp[:,13]
-  sourcePosY = tmp[:,14]
+  sourcePosX = coincidences[:,13]
+  sourcePosY = coincidences[:,14]
 
   # Plot 2D histogram
 
@@ -163,13 +150,9 @@ def plot_sourcePosX_vs_sourcePosY(goja_output_file, result_figure_path):
   plt.clf()
   plt.close()
 
-def calculate_ratios(goja_output_file):
+def calculate_ratios(coincidences, filename):
 
-  filename = goja_output_file.split("/")[-1]
-
-  tmp = loadtxt(goja_output_file)
-
-  type_of_coincidence = tmp[:,12]
+  type_of_coincidence = coincidences[:,12]
 
   N_true = 0
   N_acci = 0
@@ -227,13 +210,16 @@ if __name__ == "__main__":
 
   OUTPUT_FORMAT = "." + args.outputformat
 
+  # Load data from file
+  coincidences = loadtxt(args.path_coincidences_file)
+
   if args.mode == "plot":
-    plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, ylim=[90,180])
-    #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=1)
-    #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=2)
-    #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=3)
-    #plot_Da_vs_Dt(args.path_coincidences_file, args.path_output_da_dt, args.show_cut, toc=4)
-    plot_sourcePosX_vs_sourcePosY(args.path_coincidences_file, args.path_output_sposx_sposy)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, ylim=[90,180])
+    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1)
+    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2)
+    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3)
+    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4)
+    plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "stats":
-    calculate_ratios(args.path_coincidences_file)
+    calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

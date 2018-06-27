@@ -12,7 +12,25 @@ from nema_common import *
 
 OUTPUT_FORMAT = ".png"
 
-# Plot using data from GATE simulations
+## Plot Da vs. Dt using data from GATE simulations.
+#
+#  Da - differences of central angles between hits in the coincidence
+#  Dt - differences of times of interactions of hits in the coincidence
+#
+#  Parameters
+#  ----------
+#  coincidences : ndarray
+#      Data read from the listmode goja output file using the numpy.loadtxt.
+#  result_figure_path : str
+#      Path to the output image file.
+#  show_cut : bool
+#      Switch to enable or disable the ellipsoidal cut line on the image.
+#  ylim : tuple
+#      Limits of the angles differences axis.
+#  toc : int
+#      Type of the coincidence. When set to 0, all coincidences are plotted.
+#      When set to 1 (true), 2 (psca), 3 (psca) or 4 (acci), only coincidences
+#      with a chosen type of the coincidence are plotted.
 def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=0):
 
   posX1 = coincidences[:,0]
@@ -96,7 +114,17 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=
   plt.clf()
   plt.close()
 
-# Plot using data from experiment
+## Plot Da vs. Dt using data from experiment.
+#
+#  Da - differences of central angles between hits in the coincidence
+#  Dt - differences of times of interactions of hits in the coincidence
+#
+#  Parameters
+#  ----------
+#  coincidences : ndarray
+#      Data read from the listmode goja output file using the numpy.loadtxt.
+#  result_figure_path : str
+#      Path to the output image file.
 def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
 
   tim_diffs = coincidences[:,6]
@@ -125,6 +153,16 @@ def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
   plt.clf()
   plt.close()
 
+## Plot source position x vs. y using data from GATE simulations.
+#
+#  source position - position of the annihilation
+#
+#  Parameters
+#  ----------
+#  coincidences : ndarray
+#      Data read from the listmode goja output file using the numpy.loadtxt.
+#  result_figure_path : str
+#      Path to the output image file.
 def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
 
   sourcePosX = coincidences[:,13]
@@ -150,6 +188,18 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
   plt.clf()
   plt.close()
 
+## Calculate (and print) ratios of accidental coincidences using data from GATE simulations.
+#
+#  2 ratios are calculated:
+#   - ratio_acci - ratio between accidental and all coincidences
+#   - ratio_acci_to_true - ratio between accidental and true coincidences
+#
+#  Parameters
+#  ----------
+#  coincidences : ndarray
+#      Data read from the listmode goja output file using the numpy.loadtxt.
+#  filename : str
+#      Name of the goja output file used in the analysis.
 def calculate_ratios(coincidences, filename):
 
   type_of_coincidence = coincidences[:,12]

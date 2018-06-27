@@ -233,7 +233,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="plot",
-                      help='mode of the script: plot or stats')
+                      help='mode of the script: plot, plot_by_types or stats')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
@@ -241,16 +241,16 @@ if __name__ == "__main__":
                       default="./DA_vs_DT",
                       help='path to the output figure')
 
+  parser.add_argument('-sc', '--show-cut',
+                      dest='show_cut',
+                      action='store_true',
+                      help='set if you want to show cut')
+
   parser.add_argument('-osxsy', '--output-sposx-sposy',
                       dest='path_output_sposx_sposy',
                       type=str,
                       default="./sourcePosX_vs_sourcePosY",
                       help='path to the output figure sourcePosX vs. sourcePosY')
-
-  parser.add_argument('-sc', '--show-cut',
-                      dest='show_cut',
-                      action='store_true',
-                      help='set if you want to show cut')
 
   parser.add_argument('-of', '--outputformat',
                       dest='outputformat',
@@ -267,11 +267,16 @@ if __name__ == "__main__":
 
   if args.mode == "plot":
     plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, ylim=[90,180])
-    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1)
-    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2)
-    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3)
-    #plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4)
     plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
+
+  elif args.mode == "plot_by_types":
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1)
+    try:
+      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2)
+    except:
+      print "There are no phantom coincidences in the goja output file."
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4)
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

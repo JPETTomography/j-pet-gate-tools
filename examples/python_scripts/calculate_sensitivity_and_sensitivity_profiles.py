@@ -54,6 +54,12 @@ if __name__ == "__main__":
                       default=1.0,
                       help='width of the virtual slice')
 
+  parser.add_argument('-sl', '--source-length',
+                      dest='source_length',
+                      type=float,
+                      default=70.,
+                      help='length of the source used in the simulations')
+
   args = parser.parse_args()
 
   if not args.coincidences_directory:
@@ -114,11 +120,11 @@ if __name__ == "__main__":
     hist = histogram(sourcePosZ_true, bins=pos_bins)
     hist_PMT = histogram(sourcePosZ_true_PMT, bins=pos_bins)
 
-    # activity per slice (source has only 70 cm length)
-    if L<=70:
+    # activity per slice
+    if L<=args.source_length:
       norm_factor = activity/N*time
     else:
-      norm_factor = activity/(70./args.slice_width)*time
+      norm_factor = activity/(args.source_length/args.slice_width)*time
 
     sensitivity_profile = hist[0]/norm_factor
     sensitivity_profile_PMT = hist_PMT[0]/norm_factor

@@ -206,6 +206,7 @@ def generate_necr_simulations():
 
       with open(where + '/Gate_parallel.sh', 'a') as gate_parallel_sh:
         gate_parallel_sh.write(generate_gate_parallel_sh(NR_OF_SPLITS))
+      os.system('chmod u+x ' + where + '/Gate_parallel.sh')
 
 def generate_sf_simulations():
 
@@ -267,6 +268,7 @@ def generate_sf_simulations():
 
     with open(where + '/Gate_parallel.sh', 'a') as gate_parallel_sh:
       gate_parallel_sh.write(generate_gate_parallel_sh(NR_OF_SPLITS))
+    os.system('chmod u+x ' + where + '/Gate_parallel.sh')
 
 def generate_sensitivity_simulations():
 
@@ -324,6 +326,7 @@ def generate_sensitivity_simulations():
 
     with open(where + '/Gate_parallel.sh', 'a') as gate_parallel_sh:
       gate_parallel_sh.write(generate_gate_parallel_sh(NR_OF_SPLITS))
+    os.system('chmod u+x ' + where + '/Gate_parallel.sh')
 
 if __name__ == '__main__':
 

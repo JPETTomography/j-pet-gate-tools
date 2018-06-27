@@ -71,11 +71,11 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=
 
   print len(posX1)
 
-  # Calculate vectors of times and angles differences
+  # Calculate vectors of times and angles differences:
 
   [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
 
-  # Plot 2D histogram
+  # Plot 2D histogram:
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
@@ -92,7 +92,9 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
-  # Ellipse curve
+  # Ellipsoidal cut obtained using simulations with SF phantom and rod source
+  # displaced by 25 cm from the axis of the scanner:
+
   xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
   for i in xrange(len(xxx)):
@@ -168,7 +170,7 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
   sourcePosX = coincidences[:,13]
   sourcePosY = coincidences[:,14]
 
-  # Plot 2D histogram
+  # Plot 2D histogram:
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18

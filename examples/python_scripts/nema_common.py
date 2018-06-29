@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import random
+import random as rnd
 from numpy import *
 
 # Physical constants:
@@ -96,10 +96,10 @@ def create_work_directories():
 # L is the lenght of the scintillators.
 def blur_sourcePosZ(sourcePosZ,  sigma,  L):
 
-  result = random.gauss(sourcePosZ, sigma)
+  result = rnd.gauss(sourcePosZ, sigma)
   #TODO:
   #while result < -L/2. or result > L/2.:
-    #result = random.gauss(sourcePosZ, sigma)
+    #result = rnd.gauss(sourcePosZ, sigma)
   return result
 
 def calculate_counters(tim_diffs, ang_diffs, param):

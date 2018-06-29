@@ -59,6 +59,12 @@ if __name__ == "__main__":
                       default="png",
                       help='output format of images')
 
+  parser.add_argument('-sl', '--source-length',
+                      dest='source_length',
+                      type=float,
+                      default=70.,
+                      help='length of the source used in the simulations')
+
   args = parser.parse_args()
 
   rcParams['font.size'] = 24
@@ -155,7 +161,7 @@ if __name__ == "__main__":
     plt.xlabel("Position along z axis [cm]")
     plt.ylabel("Sensitivity [cps/kBq]")
     #plt.legend(loc=1)
-    plt.xlim(-35,35)
+    plt.xlim(-args.source_length/2., args.source_length/2.)
     plt.ylim(ymin=0)
     plt.savefig(workdir_Sensitivity + "sensitivityProfile_" + t + label_blurred + "." + args.outputformat)
 

@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
       savetxt(path_realtime, [realtime])
 
-      with open(path_statistics) as stats:
+      with open(path_statistics, 'w') as stats:
         stats.write(str(int(counter_all_compton_hits)) + " # all Compton hits\n")
         stats.write(str(int(counter_compton_hits_over_the_ETH0)) + " # compton hits with edep over the ETH0\n")
         stats.write(str(int(counter_compton_hits_over_the_ETH)) + " # compton hits with edep over the ETH\n")

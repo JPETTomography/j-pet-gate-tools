@@ -1,0 +1,187 @@
+# W O R L D
+
+/gate/world/geometry/setXLength 300. cm
+/gate/world/geometry/setYLength 300. cm
+/gate/world/geometry/setZLength 300. cm
+
+############ 1st LAYER ############
+
+# S Y S T E M
+
+/gate/world/daughters/name detector1
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/detector1/setMaterial Air
+/gate/detector1/geometry/setXLength 19 mm
+/gate/detector1/geometry/setYLength 7 mm
+/gate/detector1/geometry/setZLength 52 cm
+/gate/detector1/placement/setTranslation  425 0 0 mm
+/gate/detector1/vis/forceWireframe
+/gate/detector1/vis/setVisible 0
+
+# C R Y S T A L
+
+/gate/detector1/daughters/name crystal1
+/gate/detector1/daughters/insert box
+/gate/crystal1/placement/setTranslation 0 0 0 cm
+/gate/crystal1/geometry/setXLength 19   mm
+/gate/crystal1/geometry/setYLength 7   mm
+/gate/crystal1/geometry/setZLength 50    cm
+/gate/crystal1/setMaterial EJ230
+/gate/crystal1/vis/forceSolid
+/gate/crystal1/vis/setColor white
+/gate/crystal1/vis/setVisible 1
+
+# P M T S
+
+/gate/detector1/daughters/name pmtA1
+/gate/detector1/daughters/insert box
+/gate/pmtA1/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmtA1/geometry/setXLength 19 mm
+/gate/pmtA1/geometry/setYLength 7 mm
+/gate/pmtA1/geometry/setZLength 1 cm
+/gate/pmtA1/setMaterial Air
+/gate/pmtA1/vis/setVisible 1
+/gate/pmtA1/vis/setColor red
+
+/gate/detector1/daughters/name pmtB1
+/gate/detector1/daughters/insert box
+/gate/pmtB1/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmtB1/geometry/setXLength 19 mm
+/gate/pmtB1/geometry/setYLength 7 mm
+/gate/pmtB1/geometry/setZLength 1 cm
+/gate/pmtB1/setMaterial Air
+/gate/pmtB1/vis/setVisible 1
+/gate/pmtB1/vis/setColor red
+
+# R E P E A T E R S
+
+/gate/detector1/repeaters/insert ring
+/gate/detector1/ring/setRepeatNumber 48
+
+# A T T A C H M E N T S
+
+/gate/systems/detector1/level1/attach crystal1
+/gate/crystal1/attachCrystalSD
+
+############ 2nd LAYER ############
+
+# S Y S T E M
+
+/gate/world/daughters/name detector2
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/detector2/setMaterial Air
+/gate/detector2/geometry/setXLength 19 mm
+/gate/detector2/geometry/setYLength 7 mm
+/gate/detector2/geometry/setZLength 52 cm
+/gate/detector2/placement/setTranslation  467.5 0 0 mm
+/gate/detector2/vis/forceWireframe
+/gate/detector2/vis/setVisible 0
+
+# C R Y S T A L
+
+/gate/detector2/daughters/name crystal2
+/gate/detector2/daughters/insert box
+/gate/crystal2/placement/setTranslation 0 0 0 cm
+/gate/crystal2/geometry/setXLength 19   mm
+/gate/crystal2/geometry/setYLength 7   mm
+/gate/crystal2/geometry/setZLength 50    cm
+/gate/crystal2/setMaterial EJ230
+/gate/crystal2/vis/forceSolid
+/gate/crystal2/vis/setColor white
+/gate/crystal2/vis/setVisible 1
+
+# P M T S
+
+/gate/detector2/daughters/name pmtA2
+/gate/detector2/daughters/insert box
+/gate/pmtA2/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmtA2/geometry/setXLength 19 mm
+/gate/pmtA2/geometry/setYLength 7 mm
+/gate/pmtA2/geometry/setZLength 1 cm
+/gate/pmtA2/setMaterial Air
+/gate/pmtA2/vis/setVisible 1
+/gate/pmtA2/vis/setColor red
+
+/gate/detector2/daughters/name pmtB2
+/gate/detector2/daughters/insert box
+/gate/pmtB2/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmtB2/geometry/setXLength 19 mm
+/gate/pmtB2/geometry/setYLength 7 mm
+/gate/pmtB2/geometry/setZLength 1 cm
+/gate/pmtB2/setMaterial Air
+/gate/pmtB2/vis/setVisible 1
+/gate/pmtB2/vis/setColor red
+
+# R E P E A T E R S
+
+/gate/detector2/repeaters/insert ring
+/gate/detector2/ring/setFirstAngle 3.9130434782608696 deg
+/gate/detector2/ring/setRepeatNumber 48
+
+# A T T A C H M E N T S
+
+/gate/systems/detector2/level1/attach crystal2
+/gate/crystal2/attachCrystalSD
+
+############ 3rd LAYER ############
+
+# S Y S T E M
+
+/gate/world/daughters/name detector3
+/gate/world/daughters/systemType scanner
+/gate/world/daughters/insert box
+/gate/detector3/setMaterial Air
+/gate/detector3/geometry/setXLength 19 mm
+/gate/detector3/geometry/setYLength 7 mm
+/gate/detector3/geometry/setZLength 52 cm
+/gate/detector3/placement/setTranslation  575 0 0 mm
+/gate/detector3/vis/forceWireframe
+/gate/detector3/vis/setVisible 0
+
+# C R Y S T A L
+
+/gate/detector3/daughters/name crystal3
+/gate/detector3/daughters/insert box
+/gate/crystal3/placement/setTranslation 0 0 0 cm
+/gate/crystal3/geometry/setXLength 19   mm
+/gate/crystal3/geometry/setYLength 7   mm
+/gate/crystal3/geometry/setZLength 50    cm
+/gate/crystal3/setMaterial EJ230
+/gate/crystal3/vis/forceSolid
+/gate/crystal3/vis/setColor white
+/gate/crystal3/vis/setVisible 1
+
+# P M T S
+
+/gate/detector3/daughters/name pmtA3
+/gate/detector3/daughters/insert box
+/gate/pmtA3/placement/setTranslation 0. 0. 25.5 cm
+/gate/pmtA3/geometry/setXLength 19 mm
+/gate/pmtA3/geometry/setYLength 7 mm
+/gate/pmtA3/geometry/setZLength 1 cm
+/gate/pmtA3/setMaterial Air
+/gate/pmtA3/vis/setVisible 1
+/gate/pmtA3/vis/setColor red
+
+/gate/detector3/daughters/name pmtB3
+/gate/detector3/daughters/insert box
+/gate/pmtB3/placement/setTranslation 0. 0. -25.5 cm
+/gate/pmtB3/geometry/setXLength 19 mm
+/gate/pmtB3/geometry/setYLength 7 mm
+/gate/pmtB3/geometry/setZLength 1 cm
+/gate/pmtB3/setMaterial Air
+/gate/pmtB3/vis/setVisible 1
+/gate/pmtB3/vis/setColor red
+
+# R E P E A T E R S
+
+/gate/detector3/repeaters/insert ring
+/gate/detector3/ring/setFirstAngle 1.9565217391304348 deg
+/gate/detector3/ring/setRepeatNumber 96
+
+# A T T A C H M E N T S
+
+/gate/systems/detector3/level1/attach crystal3
+/gate/crystal3/attachCrystalSD

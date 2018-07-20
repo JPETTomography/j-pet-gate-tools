@@ -25,7 +25,7 @@ LoopResults Hits::Loop() {
 	else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
 	EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
 
-	LoopResults lr = {0.,vector<int>()};
+	LoopResults lr = {0.,vector<int>(),0,0,0};
 	if (fChain == 0)
 		return lr;
 
@@ -69,6 +69,12 @@ LoopResults Hits::Loop() {
 		hit.nPhantomCompton = nPhantomCompton;
 		hit.nCrystalCompton = nCrystalCompton;
 		string procName = string(processName);
+
+		if (procName=="Compton" or procName=="compt") {
+			lr.counter_all_compton_hits += 1;
+			if (hit.edep>COMPTON_E_TH_0) lr.counter_compton_hits_over_the_ETH0 += 1;
+			if (hit.edep>COMPTON_E_TH) lr.counter_compton_hits_over_the_ETH += 1;
+		}
 
 		bool hit_is_proper = hit.edep>COMPTON_E_TH_0 and						// deposited energy is bigger than the noise threshold
 		                     (procName=="Compton" or procName=="compt") and		// the photon is scattered using Compton scattering

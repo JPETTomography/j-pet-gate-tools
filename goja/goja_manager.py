@@ -21,6 +21,10 @@ def verify_goja_output(gate_path, goja_path):
         if not os.path.isfile(path_realtime):
           print "File ", path_realtime, " is missing."
           nr_of_missing_files += 1
+        path_statistics = goja_path + fname[:-5] + "_statistics"
+        if not os.path.isfile(path_statistics):
+          print "File ", path_statistics, " is missing."
+          nr_of_missing_files += 1
     print "Number of missing files: ", nr_of_missing_files
     return nr_of_missing_files
 
@@ -101,6 +105,7 @@ if __name__ == "__main__":
                      + " --eth0 " + str(args.eth0) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + args.path_goja_output + fname[0:-5] + "_realtime" \
+                     + " --save-statistics-to " + args.path_goja_output + fname[0:-5] + "_statistics" \
                      + " > " + args.path_goja_output + fname[0:-5] + "_coincidences &"
         os.system(goja_command)
         print goja_command
@@ -121,6 +126,7 @@ if __name__ == "__main__":
                      + " --eth0 " + str(args.eth0) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
+                     + " --save-statistics-to " + basepath_goja + "${PBS_ARRAYID}" + "_statistics" \
                      + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
         array_pbs.write(goja_command + '\n')
         array_pbs.write('exit 0;\n')
@@ -144,12 +150,14 @@ if __name__ == "__main__":
     for fname in fnames:
       path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
       path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
-      if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime):
+      path_statistics = args.path_goja_output + fname[:-5] + "_statistics"
+      if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
         basepath_goja = args.path_goja_output + fname[:-5]
         goja_command = "goja --root " + args.path_gate_output + fname \
                        + " --eth0 " + str(args.eth0) \
                        + " --N0 " + str(args.N0) \
                        + " --save-real-time-to " + basepath_goja + "_realtime" \
+                       + " --save-statistics-to " + basepath_goja + "_statistics" \
                        + " > " + basepath_goja + "_coincidences &"
         print goja_command
         os.system(goja_command)
@@ -187,8 +195,19 @@ if __name__ == "__main__":
           pass
         else:
           raise e
+      path_statistics = args.path_goja_output + args.simulation_name + "_STATISTICS"
+      try:
+        os.unlink(path_statistics)
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
 
       realtime = 0.
+      counter_all_compton_hits = 0
+      counter_compton_hits_over_the_ETH0 = 0
+      counter_compton_hits_over_the_ETH = 0
 
       fnames = os.listdir(args.path_goja_output)
       fnames = [fname for fname in fnames if "_coincidences" in fname]
@@ -205,7 +224,17 @@ if __name__ == "__main__":
             for line in infile:
               outfile.write(line)
 
+          counters = genfromtxt(basepath_goja + "_statistics", usecols=(0))
+          counter_all_compton_hits += counters[0]
+          counter_compton_hits_over_the_ETH0 += counters[1]
+          counter_compton_hits_over_the_ETH += counters[2]
+
       savetxt(path_realtime, [realtime])
+
+      with open(path_statistics) as stats:
+        stats.write(str(int(counter_all_compton_hits)) + " # all Compton hits\n")
+        stats.write(str(int(counter_compton_hits_over_the_ETH0)) + " # compton hits with edep over the ETH0\n")
+        stats.write(str(int(counter_compton_hits_over_the_ETH)) + " # compton hits with edep over the ETH\n")
 
       if args.clean:
         for fname in fnames:
@@ -213,6 +242,7 @@ if __name__ == "__main__":
           basepath_goja = args.path_goja_output + basename
           os.unlink(basepath_goja + "_coincidences")
           os.unlink(basepath_goja + "_realtime")
+          os.unlink(basepath_goja + "_statistics")
 
       print "Goja output succesfully concatenated."
 

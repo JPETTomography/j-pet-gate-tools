@@ -31,7 +31,11 @@ OUTPUT_FORMAT = ".png"
 #      Type of the coincidence. When set to 0, all coincidences are plotted.
 #      When set to 1 (true), 2 (psca), 3 (psca) or 4 (acci), only coincidences
 #      with a chosen type of the coincidence are plotted.
-def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=0):
+#  t_bins : int
+#      Number of bins for times differences axis.
+#  a_bins : int
+#      Number of bis for angles differences axis.
+def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=0, t_bins, a_bins):
 
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
@@ -83,9 +87,6 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
-
-  t_bins = 100
-  a_bins = 180
 
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins), range=[[0, 3],[0, 180]])
   VMAX = H.max()
@@ -258,6 +259,18 @@ if __name__ == "__main__":
                       default="png",
                       help='output format of images')
 
+  parser.add_argument('--t_bins',
+                      dest='t_bins',
+                      type=int,
+                      default=100,
+                      help='number of bins for times differences axis')
+
+  parser.add_argument('--a_bins',
+                      dest='a_bins',
+                      type=int,
+                      default=180,
+                      help='number of bins for angles differences axis')
+
   args = parser.parse_args()
 
   OUTPUT_FORMAT = "." + args.outputformat
@@ -266,17 +279,22 @@ if __name__ == "__main__":
   coincidences = loadtxt(args.path_coincidences_file)
 
   if args.mode == "plot":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, ylim=[90,180])
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, ylim=[90,180],
+      t_bins=args.t_bins, a_bins=args.a_bins)
     plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1,
+      t_bins=args.t_bins, a_bins=args.a_bins)
     try:
-      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2)
+      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2,
+        t_bins=args.t_bins, a_bins=args.a_bins)
     except:
       print "There are no phantom coincidences in the goja output file."
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3)
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3,
+      t_bins=args.t_bins, a_bins=args.a_bins)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4,
+      t_bins=args.t_bins, a_bins=args.a_bins)
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

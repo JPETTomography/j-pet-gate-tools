@@ -25,17 +25,17 @@ OUTPUT_FORMAT = ".png"
 #      Path to the output image file.
 #  show_cut : bool
 #      Switch to enable or disable the ellipsoidal cut line on the image.
+#  t_bins : int
+#      Number of bins for times differences axis.
+#  a_bins : int
+#      Number of bis for angles differences axis.
 #  ylim : tuple
 #      Limits of the angles differences axis.
 #  toc : int
 #      Type of the coincidence. When set to 0, all coincidences are plotted.
 #      When set to 1 (true), 2 (psca), 3 (psca) or 4 (acci), only coincidences
 #      with a chosen type of the coincidence are plotted.
-#  t_bins : int
-#      Number of bins for times differences axis.
-#  a_bins : int
-#      Number of bis for angles differences axis.
-def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, ylim=[0,180], toc=0, t_bins, a_bins):
+def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0):
 
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
@@ -279,22 +279,22 @@ if __name__ == "__main__":
   coincidences = loadtxt(args.path_coincidences_file)
 
   if args.mode == "plot":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, ylim=[90,180],
-      t_bins=args.t_bins, a_bins=args.a_bins)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+      args.t_bins, args.a_bins, ylim=[90,180])
     plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=1,
-      t_bins=args.t_bins, a_bins=args.a_bins)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+      args.t_bins, args.a_bins, toc=1)
     try:
-      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=2,
-        t_bins=args.t_bins, a_bins=args.a_bins)
+      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+        args.t_bins, args.a_bins, toc=2)
     except:
       print "There are no phantom coincidences in the goja output file."
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=3,
-      t_bins=args.t_bins, a_bins=args.a_bins)
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut, toc=4,
-      t_bins=args.t_bins, a_bins=args.a_bins)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+      args.t_bins, args.a_bins, toc=3)
+    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+      args.t_bins, args.a_bins, toc=4)
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

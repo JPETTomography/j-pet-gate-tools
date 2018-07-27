@@ -34,7 +34,8 @@
 #  P A R T I C L E   S O U R C E
 #=====================================================
 
-/control/execute Source_Run4.mac
+/control/execute Source_Run4_Ion.mac
+#/control/execute Source_Run4_Gamma.mac
 
 #=====================================================
 #  D A T A   O U T P U T

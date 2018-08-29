@@ -212,7 +212,8 @@ if __name__ == "__main__":
 
       fnames = os.listdir(args.path_goja_output)
       fnames = [fname for fname in fnames if "_coincidences" in fname]
-      fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
+      if len(fnames)>1:
+        fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
       with open(path_coincidences, 'w') as outfile:
         for fname in fnames:

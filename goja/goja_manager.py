@@ -138,7 +138,7 @@ if __name__ == "__main__":
       os.unlink('array.pbs')
 
     else:
-      print "Inproper type of run. " + help_message
+      print "Improper type of run. " + help_message
 
   elif args.mode=="analyze-missing":
 
@@ -149,19 +149,52 @@ if __name__ == "__main__":
     fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
     for fname in fnames:
+
       path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
       path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
       path_statistics = args.path_goja_output + fname[:-5] + "_statistics"
+
       if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
-        basepath_goja = args.path_goja_output + fname[:-5]
-        goja_command = "goja --root " + args.path_gate_output + fname \
-                       + " --eth0 " + str(args.eth0) \
-                       + " --N0 " + str(args.N0) \
-                       + " --save-real-time-to " + basepath_goja + "_realtime" \
-                       + " --save-statistics-to " + basepath_goja + "_statistics" \
-                       + " > " + basepath_goja + "_coincidences &"
-        print goja_command
-        os.system(goja_command)
+
+        if args.type_of_run == 'locally':
+          basepath_goja = args.path_goja_output + fname[:-5]
+          goja_command = "goja --root " + args.path_gate_output + fname \
+                        + " --eth0 " + str(args.eth0) \
+                        + " --N0 " + str(args.N0) \
+                        + " --save-real-time-to " + basepath_goja + "_realtime" \
+                        + " --save-statistics-to " + basepath_goja + "_statistics" \
+                        + " > " + basepath_goja + "_coincidences &"
+          os.system(goja_command)
+          print goja_command
+
+        elif args.type_of_run == 'on-cluster':
+          basename = fname[0:-5]
+          basepath_goja = args.path_goja_output + basename
+          basepath_gate = args.path_gate_output + basename
+          # generate array.pbs:
+          with open('array.pbs', 'a') as array_pbs:
+            array_pbs.write('#!/bin/sh\n')
+            array_pbs.write('#PBS -q i3d\n')
+            array_pbs.write('#PBS -l nodes=1:ppn=1\n')
+            array_pbs.write('#PBS -N GOJA\n')
+            array_pbs.write('#PBS -V\n')
+            array_pbs.write('cd ${PBS_O_WORKDIR}\n')
+            goja_command = "goja --root " + basepath_gate + ".root" \
+                        + " --eth0 " + str(args.eth0) \
+                        + " --N0 " + str(args.N0) \
+                        + " --save-real-time-to " + basepath_goja + "_realtime" \
+                        + " --save-statistics-to " + basepath_goja + "_statistics" \
+                        + " > " + basepath_goja + "_coincidences"
+            array_pbs.write(goja_command + '\n')
+            array_pbs.write('exit 0;\n')
+          # push into queue:
+          qsub_command = 'qsub array.pbs'
+          os.system(qsub_command)
+          # remove array.pbs:
+          os.unlink('array.pbs')
+
+        else:
+          print "Improper type of run. " + help_message
 
   elif args.mode=="verify":
 
@@ -250,4 +283,4 @@ if __name__ == "__main__":
 
   else:
 
-    print 'Inproper mode. ' + help_message
+    print 'Improper mode. ' + help_message

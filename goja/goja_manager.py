@@ -115,7 +115,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="analyze",
-                      help='analyze, analyze-missing, verify or concatenate')
+                      help='analyze, analyze-missing, verify, concatenate or concatenate-force')
 
   parser.add_argument('--eth0',
                       dest='eth0',
@@ -132,18 +132,18 @@ if __name__ == "__main__":
   parser.add_argument('-r', '--run',
                       dest='type_of_run',
                       type=str,
-                      default='locally',
+                      default='on-cluster',
                       help='run \'locally\' or \'on-cluster\' [for mode \'analyze\']')
 
   parser.add_argument('-sn', '--simulation-name',
                       dest='simulation_name',
                       type=str,
                       default="simulation",
-                      help='name of the simulation [for mode \'concatenate\']')
+                      help='name of the simulation [for modes \'concatenate\' and \'concatenate-force\']')
 
   parser.add_argument('-c', '--clean',
                       action='store_true',
-                      help='remove partial files after concatenation [for mode \'concatenate\']')
+                      help='remove partial files after concatenation [for modes \'concatenate\' and \'concatenate-force\']')
 
   args = parser.parse_args()
 
@@ -290,18 +290,15 @@ if __name__ == "__main__":
 
     fnames_tmp = os.listdir(args.path_goja_output)
     fnames_tmp = [fname for fname in fnames_tmp if "_coincidences" in fname]
-
     fnames = []
-    for fname in fnames:
-      path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
-      path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
-      path_statistics = args.path_goja_output + fname[:-5] + "_statistics"
-      if os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
+    for fname in fnames_tmp:
+      path_coincidences = args.path_goja_output + fname
+      path_realtime = args.path_goja_output + fname.replace("_coincidences", "") + "_realtime"
+      path_statistics = args.path_goja_output + fname.replace("_coincidences", "") + "_statistics"
+      if os.path.isfile(path_coincidences) and os.path.isfile(path_realtime) and os.path.isfile(path_statistics):
         fnames.append(fname)
-
     if len(fnames)>1:
       fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
-
     concatenate_files(fnames)
 
   else:

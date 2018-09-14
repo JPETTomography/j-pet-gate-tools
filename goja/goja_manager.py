@@ -28,6 +28,70 @@ def verify_goja_output(gate_path, goja_path):
     print "Number of missing files: ", nr_of_missing_files
     return nr_of_missing_files
 
+def concatenate_files(fnames):
+
+      path_coincidences = args.path_goja_output + args.simulation_name + "_COINCIDENCES"
+      try:
+        os.unlink(path_coincidences)
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
+      path_realtime = args.path_goja_output + args.simulation_name + "_REALTIME"
+      try:
+        os.unlink(path_realtime)
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
+      path_statistics = args.path_goja_output + args.simulation_name + "_STATISTICS"
+      try:
+        os.unlink(path_statistics)
+      except OSError as e:
+        if e.errno == errno.ENOENT:
+          pass
+        else:
+          raise e
+
+      realtime = 0.
+      counter_all_compton_hits = 0
+      counter_compton_hits_over_the_ETH0 = 0
+      counter_compton_hits_over_the_ETH = 0
+
+      with open(path_coincidences, 'w') as outfile:
+        for fname in fnames:
+          basename = fname[0:-13]
+          basepath_goja = args.path_goja_output + basename
+
+          realtime += loadtxt(basepath_goja + "_realtime")
+
+          with open(basepath_goja + "_coincidences") as infile:
+            for line in infile:
+              outfile.write(line)
+
+          counters = genfromtxt(basepath_goja + "_statistics", usecols=(0))
+          counter_all_compton_hits += counters[0]
+          counter_compton_hits_over_the_ETH0 += counters[1]
+          counter_compton_hits_over_the_ETH += counters[2]
+
+      savetxt(path_realtime, [realtime])
+
+      with open(path_statistics, 'w') as stats:
+        stats.write(str(int(counter_all_compton_hits)) + " # all Compton hits\n")
+        stats.write(str(int(counter_compton_hits_over_the_ETH0)) + " # compton hits with edep over the ETH0\n")
+        stats.write(str(int(counter_compton_hits_over_the_ETH)) + " # compton hits with edep over the ETH\n")
+
+      if args.clean:
+        for fname in fnames:
+          basename = fname[0:-13]
+          basepath_goja = args.path_goja_output + basename
+          os.unlink(basepath_goja + "_coincidences")
+          os.unlink(basepath_goja + "_realtime")
+          os.unlink(basepath_goja + "_statistics")
+      print "Goja output succesfully concatenated."
+
 if __name__ == "__main__":
 
   help_message = "Type goja_manager.py --help."
@@ -210,76 +274,35 @@ if __name__ == "__main__":
     nr_of_missing_files = verify_goja_output(args.path_gate_output, args.path_goja_output)
 
     if nr_of_missing_files:
-      print "Concatenation cannot be performed."
-
+      print "Concatenation cannot be performed because of missing files. " + \
+            "Obtain missing files using the analyze-missing mode or " + \
+            "force the concatenation (concatenate-force) mode."
     else:
-      path_coincidences = args.path_goja_output + args.simulation_name + "_COINCIDENCES"
-      try:
-        os.unlink(path_coincidences)
-      except OSError as e:
-        if e.errno == errno.ENOENT:
-          pass
-        else:
-          raise e
-      path_realtime = args.path_goja_output + args.simulation_name + "_REALTIME"
-      try:
-        os.unlink(path_realtime)
-      except OSError as e:
-        if e.errno == errno.ENOENT:
-          pass
-        else:
-          raise e
-      path_statistics = args.path_goja_output + args.simulation_name + "_STATISTICS"
-      try:
-        os.unlink(path_statistics)
-      except OSError as e:
-        if e.errno == errno.ENOENT:
-          pass
-        else:
-          raise e
-
-      realtime = 0.
-      counter_all_compton_hits = 0
-      counter_compton_hits_over_the_ETH0 = 0
-      counter_compton_hits_over_the_ETH = 0
-
       fnames = os.listdir(args.path_goja_output)
       fnames = [fname for fname in fnames if "_coincidences" in fname]
       if len(fnames)>1:
         fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
+      concatenate_files(fnames)
 
-      with open(path_coincidences, 'w') as outfile:
-        for fname in fnames:
-          basename = fname[0:-13]
-          basepath_goja = args.path_goja_output + basename
+  elif args.mode=="concatenate-force":
 
-          realtime += loadtxt(basepath_goja + "_realtime")
+    print "Concatenation (force):"
 
-          with open(basepath_goja + "_coincidences") as infile:
-            for line in infile:
-              outfile.write(line)
+    fnames_tmp = os.listdir(args.path_goja_output)
+    fnames_tmp = [fname for fname in fnames_tmp if "_coincidences" in fname]
 
-          counters = genfromtxt(basepath_goja + "_statistics", usecols=(0))
-          counter_all_compton_hits += counters[0]
-          counter_compton_hits_over_the_ETH0 += counters[1]
-          counter_compton_hits_over_the_ETH += counters[2]
+    fnames = []
+    for fname in fnames:
+      path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
+      path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
+      path_statistics = args.path_goja_output + fname[:-5] + "_statistics"
+      if os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
+        fnames.append(fname)
 
-      savetxt(path_realtime, [realtime])
+    if len(fnames)>1:
+      fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
-      with open(path_statistics, 'w') as stats:
-        stats.write(str(int(counter_all_compton_hits)) + " # all Compton hits\n")
-        stats.write(str(int(counter_compton_hits_over_the_ETH0)) + " # compton hits with edep over the ETH0\n")
-        stats.write(str(int(counter_compton_hits_over_the_ETH)) + " # compton hits with edep over the ETH\n")
-
-      if args.clean:
-        for fname in fnames:
-          basename = fname[0:-13]
-          basepath_goja = args.path_goja_output + basename
-          os.unlink(basepath_goja + "_coincidences")
-          os.unlink(basepath_goja + "_realtime")
-          os.unlink(basepath_goja + "_statistics")
-
-      print "Goja output succesfully concatenated."
+    concatenate_files(fnames)
 
   else:
 

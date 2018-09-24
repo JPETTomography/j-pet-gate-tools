@@ -35,13 +35,13 @@ if __name__ == '__main__':
 
     # default no of strips
     strips_in_total = 192
+    # check no of strips
+    if '-s' in options:
+        strips_in_total = int(options[options.index('-s') + 1])
     # check layer if other than 1
     if '-l' in options:
         layer_id = int(options[options.index('-l') + 1])
         if layer_id == 0:
-            # check no of strips
-            if '-s' in options:
-                strips_in_total = int(options[options.index('-s') + 1])
             lc.add_zero_layer(strips_in_total)
     else:
         layer_id = 1

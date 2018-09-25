@@ -128,10 +128,10 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
 #      Data read from the listmode goja output file using the numpy.loadtxt.
 #  result_figure_path : str
 #      Path to the output image file.
-def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
+def plot_Da_vs_Dt_exp(coincidences, result_figure_path, t_bins, a_bins):
 
   tim_diffs = coincidences[:,6]
-  ang_diffs = coincidences[:,7]
+  ang_diffs = coincidences[:,9]
 
   # Plot 2D histogram
 
@@ -142,9 +142,6 @@ def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  t_bins = 25
-  a_bins = 45
-
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins)) #, range=[[0, 3],[0, 180]])
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
@@ -152,7 +149,7 @@ def plot_Da_vs_Dt_exp(coincidences, result_figure_path):
 
   plt.xlabel("Time difference [ps]")
   plt.ylabel("Angle difference [deg.]")
-  plt.savefig(result_figure_path + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.savefig(result_figure_path + "_" + str(t_bins) + "_" + str(a_bins) + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -234,7 +231,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="plot",
-                      help='mode of the script: plot, plot_by_types or stats')
+                      help='mode of the script: plot, plot_by_types, stats, exp')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
@@ -298,3 +295,7 @@ if __name__ == "__main__":
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])
+
+  elif args.mode == "exp":
+    plot_Da_vs_Dt_exp(coincidences, (args.path_coincidences_file.split("/")[-1]).replace(".coincidences", ""),
+      args.t_bins, args.a_bins)

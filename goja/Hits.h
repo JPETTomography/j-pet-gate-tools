@@ -15,6 +15,9 @@
 struct LoopResults {
     double real_time;
     vector<int> multiplicities;
+    int counter_all_compton_hits;
+    int counter_compton_hits_over_the_ETH0;
+    int counter_compton_hits_over_the_ETH;
 };
 
 // Header file for the classes stored in the TTree if any.

@@ -16,8 +16,12 @@ SLICE_WIDTH = 2. # in cm
 BINS_DISPLACEMENTS = 100
 BINS_ANGLES = 90
 
-suffix_coincidences = "_NECR_COINCIDENCES_short"
-suffix_realtime = "_NECR_REALTIME_short"
+SUFFIX_COINCIDENCES = "_NECR_COINCIDENCES_short"
+SUFFIX_REALTIME = "_NECR_REALTIME_short"
+OUTPUT_FORMAT = ""
+
+CALCULATE_SF = False
+TEXT_OUTPUT_FILE = "necr_dependency.txt"
 
 class sinogram:
 
@@ -103,6 +107,8 @@ def perform_analysis(activity, filepath, workdir):
       L = 50.
   elif "L100" in filepath:
       L = 100.
+  elif "L200" in filepath:
+      L = 200.
   else:
       L = 50.
 
@@ -116,7 +122,7 @@ def perform_analysis(activity, filepath, workdir):
   # Loading coincidences from the file
   #===========================================
 
-  coincidences = loadtxt(filepath + suffix_coincidences)
+  coincidences = loadtxt(filepath + SUFFIX_COINCIDENCES)
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
   posZ1 = coincidences[:,2]
@@ -132,7 +138,7 @@ def perform_analysis(activity, filepath, workdir):
   #===========================================
 
   time = 0.
-  realtime_path = filepath + suffix_realtime
+  realtime_path = filepath + SUFFIX_REALTIME
   if os.path.exists(realtime_path):
     time = loadtxt(realtime_path)
   else:
@@ -237,7 +243,7 @@ def perform_analysis(activity, filepath, workdir):
   plt.colorbar()
   plt.xlabel("Displacement [cm]")
   plt.ylabel("Angle [rad.]")
-  plt.savefig(workdir + "sinogram_final_" + activity + ".png")
+  plt.savefig(workdir + "sinogram_final_" + activity + OUTPUT_FORMAT)
   plt.clf()
 
   #===========================================
@@ -304,13 +310,16 @@ def perform_analysis(activity, filepath, workdir):
   plt.xlim(-12,12) # from NEMA cut
   plt.ylim(0,1.1*max(vecsum/1000.))
 
-  plt.savefig(workdir + "sumhist_"+activity+".png")
+  plt.savefig(workdir + "sumhist_" + activity + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
 
   #===========================================
 
-  float_activity = float(activity)/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
+  if not CALCULATE_SF:
+    float_activity = float(activity)/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
+  else:
+    float_activity = 0.001/22000.*1000 # in kBq/cc (activity is in MBq, volume in cc)
 
   SF_sin = S/(S+T)*100. # sin - sinogram
   SF_ctr = float(N_dsca+N_psca)/(N_dsca+N_psca+N_true)*100. # ctr - counter
@@ -321,17 +330,20 @@ def perform_analysis(activity, filepath, workdir):
   NECR_sin = NECR_sin/1000. # cps -> kcps
   NECR_ctr = NECR_ctr/1000. # cps -> kcps
 
+  ratio_acci = N_acci/float(N_all)
+
   # Printing calculated values
   data_for_single_activity = str(float_activity) + "\t"
   data_for_single_activity += str(SF_sin) + "\t" + str(SF_ctr) + "\t"
   data_for_single_activity += str(NECR_sin) + "\t" + str(NECR_ctr) + "\t"
   data_for_single_activity += str(T) + "\t" + str(S) + "\t"
   data_for_single_activity += str(N_true) + "\t" + str(N_dsca) + "\t" + str(N_psca) + "\t" + str(N_acci) + "\t"
-  data_for_single_activity += str(time)
+  data_for_single_activity += str(time) + "\t"
+  data_for_single_activity += str(ratio_acci)
 
   print data_for_single_activity
 
-  with open(workdir + "necr_dependency.txt", "a") as necr_dependency:
+  with open(workdir + TEXT_OUTPUT_FILE, "a") as necr_dependency:
     necr_dependency.write(data_for_single_activity + '\n')
 
   #===========================================
@@ -365,26 +377,26 @@ def perform_analysis(activity, filepath, workdir):
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(BINS_DISPLACEMENTS,BINS_ANGLES), range=[[0, 3],[0, 180]])
 
   fig = plt.figure(figsize=(8, 6))
-  fig.add_subplot(111)
-  plt.subplots_adjust(left=0.15, right=0.96, top=0.97, bottom=0.15)
+  ax = fig.add_subplot(111)
+  plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='nearest', origin='low',
+  plt.imshow(H.T, interpolation='None', origin='low',
              extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]],
              aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
-  param = 2.2
-  xxx = linspace(0,param,100)
+  xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
   # Ellipse curve
   for i in xrange(len(xxx)):
-    yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(param*param)))
+    yyy.append(ellipsoid_threshold(xxx[i]))
   plt.plot(xxx,yyy,color='red')
   plt.xlabel("Time difference [ns]")
   plt.ylabel("Angle difference [deg.]")
   #plt.show()
-  plt.savefig(workdir + "2D_differences_"+activity+".png")
+  plt.ylim(90,180)
+  plt.savefig(workdir + "2D_differences_" + activity + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -403,29 +415,44 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='Calculate sensitivity and sensitivity profiles using the GOJA results.',
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-  parser.add_argument('--coincidences-directory',
+  parser.add_argument('-cd', '--coincidences-directory',
                       dest='coincidences_directory',
                       type=str,
                       default="/media/pkowalski/TOSHIBA EXT/NCBJ/GATE/NEMA/4_NECR/N0_1000_short/",
                       help='path to dir with the GOJA sensitivity results')
 
-  parser.add_argument('--slice-width',
+  parser.add_argument('-sw', '--slice-width',
                       dest='slice_width',
                       type=float,
                       default=SLICE_WIDTH,
-                      help='with of the virtual slice')
-  parser.add_argument('--bins-displacements',
+                      help='width of the virtual slice')
+
+  parser.add_argument('-bd', '--bins-displacements',
                       dest='bins_displacements',
                       type=float,
                       default=BINS_DISPLACEMENTS,
                       help='nr of bins for displacements')
-  parser.add_argument('--bins-angles',
+
+  parser.add_argument('-ba' ,'--bins-angles',
                       dest='bins_angles',
                       type=float,
                       default=BINS_ANGLES,
                       help='nr of bins for angles')
 
+  parser.add_argument('--scatter-fraction',
+                      dest='scatter_fraction',
+                      action='store_true',
+                      help='use to calculate the SF using the set of 1 kBq simulations')
+
+  parser.add_argument('-of', '--outputformat',
+                      dest='outputformat',
+                      type=str,
+                      default="png",
+                      help='output format of images')
+
   args = parser.parse_args()
+
+  OUTPUT_FORMAT = "." + args.outputformat
 
   if not args.coincidences_directory:
     print "No directory with coincidences provided. Analysis cannot be performed. Check --help option."
@@ -437,15 +464,18 @@ if __name__ == "__main__":
     print "Directory " + args.coincidences_directory + " is not valid. It should contain coincidences files with proper names. Check --help option."
     sys.exit()
 
+  if args.scatter_fraction:
+    CALCULATE_SF = True
+    TEXT_OUTPUT_FILE = "sf.txt"
+    SUFFIX_COINCIDENCES = "SF_COINCIDENCES_short"
+    SUFFIX_REALTIME = "SF_REALTIME_short"
+    activities_NECR = [""]
+
   SLICE_WIDTH = args.slice_width
-  BINS_DISPLACEMENTS = args.bins_displacements
-  BINS_ANGLES = args.bins_angles
+  BINS_DISPLACEMENTS = int(args.bins_displacements)
+  BINS_ANGLES = int(args.bins_angles)
 
   directory = args.coincidences_directory
-
-  activities = ["0001","0100","0200","0300","0400","0500","0600","0700","0800",
-                "0900","1000","1100","1200","1300","1400","1500","1600","1700",
-                "1800","1900","2000"]
 
   create_work_directories()
 
@@ -456,11 +486,11 @@ if __name__ == "__main__":
     workdir = workdir_NECR + geometry + "/"
     if (not os.path.isdir(workdir)):
       os.system("mkdir " + workdir)
-    if (os.path.isfile(workdir + "necr_dependency.txt")):
-      os.system("rm " + workdir + "necr_dependency.txt")
+    if (os.path.isfile(workdir + TEXT_OUTPUT_FILE)):
+      os.system("rm " + workdir + TEXT_OUTPUT_FILE)
 
-    for i in xrange(len(activities)):
+    for i in xrange(len(activities_NECR)):
 
-      activity = activities[i]
+      activity = activities_NECR[i]
       filepath = directory + geometry + "_" + activity
       perform_analysis(activity, filepath, workdir)

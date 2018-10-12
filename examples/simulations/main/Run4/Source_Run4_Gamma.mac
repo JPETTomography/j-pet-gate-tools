@@ -1,0 +1,96 @@
+#=====================================================
+# Run4 source based on the back-to-back gamma sources
+#=====================================================
+
+# Coordinates x and y are switched according to:
+# http://koza.if.uj.edu.pl/petwiki/index.php/Coordinate_system_in_Big_Barrel
+
+# Information about sources taken from:
+# http://koza.if.uj.edu.pl/petwiki/images/8/84/Warsaw-21032018_mpn.pdf
+
+# TODO: add real shapes of sources
+
+#=====================================================
+
+# BW/Z-62/37/12 - Na-22 - (0,1,0)
+
+/gate/source/addSource Na22_3712
+/gate/source/Na22_3712/setActivity 204000 Bq
+/gate/source/Na22_3712/setType backtoback
+/gate/source/Na22_3712/gps/particle gamma
+/gate/source/Na22_3712/gps/ene/mono 511. keV
+/gate/source/Na22_3712/gps/type Volume
+/gate/source/Na22_3712/gps/shape Sphere
+/gate/source/Na22_3712/gps/radius 0.5 mm
+/gate/source/Na22_3712/gps/angtype iso
+/gate/source/Na22_3712/gps/centre 1. 0. 0. cm
+
+# BW/Z-62/39/12 - Na-22 - (0,10,0)
+
+/gate/source/addSource Na22_3912
+/gate/source/Na22_3912/setActivity 207000 Bq
+/gate/source/Na22_3912/setType backtoback
+/gate/source/Na22_3912/gps/particle gamma
+/gate/source/Na22_3912/gps/ene/mono 511. keV
+/gate/source/Na22_3912/gps/type Volume
+/gate/source/Na22_3912/gps/shape Sphere
+/gate/source/Na22_3912/gps/radius 0.5 mm
+/gate/source/Na22_3912/gps/angtype iso
+/gate/source/Na22_3912/gps/centre 10. 0. 0. cm
+
+# UR450 - Na-22 - (0,20,0)
+# UR 450: height = 3.0 mm; diameter = 25.0 mm # TODO
+
+/gate/source/addSource Na22_UR450
+/gate/source/Na22_UR450/setActivity 1134000 Bq
+/gate/source/Na22_UR450/setType backtoback
+/gate/source/Na22_UR450/gps/particle gamma
+/gate/source/Na22_UR450/gps/ene/mono 511. keV
+/gate/source/Na22_UR450/gps/type Volume
+/gate/source/Na22_UR450/gps/shape Sphere
+/gate/source/Na22_UR450/gps/radius 0.5 mm
+/gate/source/Na22_UR450/gps/angtype iso
+/gate/source/Na22_UR450/gps/centre 20. 0. 0. cm
+
+# UR451 - Na-22 - (0,1,-18.75)
+
+/gate/source/addSource Na22_UR451
+/gate/source/Na22_UR451/setActivity 1131000 Bq
+/gate/source/Na22_UR451/setType backtoback
+/gate/source/Na22_UR451/gps/particle gamma
+/gate/source/Na22_UR451/gps/ene/mono 511. keV
+/gate/source/Na22_UR451/gps/type Volume
+/gate/source/Na22_UR451/gps/shape Sphere
+/gate/source/Na22_UR451/gps/radius 0.5 mm
+/gate/source/Na22_UR451/gps/angtype iso
+/gate/source/Na22_UR451/gps/centre 1. 0. -18.75. cm
+
+# K4-390 - Na-22 - (0,10,-18.75)
+
+/gate/source/addSource Na22_K4390
+/gate/source/Na22_K4390/setActivity 6198000 Bq
+/gate/source/Na22_K4390/setType backtoback
+/gate/source/Na22_K4390/gps/particle gamma
+/gate/source/Na22_K4390/gps/ene/mono 511. keV
+/gate/source/Na22_K4390/gps/type Volume
+/gate/source/Na22_K4390/gps/shape Sphere
+/gate/source/Na22_K4390/gps/radius 0.5 mm
+/gate/source/Na22_K4390/gps/angtype iso
+/gate/source/Na22_K4390/gps/centre 10. 0. -18.75. cm
+
+# L2-925 - Na-22 - (0,20,-18.75)
+
+/gate/source/addSource Na22_L2925
+/gate/source/Na22_L2925/setActivity 7601000 Bq
+/gate/source/Na22_L2925/setType backtoback
+/gate/source/Na22_L2925/gps/particle gamma
+/gate/source/Na22_L2925/gps/ene/mono 511. keV
+/gate/source/Na22_L2925/gps/type Volume
+/gate/source/Na22_L2925/gps/shape Sphere
+/gate/source/Na22_L2925/gps/radius 0.5 mm
+/gate/source/Na22_L2925/gps/angtype iso
+/gate/source/Na22_L2925/gps/centre 20. 0. -18.75. cm
+
+#=====================================================
+
+/gate/source/list

@@ -65,7 +65,8 @@ int main (int argc, char* argv[]) {
 	("save-real-time-to", po::value<string>(), "save real time of the simulation to the file path "
 	                                           "(necessary when the input consists of many files [option --root-many] "
 	                                           "and some of them may be broken [for example not closed properly])")
-	("save-multiplicities-to", po::value<string>(), "save multiplicities to the file path");
+	("save-multiplicities-to", po::value<string>(), "save multiplicities to the file path")
+	("save-statistics-to", po::value<string>(), "save statistics to the file path (only single root file mode)");
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
@@ -85,6 +86,10 @@ int main (int argc, char* argv[]) {
 
 	double real_time = 0.;
 	vector<int> multiplicities;
+	int counter_all_compton_hits = 0;
+	int counter_compton_hits_over_the_ETH0 = 0;
+	int counter_compton_hits_over_the_ETH = 0;
+
 	if (!(vm.count("root")) and !(vm.count("root-many"))) {
 		cout << "You need to add root file(s) using --root or --root-many. See help.\n";
 		return 1;
@@ -97,6 +102,9 @@ int main (int argc, char* argv[]) {
 		LoopResults lr = h.Loop();
 		real_time = lr.real_time;
 		multiplicities = lr.multiplicities;
+		counter_all_compton_hits = lr.counter_all_compton_hits;
+		counter_compton_hits_over_the_ETH0 = lr.counter_compton_hits_over_the_ETH0;
+		counter_compton_hits_over_the_ETH = lr.counter_compton_hits_over_the_ETH;
 	}
 	else if (vm.count("root-many")) {
 		stringstream ss;
@@ -140,6 +148,15 @@ int main (int argc, char* argv[]) {
 		for(auto iterator = multiplicities_hist.begin(); iterator != multiplicities_hist.end(); iterator++) {
 			f << iterator->first << "\t" << iterator->second << endl;
 		}
+		f.close();
+	}
+
+	if (vm.count("save-statistics-to")) {
+		ofstream f;
+		f.open(vm["save-statistics-to"].as<string>());
+		f << counter_all_compton_hits << " # all Compton hits" << endl;
+		f << counter_compton_hits_over_the_ETH0 << " # compton hits with edep over the ETH0" << endl;
+		f << counter_compton_hits_over_the_ETH << " # compton hits with edep over the ETH" << endl;
 		f.close();
 	}
 

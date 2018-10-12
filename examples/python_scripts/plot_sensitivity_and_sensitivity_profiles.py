@@ -34,6 +34,8 @@ def create_label (template, label_old):
                 label_new += "L=50cm"
             elif tmp[i]=="L100":
                 label_new += "L=100cm"
+            elif tmp[i]=="L200":
+                label_new += "L=200cm"
             else:
                 label_new += tmp[i]
             if (flag==0):
@@ -57,6 +59,12 @@ if __name__ == "__main__":
                       default="png",
                       help='output format of images')
 
+  parser.add_argument('-sl', '--source-length',
+                      dest='source_length',
+                      type=float,
+                      default=70.,
+                      help='length of the source used in the simulations')
+
   args = parser.parse_args()
 
   rcParams['font.size'] = 24
@@ -75,10 +83,10 @@ if __name__ == "__main__":
 
   N = 0
 
-  templates = ["D75", "D85", "D95", "L020", "L050", "L100", "1lay", "2lay"]
+  templates = ["D75", "D85", "D95", "L020", "L050", "L100", "L200", "1lay", "2lay"]
 
   titles = ["D = 75 cm", "D = 85 cm", "D = 95 cm",
-            "L = 20 cm", "L = 50 cm", "L = 100 cm",
+            "L = 20 cm", "L = 50 cm", "L = 100 cm", "L = 200 cm",
             "1 layer", "2 layers"]
 
   for i in xrange(len(templates)):
@@ -122,6 +130,9 @@ if __name__ == "__main__":
       elif "L100" in d[0]:
           N = 100
           c = 'blue'
+      elif "L200" in d[0]:
+          N = 200
+          c = 'green'
 
       arguments = linspace(-N/2.+0.5,N/2-0.5, N)
 
@@ -130,7 +141,7 @@ if __name__ == "__main__":
 
       # Group specific settings
       if t in ["D75", "D85", "D95"]:
-        plt.ylim([0,25])
+        plt.ylim([0,23])
 
       label_blurred = ""
       if not args.blurred:
@@ -150,7 +161,7 @@ if __name__ == "__main__":
     plt.xlabel("Position along z axis [cm]")
     plt.ylabel("Sensitivity [cps/kBq]")
     #plt.legend(loc=1)
-    plt.xlim(-35,35)
+    plt.xlim(-args.source_length/2., args.source_length/2.)
     plt.ylim(ymin=0)
     plt.savefig(workdir_Sensitivity + "sensitivityProfile_" + t + label_blurred + "." + args.outputformat)
 
@@ -167,13 +178,13 @@ if __name__ == "__main__":
 
   MARKERSIZE = 10
 
-  L = [20,50,100]
-  D75_1lay = [data["D75_1lay_L020_7mm"][0], data["D75_1lay_L050_7mm"][0], data["D75_1lay_L100_7mm"][0]]
-  D85_1lay = [data["D85_1lay_L020_7mm"][0], data["D85_1lay_L050_7mm"][0], data["D85_1lay_L100_7mm"][0]]
-  D95_1lay = [data["D95_1lay_L020_7mm"][0], data["D95_1lay_L050_7mm"][0], data["D95_1lay_L100_7mm"][0]]
-  D75_2lay = [data["D75_2lay_L020_7mm"][0], data["D75_2lay_L050_7mm"][0], data["D75_2lay_L100_7mm"][0]]
-  D85_2lay = [data["D85_2lay_L020_7mm"][0], data["D85_2lay_L050_7mm"][0], data["D85_2lay_L100_7mm"][0]]
-  D95_2lay = [data["D95_2lay_L020_7mm"][0], data["D95_2lay_L050_7mm"][0], data["D95_2lay_L100_7mm"][0]]
+  L = [20,50,100,200]
+  D75_1lay = [data["D75_1lay_L020_7mm"][0], data["D75_1lay_L050_7mm"][0], data["D75_1lay_L100_7mm"][0], data["D75_1lay_L200_7mm"][0]]
+  D85_1lay = [data["D85_1lay_L020_7mm"][0], data["D85_1lay_L050_7mm"][0], data["D85_1lay_L100_7mm"][0], data["D85_1lay_L200_7mm"][0]]
+  D95_1lay = [data["D95_1lay_L020_7mm"][0], data["D95_1lay_L050_7mm"][0], data["D95_1lay_L100_7mm"][0], data["D95_1lay_L200_7mm"][0]]
+  D75_2lay = [data["D75_2lay_L020_7mm"][0], data["D75_2lay_L050_7mm"][0], data["D75_2lay_L100_7mm"][0], data["D75_2lay_L200_7mm"][0]]
+  D85_2lay = [data["D85_2lay_L020_7mm"][0], data["D85_2lay_L050_7mm"][0], data["D85_2lay_L100_7mm"][0], data["D85_2lay_L200_7mm"][0]]
+  D95_2lay = [data["D95_2lay_L020_7mm"][0], data["D95_2lay_L050_7mm"][0], data["D95_2lay_L100_7mm"][0], data["D95_2lay_L200_7mm"][0]]
 
   plt.subplots_adjust(left=0.19, right=0.99, top=0.97, bottom=0.17)
   plt.plot(L, D75_1lay, '<', markersize=MARKERSIZE, color='r', label="D=75cm, 1 layer")
@@ -184,7 +195,7 @@ if __name__ == "__main__":
   plt.plot(L, D95_2lay, 'P', markersize=MARKERSIZE, color='k', label="D=95cm, 2 layers")
   plt.xlabel("Scintillator length [cm]")
   plt.ylabel("Sensitivity [cps/kBq]")
-  rcParams['legend.fontsize'] = 18
+  rcParams['legend.fontsize'] = 16
   plt.legend(loc=2)
   plt.ylim(ymin=0)
   plt.savefig(workdir_Sensitivity + "Sensitivities." + args.outputformat)

@@ -10,7 +10,7 @@
 # MATERIALS
 #=====================================================
 
-/gate/geometry/setMaterialDatabase ../../GateMaterials.db
+/gate/geometry/setMaterialDatabase ../../materials/GateMaterials.db
 
 #=====================================================
 # GEOMETRY

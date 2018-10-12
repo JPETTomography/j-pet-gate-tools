@@ -77,7 +77,7 @@ def calculate_reduction_for_necr_simulations(necr_simulations):
       posY2 = tmp[:,5]
       times2 = tmp[:,7]
       [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
-      [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs, ELLIPSE_PARAM)
+      [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs)
       with open(sls_file, "a") as myfile:
         myfile.write("{0}\t{1}\t{2}\n".format(counter_above, counter_below, counter_above+counter_below))
       print g + "\t" + a + "\t" + str(counter_above) + "\t" + str(counter_below) + "\t" + str(counter_above+counter_below)

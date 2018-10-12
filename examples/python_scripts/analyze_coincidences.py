@@ -99,12 +99,12 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
   for i in xrange(len(xxx)):
-    yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(ELLIPSE_PARAM*ELLIPSE_PARAM)))
+    yyy.append(ellipsoid_threshold(xxx[i]))
 
   if show_cut:
     plt.plot(xxx, yyy, color='r', linewidth=2)
 
-  [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs, ELLIPSE_PARAM)
+  [counter_above, counter_below] = calculate_counters(tim_diffs, ang_diffs)
   print "Number of events above the cut: ", counter_above
   print "Number of events below the cut: ", counter_below
   print "Percentage of cut events: ", float(counter_below)/(counter_above+counter_below)*100.

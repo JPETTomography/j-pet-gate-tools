@@ -23,6 +23,10 @@ NEMA_DISPLACEMENT_CUT = 12 # [cm]
 #  2-level selection method (in space Da vs. Dt).
 ELLIPSE_PARAM = 2.2
 
+def ellipsoid_threshold(time_difference):
+
+  return 180-80*sqrt(1.-time_difference*time_difference/(ELLIPSE_PARAM*ELLIPSE_PARAM))
+
 class strip:
 
   def __init__(self,  name,  L,  crtPMT,  crtSi):
@@ -102,7 +106,7 @@ def blur_sourcePosZ(sourcePosZ,  sigma,  L):
     #result = rnd.gauss(sourcePosZ, sigma)
   return result
 
-def calculate_counters(tim_diffs, ang_diffs, param):
+def calculate_counters(tim_diffs, ang_diffs):
 
   counter_above = 0
   counter_below = 0
@@ -110,7 +114,7 @@ def calculate_counters(tim_diffs, ang_diffs, param):
     t = tim_diffs[i]
     a = ang_diffs[i]
     try:
-      newa = 180-80*sqrt(1.-t*t/(param*param))
+      newa = ellipsoid_threshold(t)
       if a>newa: counter_above += 1
       else: counter_below += 1
     except:

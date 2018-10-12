@@ -386,12 +386,11 @@ def perform_analysis(activity, filepath, workdir):
              aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
-  param = 2.2
-  xxx = linspace(0,param,100)
+  xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
   # Ellipse curve
   for i in xrange(len(xxx)):
-    yyy.append(180-80*sqrt(1.-xxx[i]*xxx[i]/(param*param)))
+    yyy.append(ellipsoid_threshold(xxx[i]))
   plt.plot(xxx,yyy,color='red')
   plt.xlabel("Time difference [ns]")
   plt.ylabel("Angle difference [deg.]")

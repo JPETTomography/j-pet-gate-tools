@@ -130,8 +130,18 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
 #      Path to the output image file.
 def plot_Da_vs_Dt_exp(coincidences, result_figure_path, t_bins, a_bins):
 
+  posX1 = coincidences[:,0]
+  posY1 = coincidences[:,1]
+  posZ1 = coincidences[:,2]
+  posX2 = coincidences[:,3]
+  posY2 = coincidences[:,4]
+  posZ2 = coincidences[:,5]
+
   tim_diffs = coincidences[:,6]
-  ang_diffs = coincidences[:,9]
+  ang_diffs = coincidences[:,7]
+
+  edep1 = coincidences[:,8]
+  edep2 = coincidences[:,9]
 
   # Plot 2D histogram
 
@@ -298,4 +308,4 @@ if __name__ == "__main__":
 
   elif args.mode == "exp":
     plot_Da_vs_Dt_exp(coincidences, (args.path_coincidences_file.split("/")[-1]).replace(".coincidences", ""),
-      args.t_bins, args.a_bins)
+      100, 48) #args.t_bins, args.a_bins)

@@ -123,6 +123,12 @@ if __name__ == "__main__":
                       default=0.01,
                       help='noise energy threshold in MeV [for mode \'analyze\']')
 
+  parser.add_argument('--tw',
+                      dest='tw',
+                      type=float,
+                      default=3,
+                      help='time window in ns [for mode \'analyze\']')
+
   parser.add_argument('--N0',
                       dest='N0',
                       type=int,
@@ -168,6 +174,7 @@ if __name__ == "__main__":
       for fname in fnames:
         goja_command = "goja --root " + args.path_gate_output + fname \
                      + " --eth0 " + str(args.eth0) \
+                     + " --tw " + str(args.tw) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + args.path_goja_output + fname[0:-5] + "_realtime" \
                      + " --save-statistics-to " + args.path_goja_output + fname[0:-5] + "_statistics" \
@@ -189,6 +196,7 @@ if __name__ == "__main__":
         array_pbs.write('cd ${PBS_O_WORKDIR}\n')
         goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
                      + " --eth0 " + str(args.eth0) \
+                     + " --tw " + str(args.tw) \
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
                      + " --save-statistics-to " + basepath_goja + "${PBS_ARRAYID}" + "_statistics" \
@@ -224,6 +232,7 @@ if __name__ == "__main__":
           basepath_goja = args.path_goja_output + fname[:-5]
           goja_command = "goja --root " + args.path_gate_output + fname \
                         + " --eth0 " + str(args.eth0) \
+                        + " --tw " + str(args.tw) \
                         + " --N0 " + str(args.N0) \
                         + " --save-real-time-to " + basepath_goja + "_realtime" \
                         + " --save-statistics-to " + basepath_goja + "_statistics" \
@@ -245,6 +254,7 @@ if __name__ == "__main__":
             array_pbs.write('cd ${PBS_O_WORKDIR}\n')
             goja_command = "goja --root " + basepath_gate + ".root" \
                         + " --eth0 " + str(args.eth0) \
+                        + " --tw " + str(args.tw) \
                         + " --N0 " + str(args.N0) \
                         + " --save-real-time-to " + basepath_goja + "_realtime" \
                         + " --save-statistics-to " + basepath_goja + "_statistics" \

@@ -7,10 +7,57 @@ from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from math import *
 import argparse
+import sys
 
 from nema_common import *
 
 OUTPUT_FORMAT = ".png"
+
+def get_strips_centers(geometry):
+
+  xs = []
+  ys = []
+
+  if geometry == "lab192": #TODO add other geometries
+
+    r1 = 42.5
+    r2 = 46.75
+    r3 = 57.5
+
+    n1 = 48
+    n3 = 96
+
+    a_step1 = 2*pi/n1
+
+    angles1 = linspace(0, 2*pi-a_step1, n1)
+    xs1 = r1*cos(angles1)
+    ys1 = r1*sin(angles1)
+
+    angles2 = linspace(0, 2*pi-a_step1, n1)+a_step1/2.
+    xs2 = r2*cos(angles2)
+    ys2 = r2*sin(angles2)
+
+    a_step3 = 2*pi/n3
+
+    angles3 = linspace(0, 2*pi-a_step3, n3)+a_step3/2.
+    xs3 = r3*cos(angles3)
+    ys3 = r3*sin(angles3)
+
+    xs = concatenate((xs1, xs2, xs3), axis=None)
+    ys = concatenate((ys1, ys2, ys3), axis=None)
+
+  strips_centers = []
+  for i in range(len(xs)):
+    strips_centers.append((xs[i], ys[i]))
+
+  return strips_centers
+
+def get_closest_strip_center(strip_center, strips_centers):
+
+  strips_centers = asarray(strips_centers)
+  dist_2 = sum((strips_centers - strip_center)**2, axis=1)
+  result = strips_centers[argmin(dist_2)]
+  return result[0], result[1]
 
 ## Plot Da vs. Dt using data from GATE simulations.
 #
@@ -35,7 +82,11 @@ OUTPUT_FORMAT = ".png"
 #      Type of the coincidence. When set to 0, all coincidences are plotted.
 #      When set to 1 (true), 2 (psca), 3 (psca) or 4 (acci), only coincidences
 #      with a chosen type of the coincidence are plotted.
-def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0):
+#  discrete : bool
+#      If True, then align x and y of the hits to strips centers.
+#  recalculate : bool
+#      If True, then recalculate strips_centers.txt file needed for discretization.
+def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0, discrete=False, recalculate=False):
 
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
@@ -44,6 +95,42 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   posY2 = coincidences[:,5]
   times2 = coincidences[:,7]
   type_of_coincidence = coincidences[:,12]
+
+  vol1 = coincidences[:,8]
+  vol2 = coincidences[:,9]
+
+  centers_x = zeros(192)
+  centers_y = zeros(192)
+  xxx = linspace(1,192,192)
+
+  if discrete:
+
+    if recalculate or not os.path.exists("./strips_centers.txt"):
+
+      for i in range(len(posX1)):
+
+        strips_centers = get_strips_centers('lab192')
+        x, y = get_closest_strip_center((posX1[i], posY1[i]), strips_centers)
+        ind = int(vol1[i])-1
+        centers_x[ind] = x
+        centers_y[ind] = y
+
+        if i == 10000:
+          savetxt('./strips_centers.txt', array([xxx, centers_x, centers_y]).T, fmt='%d\t%.18e\t%.18e')
+          print 'File strips_centers.txt generated. Try again.'
+          sys.exit(1)
+
+    else:
+
+      strips_centers = loadtxt("./strips_centers.txt")
+
+      for i in range(len(posX1)):
+        ind1 = int(vol1[i])-1
+        posX1[i] = strips_centers[:,1][ind1]
+        posY1[i] = strips_centers[:,2][ind1]
+        ind2 = int(vol2[i])-1
+        posX2[i] = strips_centers[:,1][ind2]
+        posY2[i] = strips_centers[:,2][ind2]
 
   if toc != 0:
     tmp_posX1 = []
@@ -73,8 +160,6 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   elif toc==3: label = "_dsca"
   elif toc==4: label = "_acci"
 
-  print len(posX1)
-
   # Calculate vectors of times and angles differences:
 
   [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
@@ -88,7 +173,7 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins), range=[[0, 3],[0, 180]])
+  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins), range=[[0, 3],ylim])
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
@@ -278,6 +363,11 @@ if __name__ == "__main__":
                       default=180,
                       help='number of bins for angles differences axis')
 
+  parser.add_argument('-d', '--discrete',
+                      dest='discrete',
+                      action='store_true',
+                      help='if set, then align x and y of the hits to strips centers')
+
   args = parser.parse_args()
 
   OUTPUT_FORMAT = "." + args.outputformat
@@ -287,7 +377,7 @@ if __name__ == "__main__":
 
   if args.mode == "plot":
     plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
-      args.t_bins, args.a_bins, ylim=[90,180])
+      args.t_bins, args.a_bins, ylim=[-0.9375,180.9375], discrete=args.discrete) #TODO remove hardcoded values
     plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":

@@ -178,6 +178,10 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
+  # Save 2D histogram to txt file:
+
+  savetxt(result_figure_path + label + ".txt", H)
+
   # Ellipsoidal cut obtained using simulations with SF phantom and rod source
   # displaced by 25 cm from the axis of the scanner:
 

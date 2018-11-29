@@ -4,5 +4,6 @@ goja/nbproject/
 goja/build/
 examples/python_scripts/python_scripts/
 examples/python_scripts/Results*
+examples/python_scripts/*.pdf
 examples/python_scripts/*.png
-examples/python_scripts/strips_centers.txt
+examples/python_scripts/*.txt

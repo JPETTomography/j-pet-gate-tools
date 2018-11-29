@@ -75,7 +75,7 @@ def get_closest_strip_center(strip_center, strips_centers):
 #  t_bins : int
 #      Number of bins for times differences axis.
 #  a_bins : int
-#      Number of bis for angles differences axis.
+#      Number of bins for angles differences axis for continous values or number of strips for discrete values.
 #  ylim : tuple
 #      Limits of the angles differences axis.
 #  toc : int
@@ -173,7 +173,11 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins), range=[[0, 3],ylim])
+  a_bin_size = 180./a_bins
+  a_bins_vec = linspace(0-a_bin_size/2., 180.+a_bin_size/2., a_bins+2)
+  t_bins_vec = linspace(0,3,t_bins+1) #TODO
+
+  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, 3],ylim])
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
@@ -379,10 +383,12 @@ if __name__ == "__main__":
   # Load data from file
   coincidences = loadtxt(args.path_coincidences_file)
 
+  a_bin_size = 180./args.a_bins
+
   if args.mode == "plot":
     plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
-      args.t_bins, args.a_bins, ylim=[-0.9375,180.9375], discrete=args.discrete) #TODO remove hardcoded values
-    plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
+      args.t_bins, args.a_bins, ylim=[-a_bin_size/2.,180.+a_bin_size/2.], discrete=args.discrete)
+    #plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":
     plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,

@@ -68,6 +68,8 @@ def get_closest_strip_center(strip_center, strips_centers):
 #  ----------
 #  coincidences : ndarray
 #      Data read from the listmode goja output file using the numpy.loadtxt.
+#  tw : float
+#      Time window, for which the coincidence set was produced [ns].
 #  result_figure_path : str
 #      Path to the output image file.
 #  show_cut : bool
@@ -86,7 +88,7 @@ def get_closest_strip_center(strip_center, strips_centers):
 #      If True, then align x and y of the hits to strips centers.
 #  recalculate : bool
 #      If True, then recalculate strips_centers.txt file needed for discretization.
-def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0, discrete=False, recalculate=False):
+def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0, discrete=False, recalculate=False):
 
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
@@ -168,6 +170,7 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
+  ASPECT = tw/(ylim[1]-ylim[0]) # force square pixels
 
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
@@ -175,11 +178,11 @@ def plot_Da_vs_Dt(coincidences, result_figure_path, show_cut, t_bins, a_bins, yl
 
   a_bin_size = 180./a_bins
   a_bins_vec = linspace(0-a_bin_size/2., 180.+a_bin_size/2., a_bins+2)
-  t_bins_vec = linspace(0,3,t_bins+1) #TODO
+  t_bins_vec = linspace(0, tw, t_bins+1)
 
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, 3],ylim])
+  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   # Save 2D histogram to txt file:
@@ -245,7 +248,7 @@ def plot_Da_vs_Dt_exp(coincidences, result_figure_path, t_bins, a_bins):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins)) #, range=[[0, 3],[0, 180]])
+  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins))
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
@@ -330,6 +333,12 @@ if __name__ == "__main__":
                       type=str,
                       help='path to the coincidences file obtained using the GOJA tool')
 
+  parser.add_argument('-tw', '--time-window',
+                      dest='tw',
+                      type=float,
+                      default=3,
+                      help='time window, for which the coincidence set was produced [ns]')
+
   parser.add_argument('-m', '--mode',
                       dest='mode',
                       type=str,
@@ -386,21 +395,21 @@ if __name__ == "__main__":
   a_bin_size = 180./args.a_bins
 
   if args.mode == "plot":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, ylim=[-a_bin_size/2.,180.+a_bin_size/2.], discrete=args.discrete)
     #plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=1)
     try:
-      plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+      plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
         args.t_bins, args.a_bins, toc=2)
     except:
       print "There are no phantom coincidences in the goja output file."
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=3)
-    plot_Da_vs_Dt(coincidences, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=4)
 
   elif args.mode == "stats":

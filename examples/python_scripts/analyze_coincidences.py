@@ -182,6 +182,8 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
 
   H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
   VMAX = H.max()
+  print "VMAX=", VMAX
+  VMAX = 100000 #TODO
   plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 

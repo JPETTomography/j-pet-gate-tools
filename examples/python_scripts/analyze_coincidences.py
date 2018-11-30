@@ -323,6 +323,35 @@ def calculate_ratios(coincidences, filename):
 
   print("filename={0}, ratio_acci={1:.2f}%, ratio_acci_to_true={2:.2f}%".format(filename, ratio_acci, ratio_acci_to_true))
 
+def plot_diff(hist1, hist2):
+
+  hist = abs(hist2 - hist1)
+
+  TLIM = 5.
+  ALIM = 180.
+  TBIN = TLIM/shape(hist)[0]
+  ABIN = ALIM/shape(hist)[1]
+
+  hist = delete(hist, (0), axis=1)
+
+  rcParams['font.size'] = 24
+  rcParams['legend.fontsize'] = 18
+
+  fig = plt.figure(figsize=(8, 6))
+  ax = fig.add_subplot(111)
+  plt.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
+
+  ASPECT = TLIM/ALIM # force square pixels
+
+  plt.imshow(hist.T, interpolation='none', origin='low', extent=[0, 5, 0, 180], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=hist.max()))
+  plt.colorbar()
+
+  plt.xlabel("Time difference [ns]")
+  plt.ylabel("Angle difference [deg.]")
+  plt.savefig("./diff" + OUTPUT_FORMAT)
+  plt.clf()
+  plt.close()
+
 if __name__ == "__main__":
 
   parser = argparse.ArgumentParser(description='Analyze coincidences file and plot results of the analysis',
@@ -330,6 +359,7 @@ if __name__ == "__main__":
 
   parser.add_argument('-cf', '--coincidences-file',
                       dest='path_coincidences_file',
+                      default='',
                       type=str,
                       help='path to the coincidences file obtained using the GOJA tool')
 
@@ -385,12 +415,23 @@ if __name__ == "__main__":
                       action='store_true',
                       help='if set, then align x and y of the hits to strips centers')
 
+  parser.add_argument('--hist1',
+                      dest='hist1',
+                      type=str,
+                      help='path to hist1 (txt file)')
+
+  parser.add_argument('--hist2',
+                      dest='hist2',
+                      type=str,
+                      help='path to hist2 (txt file)')
+
   args = parser.parse_args()
 
   OUTPUT_FORMAT = "." + args.outputformat
 
   # Load data from file
-  coincidences = loadtxt(args.path_coincidences_file)
+  if args.path_coincidences_file != '':
+    coincidences = loadtxt(args.path_coincidences_file)
 
   a_bin_size = 180./args.a_bins
 
@@ -411,6 +452,15 @@ if __name__ == "__main__":
       args.t_bins, args.a_bins, toc=3)
     plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=4)
+
+  elif args.mode == "plot_diff":
+
+    print str(args.hist1)
+
+    hist1 = loadtxt(args.hist1)
+    hist2 = loadtxt(args.hist2)
+
+    plot_diff(hist1, hist2)
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

@@ -9,23 +9,51 @@ import re
 from numpy import *
 import string
 
+def verify_gate_output(gate_path):
+
+  nr_of_missing_files = 0
+  missing_files = []
+  nr_of_splits = 0
+
+  with open(gate_path + '../Gate_parallel.sh', 'r') as gate_parallel_sh:
+    for line in gate_parallel_sh:
+      if line.split('=')[0] == 'NR_OF_SPLITS':
+        nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
+
+  for s in xrange(nr_of_splits):
+    output_root = gate_path + 'output' + str(s+1) + '.root'
+    if not os.path.isfile(output_root):
+      print "\tFile ", output_root, " is missing."
+      nr_of_missing_files += 1
+      missing_files.append(output_root)
+
+  if nr_of_missing_files == 0:
+    print "\tGATE output is ok." #TODO check if files where closed properly
+
+  return nr_of_missing_files, missing_files
+
 def verify_goja_output(gate_path, goja_path):
-    nr_of_missing_files = 0
+
+    nr_of_missing_files, missing_files = verify_gate_output(gate_path)
+
+    #TODO add filling missing goja files
+
     for fname in os.listdir(gate_path):
       if ".root" in fname:
         path_coincidences = goja_path + fname[:-5] + "_coincidences"
         if not os.path.isfile(path_coincidences):
-          print "File ", path_coincidences, " is missing."
+          print "\tFile ", path_coincidences, " is missing."
           nr_of_missing_files += 1
         path_realtime = goja_path + fname[:-5] + "_realtime"
         if not os.path.isfile(path_realtime):
-          print "File ", path_realtime, " is missing."
+          print "\tFile ", path_realtime, " is missing."
           nr_of_missing_files += 1
         path_statistics = goja_path + fname[:-5] + "_statistics"
         if not os.path.isfile(path_statistics):
-          print "File ", path_statistics, " is missing."
+          print "\tFile ", path_statistics, " is missing."
           nr_of_missing_files += 1
-    print "Number of missing files: ", nr_of_missing_files
+    if nr_of_missing_files>0:
+      print "\tNumber of missing files: ", nr_of_missing_files
     return nr_of_missing_files
 
 def concatenate_files(fnames):
@@ -167,6 +195,7 @@ if __name__ == "__main__":
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
+    print fnames
     if len(fnames)>1:
       fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
@@ -275,7 +304,7 @@ if __name__ == "__main__":
     print "Verification:"
 
     if not verify_goja_output(args.path_gate_output, args.path_goja_output):
-      print "Goja output is ok."
+      print "\tGOJA output is ok."
 
   elif args.mode=="concatenate":
 

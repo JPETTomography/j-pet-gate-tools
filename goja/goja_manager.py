@@ -17,10 +17,10 @@ def run_simulation(path_gate_output, type_of_run):
     command_run += 'Gate main.mac &'
   else:
     command_run += './Gate_parallel.sh'
-  print command_run
+  print '\t' + command_run
   os.system(command_run)
   command_cd = 'cd ' + current_path
-  print command_cd
+  print '\t' + command_cd
   os.system(command_cd)
 
 def verify_gate_output(path_gate_output):
@@ -214,6 +214,9 @@ if __name__ == "__main__":
     print "Run missing:"
 
     nr_of_missing_files, missing_files = verify_gate_output(args.path_gate_output)
+
+    #TODO currently this mode runs all simulations, in which at least one file is missing
+    # but it should rather run only missing splits
 
     if nr_of_missing_files>0:
       run_simulation(args.path_gate_output, args.type_of_run)

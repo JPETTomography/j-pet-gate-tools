@@ -9,19 +9,33 @@ import re
 from numpy import *
 import string
 
-def verify_gate_output(gate_path):
+def run_simulation(path_gate_output, type_of_run):
+
+  current_path = os.path.dirname(os.path.realpath(__file__))
+  command_run = 'cd ' + path_gate_output + '../ && '
+  if type_of_run == "locally":
+    command_run += 'Gate main.mac &'
+  else:
+    command_run += './Gate_parallel.sh'
+  print command_run
+  os.system(command_run)
+  command_cd = 'cd ' + current_path
+  print command_cd
+  os.system(command_cd)
+
+def verify_gate_output(path_gate_output):
 
   nr_of_missing_files = 0
   missing_files = []
   nr_of_splits = 0
 
-  with open(gate_path + '../Gate_parallel.sh', 'r') as gate_parallel_sh:
+  with open(path_gate_output + '../Gate_parallel.sh', 'r') as gate_parallel_sh:
     for line in gate_parallel_sh:
       if line.split('=')[0] == 'NR_OF_SPLITS':
         nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
 
   for s in xrange(nr_of_splits):
-    output_root = gate_path + 'output' + str(s+1) + '.root'
+    output_root = path_gate_output + 'output' + str(s+1) + '.root'
     if not os.path.isfile(output_root):
       print "\tFile ", output_root, " is missing."
       nr_of_missing_files += 1
@@ -32,23 +46,23 @@ def verify_gate_output(gate_path):
 
   return nr_of_missing_files, missing_files
 
-def verify_goja_output(gate_path, goja_path):
+def verify_goja_output(path_gate_output, path_goja_output):
 
-    nr_of_missing_files, missing_files = verify_gate_output(gate_path)
+    nr_of_missing_files, missing_files = verify_gate_output(path_gate_output)
 
     #TODO add filling missing goja files
 
-    for fname in os.listdir(gate_path):
+    for fname in os.listdir(path_gate_output):
       if ".root" in fname:
-        path_coincidences = goja_path + fname[:-5] + "_coincidences"
+        path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
         if not os.path.isfile(path_coincidences):
           print "\tFile ", path_coincidences, " is missing."
           nr_of_missing_files += 1
-        path_realtime = goja_path + fname[:-5] + "_realtime"
+        path_realtime = path_goja_output + fname[:-5] + "_realtime"
         if not os.path.isfile(path_realtime):
           print "\tFile ", path_realtime, " is missing."
           nr_of_missing_files += 1
-        path_statistics = goja_path + fname[:-5] + "_statistics"
+        path_statistics = path_goja_output + fname[:-5] + "_statistics"
         if not os.path.isfile(path_statistics):
           print "\tFile ", path_statistics, " is missing."
           nr_of_missing_files += 1
@@ -143,7 +157,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="analyze",
-                      help='analyze, analyze-missing, verify, concatenate or concatenate-force')
+                      help='run, run-missing, analyze, analyze-missing, verify, concatenate or concatenate-force')
 
   parser.add_argument('--eth0',
                       dest='eth0',
@@ -167,7 +181,7 @@ if __name__ == "__main__":
                       dest='type_of_run',
                       type=str,
                       default='on-cluster',
-                      help='run \'locally\' or \'on-cluster\' [for mode \'analyze\']')
+                      help='run \'locally\' or \'on-cluster\' [for modes: run, run-missing, analyze, analyze-missing]')
 
   parser.add_argument('-sn', '--simulation-name',
                       dest='simulation_name',
@@ -189,9 +203,24 @@ if __name__ == "__main__":
     print "Directory " + args.path_goja_output + " does not exist. " + help_message
     sys.exit()
 
-  if args.mode=="analyze":
+  if args.mode == "run":
 
-    print "Analysis:"
+    print "Run:"
+
+    run_simulation(args.path_gate_output, args.type_of_run)
+
+  elif args.mode == "run-missing":
+
+    print "Run missing:"
+
+    nr_of_missing_files, missing_files = verify_gate_output(args.path_gate_output)
+
+    if nr_of_missing_files>0:
+      run_simulation(args.path_gate_output, args.type_of_run)
+
+  elif args.mode == "analyze":
+
+    print "Analyze:"
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
@@ -241,9 +270,9 @@ if __name__ == "__main__":
     else:
       print "Improper type of run. " + help_message
 
-  elif args.mode=="analyze-missing":
+  elif args.mode == "analyze-missing":
 
-    print "Analysis of missing files:"
+    print "Analyze missing:"
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
@@ -299,16 +328,16 @@ if __name__ == "__main__":
         else:
           print "Improper type of run. " + help_message
 
-  elif args.mode=="verify":
+  elif args.mode == "verify":
 
-    print "Verification:"
+    print "Verify:"
 
     if not verify_goja_output(args.path_gate_output, args.path_goja_output):
       print "\tGOJA output is ok."
 
-  elif args.mode=="concatenate":
+  elif args.mode == "concatenate":
 
-    print "Concatenation:"
+    print "Concatenate:"
 
     nr_of_missing_files = verify_goja_output(args.path_gate_output, args.path_goja_output)
 
@@ -323,9 +352,9 @@ if __name__ == "__main__":
         fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
       concatenate_files(fnames)
 
-  elif args.mode=="concatenate-force":
+  elif args.mode == "concatenate-force":
 
-    print "Concatenation (force):"
+    print "Concatenate (force):"
 
     fnames_tmp = os.listdir(args.path_goja_output)
     fnames_tmp = [fname for fname in fnames_tmp if "_coincidences" in fname]

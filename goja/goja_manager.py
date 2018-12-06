@@ -32,16 +32,23 @@ def get_nr_of_splits(path_gate_output):
         nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
   return nr_of_splits
 
-def verify_gate_output(path_gate_output):
+def verify_gate_output(path_gate_output, type_of_run):
 
   missing_files = []
-  nr_of_splits = get_nr_of_splits(path_gate_output)
 
-  for s in xrange(nr_of_splits):
-    output_root = path_gate_output + 'output' + str(s+1) + '.root'
+  if type_of_run == "locally":
+    output_root = path_gate_output + 'output.root'
     if not os.path.isfile(output_root):
       print "\tFile ", output_root, " is missing."
       missing_files.append(output_root)
+
+  elif type_of_run == "on-cluster":
+    nr_of_splits = get_nr_of_splits(path_gate_output)
+    for s in xrange(nr_of_splits):
+      output_root = path_gate_output + 'output' + str(s+1) + '.root'
+      if not os.path.isfile(output_root):
+        print "\tFile ", output_root, " is missing."
+        missing_files.append(output_root)
 
   nr_of_missing_files = len(missing_files)
   if nr_of_missing_files == 0:
@@ -221,7 +228,7 @@ if __name__ == "__main__":
 
     print "Run missing:"
 
-    nr_of_missing_files, missing_files = verify_gate_output(args.path_gate_output)
+    nr_of_missing_files, missing_files = verify_gate_output(args.path_gate_output, args.type_of_run)
 
     #TODO currently this mode runs all simulations, in which at least one file is missing
     # but it should rather run only missing splits
@@ -343,14 +350,14 @@ if __name__ == "__main__":
 
     print "Verify:"
 
-    verify_gate_output(args.path_gate_output)
+    verify_gate_output(args.path_gate_output, args.type_of_run)
     verify_goja_output(args.path_gate_output, args.path_goja_output)
 
   elif args.mode == "verify-gate":
 
     print "Verify (GATE):"
 
-    verify_gate_output(args.path_gate_output)
+    verify_gate_output(args.path_gate_output, args.type_of_run)
 
   elif args.mode == "verify-goja":
 

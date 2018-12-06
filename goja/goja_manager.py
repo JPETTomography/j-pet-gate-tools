@@ -23,52 +23,60 @@ def run_simulation(path_gate_output, type_of_run):
   print '\t' + command_cd
   os.system(command_cd)
 
-def verify_gate_output(path_gate_output):
+def get_nr_of_splits(path_gate_output):
 
-  nr_of_missing_files = 0
-  missing_files = []
   nr_of_splits = 0
-
   with open(path_gate_output + '../Gate_parallel.sh', 'r') as gate_parallel_sh:
     for line in gate_parallel_sh:
       if line.split('=')[0] == 'NR_OF_SPLITS':
         nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
+  return nr_of_splits
+
+def verify_gate_output(path_gate_output):
+
+  missing_files = []
+  nr_of_splits = get_nr_of_splits(path_gate_output)
 
   for s in xrange(nr_of_splits):
     output_root = path_gate_output + 'output' + str(s+1) + '.root'
     if not os.path.isfile(output_root):
       print "\tFile ", output_root, " is missing."
-      nr_of_missing_files += 1
       missing_files.append(output_root)
 
+  nr_of_missing_files = len(missing_files)
   if nr_of_missing_files == 0:
     print "\tGATE output is ok." #TODO check if files where closed properly
+  else:
+    print "\tNumber of missing GATE files: ", nr_of_missing_files
 
   return nr_of_missing_files, missing_files
 
 def verify_goja_output(path_gate_output, path_goja_output):
 
-    nr_of_missing_files, missing_files = verify_gate_output(path_gate_output)
+  missing_files = []
 
-    #TODO add filling missing goja files
+  for fname in os.listdir(path_gate_output):
+    if ".root" in fname:
+      path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
+      if not os.path.isfile(path_coincidences):
+        print "\tFile ", path_coincidences, " is missing."
+        missing_files.append(path_coincidences)
+      path_realtime = path_goja_output + fname[:-5] + "_realtime"
+      if not os.path.isfile(path_realtime):
+        print "\tFile ", path_realtime, " is missing."
+        missing_files.append(path_realtime)
+      path_statistics = path_goja_output + fname[:-5] + "_statistics"
+      if not os.path.isfile(path_statistics):
+        print "\tFile ", path_statistics, " is missing."
+        missing_files.append(path_statistics)
 
-    for fname in os.listdir(path_gate_output):
-      if ".root" in fname:
-        path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
-        if not os.path.isfile(path_coincidences):
-          print "\tFile ", path_coincidences, " is missing."
-          nr_of_missing_files += 1
-        path_realtime = path_goja_output + fname[:-5] + "_realtime"
-        if not os.path.isfile(path_realtime):
-          print "\tFile ", path_realtime, " is missing."
-          nr_of_missing_files += 1
-        path_statistics = path_goja_output + fname[:-5] + "_statistics"
-        if not os.path.isfile(path_statistics):
-          print "\tFile ", path_statistics, " is missing."
-          nr_of_missing_files += 1
-    if nr_of_missing_files>0:
-      print "\tNumber of missing files: ", nr_of_missing_files
-    return nr_of_missing_files
+  nr_of_missing_files = len(missing_files)
+  if nr_of_missing_files == 0:
+    print "\tGOJA output is ok."
+  else:
+    print "\tNumber of missing GOJA files: ", nr_of_missing_files
+
+  return nr_of_missing_files, missing_files
 
 def concatenate_files(fnames):
 
@@ -335,14 +343,26 @@ if __name__ == "__main__":
 
     print "Verify:"
 
-    if not verify_goja_output(args.path_gate_output, args.path_goja_output):
-      print "\tGOJA output is ok."
+    verify_gate_output(args.path_gate_output)
+    verify_goja_output(args.path_gate_output, args.path_goja_output)
+
+  elif args.mode == "verify-gate":
+
+    print "Verify (GATE):"
+
+    verify_gate_output(args.path_gate_output)
+
+  elif args.mode == "verify-goja":
+
+    print "Verify (GOJA):"
+
+    verify_goja_output(args.path_gate_output, args.path_goja_output)
 
   elif args.mode == "concatenate":
 
     print "Concatenate:"
 
-    nr_of_missing_files = verify_goja_output(args.path_gate_output, args.path_goja_output)
+    nr_of_missing_files, missing_files = verify_goja_output(args.path_gate_output, args.path_goja_output)
 
     if nr_of_missing_files:
       print "Concatenation cannot be performed because of missing files. " + \

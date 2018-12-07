@@ -242,7 +242,6 @@ if __name__ == "__main__":
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
-    print fnames
     if len(fnames)>1:
       fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 

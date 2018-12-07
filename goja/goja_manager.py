@@ -180,7 +180,7 @@ if __name__ == "__main__":
                       default=0.01,
                       help='noise energy threshold in MeV [for mode \'analyze\']')
 
-  parser.add_argument('--tw',
+  parser.add_argument('-tw', '--time-window',
                       dest='tw',
                       type=float,
                       default=3,

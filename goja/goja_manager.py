@@ -1,24 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-import errno
 import argparse
-import re
+import errno
 from numpy import *
+import os
+import re
 import string
+import subprocess
+import sys
 
 def run_simulation(path_gate_output, type_of_run):
 
   current_path = os.path.dirname(os.path.realpath(__file__))
   command_run = 'cd ' + path_gate_output + '../ && '
   if type_of_run == "locally":
-    command_run += 'Gate main.mac &'
+    command_run += 'Gate main.mac'
+    print '\t' + command_run
+    p = subprocess.Popen(command_run, stdout=subprocess.PIPE, shell=True)
+    p.wait()
   else:
     command_run += './Gate_parallel.sh'
-  print '\t' + command_run
-  os.system(command_run)
+    print '\t' + command_run
+    os.system(command_run)
   command_cd = 'cd ' + current_path
   print '\t' + command_cd
   os.system(command_cd)
@@ -253,9 +257,10 @@ if __name__ == "__main__":
                      + " --N0 " + str(args.N0) \
                      + " --save-real-time-to " + args.path_goja_output + fname[0:-5] + "_realtime" \
                      + " --save-statistics-to " + args.path_goja_output + fname[0:-5] + "_statistics" \
-                     + " > " + args.path_goja_output + fname[0:-5] + "_coincidences &"
-        os.system(goja_command)
+                     + " > " + args.path_goja_output + fname[0:-5] + "_coincidences"
         print goja_command
+        p = subprocess.Popen(goja_command, shell=True)
+        p.wait()
 
     elif args.type_of_run == 'on-cluster':
       basename = fnames[0][0:-5]
@@ -311,9 +316,10 @@ if __name__ == "__main__":
                         + " --N0 " + str(args.N0) \
                         + " --save-real-time-to " + basepath_goja + "_realtime" \
                         + " --save-statistics-to " + basepath_goja + "_statistics" \
-                        + " > " + basepath_goja + "_coincidences &"
-          os.system(goja_command)
+                        + " > " + basepath_goja + "_coincidences"
           print goja_command
+          p = subprocess.Popen(goja_command, shell=True)
+          p.wait()
 
         elif args.type_of_run == 'on-cluster':
           basename = fname[0:-5]

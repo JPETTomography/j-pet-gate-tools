@@ -298,10 +298,10 @@ if __name__ == "__main__":
 
     fnames = os.listdir(args.path_gate_output)
     fnames = [fname for fname in fnames if ".root" in fname]
-    fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
+    if len(fnames)>1:
+      fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
 
     for fname in fnames:
-
       path_coincidences = args.path_goja_output + fname[:-5] + "_coincidences"
       path_realtime = args.path_goja_output + fname[:-5] + "_realtime"
       path_statistics = args.path_goja_output + fname[:-5] + "_statistics"

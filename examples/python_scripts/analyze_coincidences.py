@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import argparse
+from math import *
 import matplotlib.pyplot as plt
-from numpy import *
 from matplotlib import rcParams
 from matplotlib.colors import LogNorm
-from math import *
-import argparse
+from matplotlib.ticker import ScalarFormatter
+from numpy import *
 import sys
 
 from nema_common import *
@@ -180,11 +181,11 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   a_bins_vec = linspace(0-a_bin_size/2., 180.+a_bin_size/2., a_bins+2)
   t_bins_vec = linspace(0, tw, t_bins+1)
 
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
   VMAX = H.max()
   print "VMAX=", VMAX
   VMAX = 100000 #TODO
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   # Save 2D histogram to txt file:
@@ -215,6 +216,53 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   plt.clf()
   plt.close()
 
+  H_tim_diffs = zeros([t_bins])
+  H_ang_diffs = zeros([a_bins+1])
+
+  T, A = shape(H)
+  for t in range(T):
+    for a in range(A):
+      H_tim_diffs[t] += H[t,a]
+      H_ang_diffs[a] += H[t,a]
+
+  YLIM = 1e5
+
+  times = []
+  for i in range(len(edges_tim_diffs)-1):
+    times.append((edges_tim_diffs[i]+edges_tim_diffs[i+1])/2.)
+
+  fig = plt.figure(figsize=(8, 6))
+  ax = fig.add_subplot(111)
+  plt.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.92)
+  ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+  plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+  bar_width = (times[-1]-times[0])/(len(times)-1)
+  plt.bar(times, H_tim_diffs, bar_width)
+  plt.xlabel("Time difference [ns]")
+  plt.xlim(0,5)
+  plt.ylim(0,YLIM)
+  plt.savefig(result_figure_path + label + "_1D_tim_diffs" + OUTPUT_FORMAT)
+  plt.clf()
+  plt.close()
+
+  angles = []
+  for i in range(len(edges_ang_diffs)-1):
+    angles.append((edges_ang_diffs[i]+edges_ang_diffs[i+1])/2.)
+
+  fig = plt.figure(figsize=(8, 6))
+  ax = fig.add_subplot(111)
+  plt.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.92)
+  ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
+  plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
+  bar_width = (angles[-1]-angles[0])/(len(angles)-1)
+  plt.bar(angles, H_ang_diffs, width=bar_width)
+  plt.xlabel("Angle difference [deg.]")
+  plt.xlim(-bar_width/2.,180+bar_width/2.)
+  plt.ylim(0,YLIM)
+  plt.savefig(result_figure_path + label + "_1D_ang_diffs" + OUTPUT_FORMAT)
+  plt.clf()
+  plt.close()
+
 ## Plot source position x vs. y using data from GATE simulations.
 #
 #  source position - position of the annihilation
@@ -239,9 +287,9 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, xedges, yedges = histogram2d(sourcePosX, sourcePosY, bins=100)
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=100)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
   plt.xlabel("sourcePosX [cm]")

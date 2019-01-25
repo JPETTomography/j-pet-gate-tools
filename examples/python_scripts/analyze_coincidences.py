@@ -215,52 +215,6 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   plt.clf()
   plt.close()
 
-## Plot Da vs. Dt using data from experiment.
-#
-#  Da - differences of central angles between hits in the coincidence
-#  Dt - differences of times of interactions of hits in the coincidence
-#
-#  Parameters
-#  ----------
-#  coincidences : ndarray
-#      Data read from the listmode goja output file using the numpy.loadtxt.
-#  result_figure_path : str
-#      Path to the output image file.
-def plot_Da_vs_Dt_exp(coincidences, result_figure_path, t_bins, a_bins):
-
-  posX1 = coincidences[:,0]
-  posY1 = coincidences[:,1]
-  posZ1 = coincidences[:,2]
-  posX2 = coincidences[:,3]
-  posY2 = coincidences[:,4]
-  posZ2 = coincidences[:,5]
-
-  tim_diffs = coincidences[:,6]
-  ang_diffs = coincidences[:,7]
-
-  edep1 = coincidences[:,8]
-  edep2 = coincidences[:,9]
-
-  # Plot 2D histogram
-
-  rcParams['font.size'] = 24
-  rcParams['legend.fontsize'] = 18
-
-  fig = plt.figure(figsize=(8, 6))
-  ax = fig.add_subplot(111)
-  plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
-
-  H, xedges, yedges = histogram2d(tim_diffs, ang_diffs, bins=(t_bins,a_bins))
-  VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[xedges[0], xedges[-1], yedges[0], yedges[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
-  plt.colorbar()
-
-  plt.xlabel("Time difference [ps]")
-  plt.ylabel("Angle difference [deg.]")
-  plt.savefig(result_figure_path + "_" + str(t_bins) + "_" + str(a_bins) + OUTPUT_FORMAT, bbox_inches='tight')
-  plt.clf()
-  plt.close()
-
 ## Plot source position x vs. y using data from GATE simulations.
 #
 #  source position - position of the annihilation
@@ -375,7 +329,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="plot",
-                      help='mode of the script: plot, plot_by_types, stats, exp')
+                      help='mode of the script: plot, plot_by_types, plot_diff, stats')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
@@ -466,7 +420,3 @@ if __name__ == "__main__":
 
   elif args.mode == "stats":
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])
-
-  elif args.mode == "exp":
-    plot_Da_vs_Dt_exp(coincidences, (args.path_coincidences_file.split("/")[-1]).replace(".coincidences", ""),
-      100, 48) #args.t_bins, args.a_bins)

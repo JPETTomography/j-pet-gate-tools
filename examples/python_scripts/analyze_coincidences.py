@@ -13,6 +13,7 @@ import sys
 from nema_common import *
 
 OUTPUT_FORMAT = ".png"
+NR_OF_STRIPS_LAB192 = 192 # nr of strips in the 3-layer prototype of the J-PET scanner
 
 def get_strips_centers(geometry):
 
@@ -102,9 +103,9 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   vol1 = coincidences[:,8]
   vol2 = coincidences[:,9]
 
-  centers_x = zeros(192)
-  centers_y = zeros(192)
-  xxx = linspace(1,192,192)
+  centers_x = zeros(NR_OF_STRIPS_LAB192)
+  centers_y = zeros(NR_OF_STRIPS_LAB192)
+  xxx = linspace(1, NR_OF_STRIPS_LAB192, NR_OF_STRIPS_LAB192)
 
   if discrete:
 
@@ -118,7 +119,13 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
         centers_x[ind] = x
         centers_y[ind] = y
 
-        if i == 10000:
+        strips_centers_collected = True
+        for j in range(NR_OF_STRIPS_LAB192):
+          if centers_x[j] == 0 and centers_y[j] == 0:
+            strips_centers_collected = False
+            break
+
+        if strips_centers_collected:
           savetxt('./strips_centers.txt', array([xxx, centers_x, centers_y]).T, fmt='%d\t%.18e\t%.18e')
           print 'File strips_centers.txt generated. Try again.'
           sys.exit(1)
@@ -183,8 +190,6 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
 
   H, edges_tim_diffs, edges_ang_diffs = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
   VMAX = H.max()
-  print "VMAX=", VMAX
-  VMAX = 100000 #TODO
   plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
 
@@ -440,11 +445,17 @@ if __name__ == "__main__":
   a_bin_size = 180./args.a_bins
 
   if args.mode == "plot":
+
+    "Mode to plot all coincidences from the coincidence file"
+
     plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, ylim=[-a_bin_size/2.,180.+a_bin_size/2.], discrete=args.discrete)
-    #plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
+    plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
   elif args.mode == "plot_by_types":
+
+    "Mode to plot all coincidences from the coincidence file by type"
+
     plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=1)
     try:
@@ -459,12 +470,14 @@ if __name__ == "__main__":
 
   elif args.mode == "plot_diff":
 
-    print str(args.hist1)
+    "Mode to plot differential image of two DA vs. DT histograms given with commandline arguments hist1 and hist2"
 
     hist1 = loadtxt(args.hist1)
     hist2 = loadtxt(args.hist2)
-
     plot_diff(hist1, hist2)
 
   elif args.mode == "stats":
+
+    "Mode to calculate some statistics from the coincidence file"
+
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])

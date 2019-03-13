@@ -178,7 +178,7 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
-  ASPECT = tw/(ylim[1]-ylim[0]) # force square pixels
+  ASPECT = tw/float(ylim[1]-ylim[0]) # force square pixels
 
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
@@ -350,7 +350,7 @@ def plot_diff(hist1, hist2):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
 
-  ASPECT = TLIM/ALIM # force square pixels
+  ASPECT = TLIM/float(ALIM) # force square pixels
 
   plt.imshow(hist.T, interpolation='none', origin='low', extent=[0, 5, 0, 180], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=hist.max()))
   plt.colorbar()

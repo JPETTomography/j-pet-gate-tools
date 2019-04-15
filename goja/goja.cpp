@@ -47,10 +47,10 @@ int main (int argc, char* argv[]) {
 	desc.add_options()
 	("help", "produce help message")
 	("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
-	("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.01 MeV)")
+	("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.0 MeV)")
 	("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
 	("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
-	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 3)")
+	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 1000)")
 	("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
 	("root", po::value<string>(), "file path of the single GATE *.root file,"
 	                              "for example --root=output.root")
@@ -78,10 +78,10 @@ int main (int argc, char* argv[]) {
 	}
 
 	SET_GOJA_ENV_VAR("eth", "GOJA_COMPTON_E_TH", "0.2");
-	SET_GOJA_ENV_VAR("eth0", "GOJA_COMPTON_E_TH_0", "0.01");
+	SET_GOJA_ENV_VAR("eth0", "GOJA_COMPTON_E_TH_0", "0.0");
 	SET_GOJA_ENV_VAR("tw", "GOJA_TIME_WINDOW", "3");
 	SET_GOJA_ENV_VAR("N", "GOJA_MAX_N", "2");
-	SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "3");
+	SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "1000");
 	SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
 
 	double real_time = 0.;

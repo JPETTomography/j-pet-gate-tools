@@ -181,7 +181,7 @@ if __name__ == "__main__":
   parser.add_argument('--eth0',
                       dest='eth0',
                       type=float,
-                      default=0.01,
+                      default=0.0,
                       help='noise energy threshold in MeV [for mode \'analyze\']')
 
   parser.add_argument('-tw', '--time-window',

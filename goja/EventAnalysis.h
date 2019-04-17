@@ -12,7 +12,7 @@ using namespace std;
 #include <TRandom.h>
 
 #include "Hit.h"
-#include "Constants.h"
+#include "Common.h"
 
 enum EventType {
     kUnspecified = 0,
@@ -22,9 +22,11 @@ enum EventType {
     kAccidental = 4
 };
 
+void sort_hits(vector<Hit> &hits, string key);
+
 class EventAnalysis {
 
-    vector<Hit> compton_hits;
+    vector<Hit> coincident_hits;
     int N;
     int N0;
 
@@ -32,13 +34,12 @@ public :
 
     EventAnalysis();
 
-    void select_compton_hits(vector<Hit> hits);
-    void sort_compton_hits(string key);
+    void select_coincident_hits(vector<Hit> &hits);
 
     // types of coincidences: true(1), phantom-scattered(2), detector-scattered(3), acci(4)
-    EventType verify_type_of_coincidence(Hit, Hit);
+    EventType verify_type_of_coincidence(Hit &h1, Hit &h2);
     void print_coincidences();
-    void analyze_event(vector<Hit> hits);
+    void analyze_event(vector<Hit> &hits);
 
 };
 

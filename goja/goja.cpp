@@ -50,7 +50,7 @@ int main (int argc, char* argv[]) {
 	("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.0 MeV)")
 	("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
 	("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
-	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (default: 1000)")
+	("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (includes N, default: 1000)")
 	("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
 	("root", po::value<string>(), "file path of the single GATE *.root file,"
 	                              "for example --root=output.root")

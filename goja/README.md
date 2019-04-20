@@ -28,7 +28,7 @@ Files 'goja' and 'goja_manager.py' will be installed by default in /usr/local/bi
 GOJA output
 -----------
 
-GOJA output consists of 16 columns. Each line of the output contains a single coincidences (LOR).
+GOJA output consists of 19 columns. Each line of the output contains a single coincidence (LOR).
 Columns 1-4 contain information about the 1st hit:
 1) posX1 [cm]
 2) posY1 [cm]

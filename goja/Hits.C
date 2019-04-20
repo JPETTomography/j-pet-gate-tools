@@ -84,13 +84,11 @@ LoopResults Hits::Loop() {
   int start_window_eventID = 0;
   double start_window_time = 0.;
   for (unsigned int i=0; i<hits.size(); i++) {
-
     auto hit = hits[i];
     if(DEBUG) cout << "hit.edep=" << hit.edep << "\thit.time=" << hit.time << "\tstart_window_time=" << start_window_time << "\thit.eventID=" << hit.eventID << endl;
-
     if (event.size()==0) {
-      if (hit.edep>COMPTON_E_TH) { // start collecting data from hit with edep>E_TH and set start of time window to its time
-        event.push_back(hit); // and the new event is created using the current hit (if edep>E_TH)
+      if (hit.edep>COMPTON_E_TH) {
+        event.push_back(hit); // start forming the event with the hit with edep>E_TH
         start_window_time = hit.time;
         start_window_eventID = hit.eventID;
         lr.counter_compton_hits_over_the_ETH += 1;
@@ -110,8 +108,8 @@ LoopResults Hits::Loop() {
           ea.analyze_event(event); // then the current event is analyzed
         }
         event.clear(); // the current event is destroyed
-        if (hit.edep>COMPTON_E_TH) { // start collecting data from hit with edep>E_TH and set start of time window to its time
-          event.push_back(hit); // and the new event is created using the current hit (if edep>E_TH)
+        if (hit.edep>COMPTON_E_TH) { // start forming the event with the hit with edep>E_TH
+          event.push_back(hit);
           start_window_time = hit.time;
           start_window_eventID = hit.eventID;
           lr.counter_compton_hits_over_the_ETH += 1;

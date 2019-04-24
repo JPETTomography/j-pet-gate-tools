@@ -25,7 +25,7 @@ LoopResults Hits::Loop() {
   else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
   EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
 
-  LoopResults lr = {0.,vector<int>(),0,0,0};
+  LoopResults lr;
   if (fChain == 0)
     return lr;
 

@@ -13,6 +13,11 @@
 #include "Hit.h"
 
 struct LoopResults {
+  LoopResults() : real_time(0.),
+                  multiplicities(vector<int>()),
+                  counter_all_compton_hits(0),
+                  counter_compton_hits_over_the_ETH0(0),
+                  counter_compton_hits_over_the_ETH(0) {}
   double real_time;
   vector<int> multiplicities;
   int counter_all_compton_hits;

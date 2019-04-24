@@ -117,6 +117,15 @@ LoopResults Hits::Loop() {
       }
     }
   }
+  // the last event
+  if (event.size()>=1) {
+    lr.multiplicities.push_back(event.size());
+    if (event.size()>=2) { // if the number of hits in the last event is at least 2
+      EventAnalysis ea;
+      ea.analyze_event(event); // then the last event is analyzed
+    }
+    event.clear(); // the last event is destroyed
+  }
 
   lr.real_time = hits[hits.size()-1].time - hits[0].time;
   if(DEBUG) cout << "lr.counter_compton_hits_over_the_ETH=" << lr.counter_compton_hits_over_the_ETH << endl;

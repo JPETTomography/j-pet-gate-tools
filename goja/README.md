@@ -28,7 +28,7 @@ Files 'goja' and 'goja_manager.py' will be installed by default in /usr/local/bi
 GOJA output
 -----------
 
-GOJA output consists of 16 columns. Each line of the output contains a single coincidences (LOR).
+GOJA output consists of 19 columns. Each line of the output contains a single coincidence (LOR).
 Columns 1-4 contain information about the 1st hit:
 1) posX1 [cm]
 2) posY1 [cm]
@@ -48,6 +48,9 @@ Next columns contain following information:
 14) sourcePosX1 [cm]
 15) sourcePosY1 [cm]
 16) sourcePosZ1 [cm]
+17) sourcePosX2 [cm]
+18) sourcePosY2 [cm]
+19) sourcePosZ2 [cm]
 
 Usage
 -----
@@ -91,7 +94,6 @@ In this case, name of subdirectory relates to the subsequent activity.
 The analysis may be performed as in Example 3, using follwoing commands:
 
   cd D85_1lay_L020_7mm
-
   for i in *0*; do mkdir $i/goja_N0_1000; done
   for i in *0*; do cd $i/goja_N0_1000 && goja_manager.py --N0 1000 --run on-cluster && cd ../..; done
   for i in *0*; do cd $i/goja_N0_1000 && goja_manager.py -m verify && cd ../..; done
@@ -102,7 +104,7 @@ Hints
 
 1) How to check number of coincidences of a given type?
 
-  cat NEMA_IQ_384str_10000000_N0_1000_COINCIDENCES | grep -P '\t1\t' | wc -l 
+  cat NEMA_IQ_384str_10000000_N0_1000_COINCIDENCES | grep -P '\t1\t' | wc -l
 
 2) How to kill series of matrix tasks on cluster?
 

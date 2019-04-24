@@ -13,11 +13,16 @@
 #include "Hit.h"
 
 struct LoopResults {
-    double real_time;
-    vector<int> multiplicities;
-    int counter_all_compton_hits;
-    int counter_compton_hits_over_the_ETH0;
-    int counter_compton_hits_over_the_ETH;
+  LoopResults() : real_time(0.),
+                  multiplicities(vector<int>()),
+                  counter_all_compton_hits(0),
+                  counter_compton_hits_over_the_ETH0(0),
+                  counter_compton_hits_over_the_ETH(0) {}
+  double real_time;
+  vector<int> multiplicities;
+  int counter_all_compton_hits;
+  int counter_compton_hits_over_the_ETH0;
+  int counter_compton_hits_over_the_ETH;
 };
 
 // Header file for the classes stored in the TTree if any.

@@ -176,7 +176,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="analyze",
-                      help='run, run-missing, analyze, analyze-missing, verify, concatenate or concatenate-force')
+                      help='mode of the script: run, run-missing, analyze, analyze-missing, verify-gate, verify-goja, concatenate, concatenate-force, clear-gate, clear-goja')
 
   parser.add_argument('--eth0',
                       dest='eth0',
@@ -403,6 +403,20 @@ if __name__ == "__main__":
     if len(fnames)>1:
       fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
     concatenate_files(fnames)
+
+  elif args.mode == "clear-gate":
+
+    print "Clear (GATE):"
+    command = 'rm -f ' + args.path_gate_output + '*'
+    print '\t' + command
+    os.system(command)
+
+  elif args.mode == "clear-goja":
+
+    print "Clear (GATE):"
+    command = 'rm -f ' + args.path_goja_output + '*'
+    print '\t' + command
+    os.system(command)
 
   else:
 

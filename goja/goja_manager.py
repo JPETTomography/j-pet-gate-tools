@@ -178,6 +178,12 @@ if __name__ == "__main__":
                       default="analyze",
                       help='mode of the script: run, run-missing, analyze, analyze-missing, verify-gate, verify-goja, concatenate, concatenate-force, clear-gate, clear-goja')
 
+  parser.add_argument('--eth',
+                      dest='eth',
+                      type=float,
+                      default=0.2,
+                      help='fixed energy threshold in MeV [for mode \'analyze\']')
+
   parser.add_argument('--eth0',
                       dest='eth0',
                       type=float,
@@ -252,6 +258,7 @@ if __name__ == "__main__":
     if args.type_of_run == 'locally':
       for fname in fnames:
         goja_command = "goja --root " + args.path_gate_output + fname \
+                     + " --eth " + str(args.eth) \
                      + " --eth0 " + str(args.eth0) \
                      + " --tw " + str(args.tw) \
                      + " --N0 " + str(args.N0) \
@@ -275,6 +282,7 @@ if __name__ == "__main__":
         array_pbs.write('#PBS -V\n')
         array_pbs.write('cd ${PBS_O_WORKDIR}\n')
         goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
+                     + " --eth " + str(args.eth) \
                      + " --eth0 " + str(args.eth0) \
                      + " --tw " + str(args.tw) \
                      + " --N0 " + str(args.N0) \
@@ -311,6 +319,7 @@ if __name__ == "__main__":
         if args.type_of_run == 'locally':
           basepath_goja = args.path_goja_output + fname[:-5]
           goja_command = "goja --root " + args.path_gate_output + fname \
+                        + " --eth " + str(args.eth) \
                         + " --eth0 " + str(args.eth0) \
                         + " --tw " + str(args.tw) \
                         + " --N0 " + str(args.N0) \
@@ -334,6 +343,7 @@ if __name__ == "__main__":
             array_pbs.write('#PBS -V\n')
             array_pbs.write('cd ${PBS_O_WORKDIR}\n')
             goja_command = "goja --root " + basepath_gate + ".root" \
+                        + " --eth " + str(args.eth) \
                         + " --eth0 " + str(args.eth0) \
                         + " --tw " + str(args.tw) \
                         + " --N0 " + str(args.N0) \

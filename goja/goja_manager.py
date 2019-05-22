@@ -303,7 +303,7 @@ if __name__ == "__main__":
       basepath_goja = (path_goja_output + basename).rstrip(string.digits)
       basepath_gate = (path_gate_output + basename).rstrip(string.digits)
       # generate ARRAY_GOJA_PBS:
-      with open(ARRAY_GOJA_PBS, 'a') as array_pbs:
+      with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
         array_pbs.write('#!/bin/sh\n')
         array_pbs.write('#PBS -q i3d\n')
         array_pbs.write('#PBS -l nodes=1:ppn=1\n')
@@ -324,7 +324,7 @@ if __name__ == "__main__":
       qsub_command = 'qsub -t 1-' + str(get_nr_of_splits(args.simulation_path)) + ' ' + ARRAY_GOJA_PBS
       os.system(qsub_command)
       # remove ARRAY_GOJA_PBS:
-      #os.unlink(ARRAY_GOJA_PBS)
+      os.unlink(ARRAY_GOJA_PBS)
 
     else:
       print "Improper type of run. " + help_message
@@ -364,7 +364,7 @@ if __name__ == "__main__":
           basepath_goja = path_goja_output + basename
           basepath_gate = path_gate_output + basename
           # generate ARRAY_GOJA_PBS:
-          with open(ARRAY_GOJA_PBS, 'a') as array_pbs:
+          with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
             array_pbs.write('#!/bin/sh\n')
             array_pbs.write('#PBS -q i3d\n')
             array_pbs.write('#PBS -l nodes=1:ppn=1\n')

@@ -230,7 +230,7 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
       H_tim_diffs[t] += H[t,a]
       H_ang_diffs[a] += H[t,a]
 
-  YLIM = 1e5
+  YLIM = 1.1 * max(H_tim_diffs)
 
   times = []
   for i in range(len(edges_tim_diffs)-1):
@@ -244,11 +244,13 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   bar_width = (times[-1]-times[0])/(len(times)-1)
   plt.bar(times, H_tim_diffs, bar_width)
   plt.xlabel("Time difference [ns]")
-  plt.xlim(0,5)
+  #plt.xlim(0,5)
   plt.ylim(0,YLIM)
   plt.savefig(result_figure_path + label + "_1D_tim_diffs" + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
+
+  YLIM = 1.1 * max(H_ang_diffs)
 
   angles = []
   for i in range(len(edges_ang_diffs)-1):

@@ -24,6 +24,19 @@ def run_simulation(type_of_run):
     print '\t' + command_run
     os.system(command_run)
 
+def run_missing_simulations_on_cluster():
+
+  with open("./missing_gate_results.txt", 'r') as missing_gate_results:
+    lines = missing_gate_results.readlines()
+    if len(lines)>0:
+      for line in lines:
+        with open("array.pbs", "r") as array_pbs:
+          with open("array.pbs.tmp", "w") as array_pbs_tmp:
+            for line in array_pbs:
+              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', line.replace('\n','')))
+        os.system('qsub array.pbs.tmp')
+        os.unlink('array.pbs.tmp')
+
 def get_nr_of_splits(simulation_path):
 
   nr_of_splits = 0
@@ -35,29 +48,32 @@ def get_nr_of_splits(simulation_path):
 
 def verify_gate_output(simulation_path, path_gate_output, type_of_run):
 
-  missing_files = []
+  nr_of_missing_files = 0
 
   if type_of_run == "locally":
+    missing_files = []
     output_root = path_gate_output + 'output.root'
     if not os.path.isfile(output_root):
       print "\tFile ", output_root, " is missing."
       missing_files.append(output_root)
+    nr_of_missing_files = len(missing_files)
 
   elif type_of_run == "on-cluster":
-    nr_of_splits = get_nr_of_splits(simulation_path)
-    for s in xrange(nr_of_splits):
-      output_root = path_gate_output + 'output' + str(s+1) + '.root'
-      if not os.path.isfile(output_root):
-        print "\tFile ", output_root, " is missing."
-        missing_files.append(output_root)
+    VERIFY_GATE_RESULTS_PBS = "verify_gate_results.pbs"
+    with open(VERIFY_GATE_RESULTS_PBS, 'w') as file_pbs:
+      file_pbs.write('#!/bin/sh\n')
+      file_pbs.write('#PBS -q a12h\n')
+      file_pbs.write('#PBS -l nodes=1:ppn=1\n')
+      file_pbs.write('#PBS -N verify_gate_results.py\n')
+      file_pbs.write('#PBS -V\n')
+      file_pbs.write('cd ${PBS_O_WORKDIR}\n')
+      file_pbs.write('verify_gate_results.py\n')
+      file_pbs.write('exit 0;\n')
+    # push into queue:
+    qsub_command = 'qsub ' + VERIFY_GATE_RESULTS_PBS
+    os.system(qsub_command)
 
-  nr_of_missing_files = len(missing_files)
-  if nr_of_missing_files == 0:
-    print "\tGATE output is ok." #TODO check if files where closed properly
-  else:
-    print "\tNumber of missing GATE files: ", nr_of_missing_files
-
-  return nr_of_missing_files, missing_files
+  return nr_of_missing_files
 
 def verify_goja_output(path_gate_output, path_goja_output):
 
@@ -272,13 +288,12 @@ if __name__ == "__main__":
 
     print "Run missing:"
 
-    nr_of_missing_files, missing_files = verify_gate_output(args.simulation_path, path_gate_output, args.type_of_run)
-
-    #TODO currently this mode runs all simulations, in which at least one file is missing
-    # but it should rather run only missing splits
-
-    if nr_of_missing_files>0:
-      run_simulation(args.type_of_run)
+    if args.type_of_run == "locally":
+      if verify_gate_output(args.simulation_path, path_gate_output, args.type_of_run)>0:
+        run_simulation(args.type_of_run)
+    else:
+      if os.path.isfile("./missing_gate_results.txt"):
+        run_missing_simulations_on_cluster()
 
   elif args.mode == "analyze":
 

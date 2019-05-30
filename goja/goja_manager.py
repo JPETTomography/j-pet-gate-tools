@@ -26,14 +26,15 @@ def run_simulation(type_of_run):
 
 def run_missing_simulations_on_cluster():
 
-  with open("./missing_gate_results.txt", 'r') as missing_gate_results:
-    lines = missing_gate_results.readlines()
-    if len(lines)>0:
-      for line in lines:
+  with open("./missing_gate_results.txt", 'r') as missing_gate_results_txt:
+    missing_gate_results = missing_gate_results_txt.readlines()
+    if len(missing_gate_results)>0:
+      for m in missing_gate_results:
+        m = m.replace('\n', '')
         with open("array.pbs", "r") as array_pbs:
           with open("array.pbs.tmp", "w") as array_pbs_tmp:
             for line in array_pbs:
-              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', line.replace('\n','')))
+              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', m).replace('i3d', 'a12h'))
         os.system('qsub array.pbs.tmp')
         os.unlink('array.pbs.tmp')
 

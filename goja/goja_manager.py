@@ -11,6 +11,9 @@ import subprocess
 import sys
 from getpass import getuser
 
+QUEUE_RUN = 'i3d'
+QUEUE_ANALYZE = 'i12h'
+
 def run_simulation(type_of_run):
 
   command_run = ''
@@ -47,7 +50,7 @@ def get_nr_of_splits(simulation_path):
         nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
   return nr_of_splits
 
-def verify_gate_output(simulation_path, path_gate_output, type_of_run):
+def verify_gate_output(path_gate_output, type_of_run):
 
   nr_of_missing_files = 0
 
@@ -76,30 +79,42 @@ def verify_gate_output(simulation_path, path_gate_output, type_of_run):
 
   return nr_of_missing_files
 
-def verify_goja_output(path_gate_output, path_goja_output):
+def verify_goja_output(path_gate_output, path_goja_output, type_of_run):
 
+  nr_of_missing_files = 0
   missing_files = []
 
-  for fname in os.listdir(path_gate_output):
-    if ".root" in fname:
-      path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
-      if not os.path.isfile(path_coincidences):
-        print "\tFile ", path_coincidences, " is missing."
-        missing_files.append(path_coincidences)
-      path_realtime = path_goja_output + fname[:-5] + "_realtime"
-      if not os.path.isfile(path_realtime):
-        print "\tFile ", path_realtime, " is missing."
-        missing_files.append(path_realtime)
-      path_statistics = path_goja_output + fname[:-5] + "_statistics"
-      if not os.path.isfile(path_statistics):
-        print "\tFile ", path_statistics, " is missing."
-        missing_files.append(path_statistics)
+  if type_of_run == "locally":
+    for fname in os.listdir(path_gate_output):
+      if ".root" in fname:
+        path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
+        if not os.path.isfile(path_coincidences):
+          print "\tFile ", path_coincidences, " is missing."
+          missing_files.append(path_coincidences)
+        path_realtime = path_goja_output + fname[:-5] + "_realtime"
+        if not os.path.isfile(path_realtime):
+          print "\tFile ", path_realtime, " is missing."
+          missing_files.append(path_realtime)
+        path_statistics = path_goja_output + fname[:-5] + "_statistics"
+        if not os.path.isfile(path_statistics):
+          print "\tFile ", path_statistics, " is missing."
+          missing_files.append(path_statistics)
+    nr_of_missing_files = len(missing_files)
 
-  nr_of_missing_files = len(missing_files)
-  if nr_of_missing_files == 0:
-    print "\tGOJA output is ok."
-  else:
-    print "\tNumber of missing GOJA files: ", nr_of_missing_files
+  elif type_of_run == "on-cluster":
+    VERIFY_GOJA_RESULTS_PBS = "verify_goja_results.pbs"
+    with open(VERIFY_GOJA_RESULTS_PBS, 'w') as file_pbs:
+      file_pbs.write('#!/bin/sh\n')
+      file_pbs.write('#PBS -q a12h\n')
+      file_pbs.write('#PBS -l nodes=1:ppn=1\n')
+      file_pbs.write('#PBS -N verify_goja_results.py\n')
+      file_pbs.write('#PBS -V\n')
+      file_pbs.write('cd ${PBS_O_WORKDIR}\n')
+      file_pbs.write('verify_goja_results.py\n')
+      file_pbs.write('exit 0;\n')
+    # push into queue:
+    qsub_command = 'qsub ' + VERIFY_GOJA_RESULTS_PBS
+    os.system(qsub_command)
 
   return nr_of_missing_files, missing_files
 
@@ -290,7 +305,7 @@ if __name__ == "__main__":
     print "Run missing:"
 
     if args.type_of_run == "locally":
-      if verify_gate_output(args.simulation_path, path_gate_output, args.type_of_run)>0:
+      if verify_gate_output(path_gate_output, args.type_of_run)>0:
         run_simulation(args.type_of_run)
     else:
       if os.path.isfile("./missing_gate_results.txt"):
@@ -321,7 +336,7 @@ if __name__ == "__main__":
       # generate ARRAY_GOJA_PBS:
       with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
         array_pbs.write('#!/bin/sh\n')
-        array_pbs.write('#PBS -q i3d\n')
+        array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
         array_pbs.write('#PBS -l nodes=1:ppn=1\n')
         array_pbs.write('#PBS -N GOJA\n')
         array_pbs.write('#PBS -V\n')
@@ -382,7 +397,7 @@ if __name__ == "__main__":
           # generate ARRAY_GOJA_PBS:
           with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
             array_pbs.write('#!/bin/sh\n')
-            array_pbs.write('#PBS -q i3d\n')
+            array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
             array_pbs.write('#PBS -l nodes=1:ppn=1\n')
             array_pbs.write('#PBS -N GOJA\n')
             array_pbs.write('#PBS -V\n')
@@ -410,20 +425,20 @@ if __name__ == "__main__":
 
     print "Verify:"
 
-    verify_gate_output(args.simulation_path, path_gate_output, args.type_of_run)
-    verify_goja_output(path_gate_output, path_goja_output)
+    verify_gate_output(path_gate_output, args.type_of_run)
+    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
 
   elif args.mode == "verify-gate":
 
     print "Verify (GATE):"
 
-    verify_gate_output(args.simulation_path, path_gate_output, args.type_of_run)
+    verify_gate_output(path_gate_output, args.type_of_run)
 
   elif args.mode == "verify-goja":
 
     print "Verify (GOJA):"
 
-    verify_goja_output(path_gate_output, path_goja_output)
+    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
 
   elif args.mode == "concatenate":
 

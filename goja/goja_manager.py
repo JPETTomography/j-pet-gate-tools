@@ -41,6 +41,41 @@ def run_missing_simulations_on_cluster():
         os.system('qsub array.pbs.tmp')
         os.unlink('array.pbs.tmp')
 
+def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0):
+
+  goja_command = "goja --root " + gate_result \
+               + " --eth " + str(eth) \
+               + " --eth0 " + str(eth0) \
+               + " --tw " + str(tw) \
+               + " --N0 " + str(N0) \
+               + " --save-real-time-to " + goja_result + "_realtime" \
+               + " --save-statistics-to " + goja_result + "_statistics" \
+               + " > " + goja_result + "_coincidences"
+  return goja_command
+
+def analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, eth, eth0, tw, N0):
+
+  for s in splits:
+    ss = str(int(s))
+    gate_result = path_gate_output + "output" + ss + ".root"
+    goja_result = path_goja_output + "output" + ss
+    goja_command = get_goja_command(gate_result, goja_result, eth, eth0, tw, N0)
+    # generate ARRAY_GOJA_PBS:
+    with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
+      array_pbs.write('#!/bin/sh\n')
+      array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
+      array_pbs.write('#PBS -l nodes=1:ppn=1\n')
+      array_pbs.write('#PBS -N GOJA' + ss + '\n')
+      array_pbs.write('#PBS -V\n')
+      array_pbs.write('cd ${PBS_O_WORKDIR}\n')
+      array_pbs.write(goja_command + '\n')
+      array_pbs.write('exit 0;\n')
+    # push into queue:
+    qsub_command = 'qsub ' + ARRAY_GOJA_PBS
+    os.system(qsub_command)
+    # remove ARRAY_GOJA_PBS:
+    os.unlink(ARRAY_GOJA_PBS)
+
 def get_nr_of_splits(simulation_path):
 
   nr_of_splits = 0
@@ -211,7 +246,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="analyze",
-                      help='mode of the script: run, run-missing, analyze, analyze-missing, verify-gate, verify-goja, concatenate, concatenate-force, clear-gate, clear-goja')
+                      help='mode of the script: run, run-missing, analyze, analyze-missing, verify, verify-gate, verify-goja, concatenate, clear-gate, clear-goja, clear-cluster-artifacts')
 
   parser.add_argument('--eth',
                       dest='eth',
@@ -316,110 +351,38 @@ if __name__ == "__main__":
     print "Analyze:"
 
     if args.type_of_run == 'locally':
-      fname = "output.root"
-      goja_command = "goja --root " + path_gate_output + fname \
-                   + " --eth " + str(args.eth) \
-                   + " --eth0 " + str(args.eth0) \
-                   + " --tw " + str(args.tw) \
-                   + " --N0 " + str(args.N0) \
-                   + " --save-real-time-to " + path_goja_output + fname[0:-5] + "_realtime" \
-                   + " --save-statistics-to " + path_goja_output + fname[0:-5] + "_statistics" \
-                   + " > " + path_goja_output + fname[0:-5] + "_coincidences"
+      gate_result = path_gate_output + "output.root"
+      goja_result = path_goja_output + "output"
+      goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
       print goja_command
       p = subprocess.Popen(goja_command, shell=True)
       p.wait()
 
     elif args.type_of_run == 'on-cluster':
-      basename = "output"
-      basepath_goja = (path_goja_output + basename).rstrip(string.digits)
-      basepath_gate = (path_gate_output + basename).rstrip(string.digits)
-      # generate ARRAY_GOJA_PBS:
-      with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
-        array_pbs.write('#!/bin/sh\n')
-        array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
-        array_pbs.write('#PBS -l nodes=1:ppn=1\n')
-        array_pbs.write('#PBS -N GOJA\n')
-        array_pbs.write('#PBS -V\n')
-        array_pbs.write('cd ${PBS_O_WORKDIR}\n')
-        goja_command = "goja --root " + basepath_gate + "${PBS_ARRAYID}" + ".root" \
-                     + " --eth " + str(args.eth) \
-                     + " --eth0 " + str(args.eth0) \
-                     + " --tw " + str(args.tw) \
-                     + " --N0 " + str(args.N0) \
-                     + " --save-real-time-to " + basepath_goja + "${PBS_ARRAYID}" + "_realtime" \
-                     + " --save-statistics-to " + basepath_goja + "${PBS_ARRAYID}" + "_statistics" \
-                     + " > " + basepath_goja + "${PBS_ARRAYID}" + "_coincidences"
-        array_pbs.write(goja_command + '\n')
-        array_pbs.write('exit 0;\n')
-      # push into queue:
-      qsub_command = 'qsub -t 1-' + str(get_nr_of_splits(args.simulation_path)) + ' ' + ARRAY_GOJA_PBS
-      os.system(qsub_command)
-      # remove ARRAY_GOJA_PBS:
-      os.unlink(ARRAY_GOJA_PBS)
-
-    else:
-      print "Improper type of run. " + help_message
+      nr_of_splits = get_nr_of_splits(args.simulation_path)
+      splits = linspace(1, nr_of_splits, nr_of_splits)
+      analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0)
 
   elif args.mode == "analyze-missing":
 
     print "Analyze missing:"
 
-    fnames = os.listdir(path_gate_output)
-    fnames = [fname for fname in fnames if ".root" in fname]
-    if len(fnames)>1:
-      fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
+    if args.type_of_run == 'locally':
+      gate_result = path_gate_output + "output.root"
+      goja_result = path_goja_output + "output"
+      if not os.path.isfile(goja_result + "coincidences") or \
+         not os.path.isfile(goja_result + "realtime") or \
+         not os.path.isfile(goja_result + "statistics"):
+        goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
+        print goja_command
+        p = subprocess.Popen(goja_command, shell=True)
+        p.wait()
 
-    for fname in fnames:
-      path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
-      path_realtime = path_goja_output + fname[:-5] + "_realtime"
-      path_statistics = path_goja_output + fname[:-5] + "_statistics"
-
-      if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
-
-        if args.type_of_run == 'locally':
-          basepath_goja = path_goja_output + fname[:-5]
-          goja_command = "goja --root " + path_gate_output + fname \
-                        + " --eth " + str(args.eth) \
-                        + " --eth0 " + str(args.eth0) \
-                        + " --tw " + str(args.tw) \
-                        + " --N0 " + str(args.N0) \
-                        + " --save-real-time-to " + basepath_goja + "_realtime" \
-                        + " --save-statistics-to " + basepath_goja + "_statistics" \
-                        + " > " + basepath_goja + "_coincidences"
-          print goja_command
-          p = subprocess.Popen(goja_command, shell=True)
-          p.wait()
-
-        elif args.type_of_run == 'on-cluster':
-          basename = fname[0:-5]
-          basepath_goja = path_goja_output + basename
-          basepath_gate = path_gate_output + basename
-          # generate ARRAY_GOJA_PBS:
-          with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
-            array_pbs.write('#!/bin/sh\n')
-            array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
-            array_pbs.write('#PBS -l nodes=1:ppn=1\n')
-            array_pbs.write('#PBS -N GOJA\n')
-            array_pbs.write('#PBS -V\n')
-            array_pbs.write('cd ${PBS_O_WORKDIR}\n')
-            goja_command = "goja --root " + basepath_gate + ".root" \
-                        + " --eth " + str(args.eth) \
-                        + " --eth0 " + str(args.eth0) \
-                        + " --tw " + str(args.tw) \
-                        + " --N0 " + str(args.N0) \
-                        + " --save-real-time-to " + basepath_goja + "_realtime" \
-                        + " --save-statistics-to " + basepath_goja + "_statistics" \
-                        + " > " + basepath_goja + "_coincidences"
-            array_pbs.write(goja_command + '\n')
-            array_pbs.write('exit 0;\n')
-          # push into queue:
-          qsub_command = 'qsub ' + ARRAY_GOJA_PBS
-          os.system(qsub_command)
-          # remove ARRAY_GOJA_PBS:
-          os.unlink(ARRAY_GOJA_PBS)
-
-        else:
-          print "Improper type of run. " + help_message
+    elif args.type_of_run == 'on-cluster':
+      if os.path.isfile("./missing_goja_results.txt"):
+        missing_goja_results = loadtxt("./missing_goja_results.txt")
+        if len(missing_gate_results)>0:
+          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0)
 
   elif args.mode == "verify":
 
@@ -444,23 +407,6 @@ if __name__ == "__main__":
 
     print "Concatenate:"
 
-    nr_of_missing_files, missing_files = verify_goja_output(path_gate_output, path_goja_output)
-
-    if nr_of_missing_files:
-      print "Concatenation cannot be performed because of missing files. " + \
-            "Obtain missing files using the analyze-missing mode or " + \
-            "force the concatenation (concatenate-force) mode."
-    else:
-      fnames = os.listdir(path_goja_output)
-      fnames = [fname for fname in fnames if "_coincidences" in fname]
-      if len(fnames)>1:
-        fnames = sorted(fnames, key=lambda x: (int(re.sub('\D','',x)),x))
-      concatenate_files(fnames)
-
-  elif args.mode == "concatenate-force":
-
-    print "Concatenate (force):"
-
     fnames_tmp = os.listdir(path_goja_output)
     fnames_tmp = [fname for fname in fnames_tmp if "_coincidences" in fname]
     fnames = []
@@ -483,8 +429,15 @@ if __name__ == "__main__":
 
   elif args.mode == "clear-goja":
 
-    print "Clear (GATE):"
+    print "Clear (GOJA):"
     command = 'rm -f ' + path_goja_output + '*'
+    print '\t' + command
+    os.system(command)
+
+  elif args.mode == "clear-cluster-artifacts":
+
+    print "Clear (cluster artifacts):"
+    command = 'rm -f *.o* *.e*'
     print '\t' + command
     os.system(command)
 

@@ -82,7 +82,7 @@ def get_nr_of_splits(simulation_path):
   with open('./Gate_parallel.sh', 'r') as gate_parallel_sh:
     for line in gate_parallel_sh:
       if line.split('=')[0] == 'NR_OF_SPLITS':
-        nr_of_splits = int((line.split('=')[1]).replace('\'', '').replace('\n', ''))
+        nr_of_splits = int((line.split('=')[1]).replace('\"', '').replace('\'', '').replace('\n', ''))
   return nr_of_splits
 
 def verify_gate_output(path_gate_output, type_of_run):

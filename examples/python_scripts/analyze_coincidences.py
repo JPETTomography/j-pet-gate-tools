@@ -4,6 +4,7 @@
 import argparse
 from math import *
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt2
 from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import ScalarFormatter
@@ -15,16 +16,16 @@ from nema_common import *
 OUTPUT_FORMAT = ".png"
 NR_OF_STRIPS_LAB192 = 192 # nr of strips in the 3-layer prototype of the J-PET scanner
 
-def get_strips_centers(geometry):
+def get_strips_centers(geometries_set):
 
   xs = []
   ys = []
 
-  if geometry == "lab192": #TODO add other geometries
+  if geometries_set == "lab192":
 
-    r1 = 42.5
-    r2 = 46.75
-    r3 = 57.5
+    r1 = 42.5*10
+    r2 = 46.75*10
+    r3 = 57.5*10
 
     n1 = 48
     n3 = 96
@@ -47,6 +48,44 @@ def get_strips_centers(geometry):
 
     xs = concatenate((xs1, xs2, xs3), axis=None)
     ys = concatenate((ys1, ys2, ys3), axis=None)
+
+  elif geometries_set == "djpet-total-body":
+
+    r1 = 408.08027535 # in mm, radius of inside layer
+    r2 = 443.08027535 # in mm, radius of outside layer
+    n = 24 # number of modules in each layer
+    alpha = 2*pi/n
+
+    strips_per_module = 16
+    thickness = 6. # in mm, thickness of a single scintillator
+    distance = 0.5 # in mm, distance between the strips in a module
+    module_width = strips_per_module*thickness + (strips_per_module-1)*distance
+    strips_ys = linspace(-module_width/2+thickness/2., module_width/2.-thickness/2., strips_per_module)
+
+    rs = [r1, r2]
+
+    for r in rs:
+
+      for y in strips_ys:
+        xs.append(r)
+        ys.append(y)
+
+      tmp_xs = xs
+      tmp_ys = ys
+
+      for i in range(n-1):
+        xprims = []
+        yprims = []
+        for t in range(len(tmp_xs)):
+          xprim = tmp_xs[t]*cos(alpha) - tmp_ys[t]*sin(alpha)
+          yprim = tmp_xs[t]*sin(alpha) + tmp_ys[t]*cos(alpha)
+          xprims.append(xprim)
+          yprims.append(yprim)
+        tmp_xs = xprims
+        tmp_ys = yprims
+        for t in range(len(tmp_xs)):
+          xs.append(xprims[t])
+          ys.append(yprims[t])
 
   strips_centers = []
   for i in range(len(xs)):
@@ -88,9 +127,16 @@ def get_closest_strip_center(strip_center, strips_centers):
 #      with a chosen type of the coincidence are plotted.
 #  discrete : bool
 #      If True, then align x and y of the hits to strips centers.
-#  recalculate : bool
-#      If True, then recalculate strips_centers.txt file needed for discretization.
-def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins, ylim=[0,180], toc=0, discrete=False, recalculate=False):
+def plot_Da_vs_Dt(coincidences,
+                  geometries_set,
+                  tw,
+                  result_figure_path,
+                  show_cut,
+                  t_bins,
+                  a_bins,
+                  ylim=[0,180],
+                  toc=0,
+                  discrete=False):
 
   posX1 = coincidences[:,0]
   posY1 = coincidences[:,1]
@@ -100,47 +146,27 @@ def plot_Da_vs_Dt(coincidences, tw, result_figure_path, show_cut, t_bins, a_bins
   times2 = coincidences[:,7]
   type_of_coincidence = coincidences[:,12]
 
-  vol1 = coincidences[:,8]
+  volhits = coincidences[:,8]
   vol2 = coincidences[:,9]
-
-  centers_x = zeros(NR_OF_STRIPS_LAB192)
-  centers_y = zeros(NR_OF_STRIPS_LAB192)
-  xxx = linspace(1, NR_OF_STRIPS_LAB192, NR_OF_STRIPS_LAB192)
 
   if discrete:
 
-    if recalculate or not os.path.exists("./strips_centers.txt"):
+    if not os.path.exists("./strips_centers_" + geometries_set + ".txt"):
 
-      for i in range(len(posX1)):
-
-        strips_centers = get_strips_centers('lab192')
-        x, y = get_closest_strip_center((posX1[i], posY1[i]), strips_centers)
-        ind = int(vol1[i])-1
-        centers_x[ind] = x
-        centers_y[ind] = y
-
-        strips_centers_collected = True
-        for j in range(NR_OF_STRIPS_LAB192):
-          if centers_x[j] == 0 and centers_y[j] == 0:
-            strips_centers_collected = False
-            break
-
-        if strips_centers_collected:
-          savetxt('./strips_centers.txt', array([xxx, centers_x, centers_y]).T, fmt='%d\t%.18e\t%.18e')
-          print 'File strips_centers.txt generated. Try again.'
-          sys.exit(1)
+      print "You need to run calculate_strips_centers mode firstly."
 
     else:
 
-      strips_centers = loadtxt("./strips_centers.txt")
+      strips_centers = loadtxt("./strips_centers_" + geometries_set + ".txt")
 
-      for i in range(len(posX1)):
-        ind1 = int(vol1[i])-1
-        posX1[i] = strips_centers[:,1][ind1]
-        posY1[i] = strips_centers[:,2][ind1]
+      # Overwrite x and y hits positions with hits centers
+      for i in range(len(coincidences)):
+        ind1 = int(volhits[i])-1
+        posX1[i] = strips_centers[:,1][ind1]/10.
+        posY1[i] = strips_centers[:,2][ind1]/10.
         ind2 = int(vol2[i])-1
-        posX2[i] = strips_centers[:,1][ind2]
-        posY2[i] = strips_centers[:,2][ind2]
+        posX2[i] = strips_centers[:,1][ind2]/10.
+        posY2[i] = strips_centers[:,2][ind2]/10.
 
   if toc != 0:
     tmp_posX1 = []
@@ -384,7 +410,13 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="plot",
-                      help='mode of the script: plot, plot_by_types, plot_diff, stats')
+                      help='mode of the script: plot, plot_by_types, plot_diff, stats, plot_strips_centers, calculate_strips_centers')
+
+  parser.add_argument('-gs', '--geometries-set',
+                      dest='geometries_set',
+                      type=str,
+                      default='djpet-total-body',
+                      help='geometries set: djpet-total-body, lab')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',
@@ -438,6 +470,9 @@ if __name__ == "__main__":
 
   args = parser.parse_args()
 
+  rcParams['font.size'] = 24
+  rcParams['legend.fontsize'] = 18
+
   OUTPUT_FORMAT = "." + args.outputformat
 
   # Load data from file
@@ -450,7 +485,7 @@ if __name__ == "__main__":
 
     "Mode to plot all coincidences from the coincidence file"
 
-    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.geometries_set, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, ylim=[-a_bin_size/2.,180.+a_bin_size/2.], discrete=args.discrete)
     plot_sourcePosX_vs_sourcePosY(coincidences, args.path_output_sposx_sposy)
 
@@ -458,16 +493,16 @@ if __name__ == "__main__":
 
     "Mode to plot all coincidences from the coincidence file by type"
 
-    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.geometries_set, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=1)
     try:
-      plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
+      plot_Da_vs_Dt(coincidences, args.geometries_set, args.tw, args.path_output_da_dt, args.show_cut,
         args.t_bins, args.a_bins, toc=2)
     except:
       print "There are no phantom coincidences in the goja output file."
-    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.geometries_set, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=3)
-    plot_Da_vs_Dt(coincidences, args.tw, args.path_output_da_dt, args.show_cut,
+    plot_Da_vs_Dt(coincidences, args.geometries_set, args.tw, args.path_output_da_dt, args.show_cut,
       args.t_bins, args.a_bins, toc=4)
 
   elif args.mode == "plot_diff":
@@ -483,3 +518,106 @@ if __name__ == "__main__":
     "Mode to calculate some statistics from the coincidence file"
 
     calculate_ratios(coincidences, args.path_coincidences_file.split("/")[-1])
+
+  elif args.mode == "plot_strips_centers":
+
+    geometries_sets = ["lab192", "djpet-total-body"]
+
+    for geometries_set in geometries_sets:
+
+      strips_centers = get_strips_centers(geometries_set)
+
+      fig = plt.figure(figsize=(8, 6))
+      ax = fig.add_subplot(111)
+      ax.set_aspect(aspect=1.)
+      plt.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
+      plt.plot(array(strips_centers)[:,0], array(strips_centers)[:,1], 'o', markersize=0.1)
+      plt.xlabel('x [mm]')
+      plt.ylabel('y [mm]')
+      plt.savefig("./strips_centers_" + geometries_set + OUTPUT_FORMAT)
+
+  elif args.mode == "calculate_strips_centers":
+
+    if args.path_coincidences_file == '':
+      print "You need to provide the coincidences file for the " + args.geometries_set \
+            + " geometries set (the best would be from the point source simulation)."
+      sys.exit(1)
+
+    thickness = 0.
+    nr_of_strips = 0
+
+    if args.geometries_set == "lab192":
+      thickness = 7. # in mm
+      nr_of_strips = NR_OF_STRIPS_LAB192
+
+    elif args.geometries_set == "djpet-total-body":
+      thickness = 6. # in mm
+      nr_of_strips = 24*2*16
+
+    else:
+     print "Not supported geometries set."
+     sys.exit(1)
+
+    nrs_of_hits = zeros(nr_of_strips)
+    xs = zeros(nr_of_strips)
+    ys = zeros(nr_of_strips)
+
+    xhits = concatenate([coincidences[:,0], coincidences[:,4]])*10. # in mm
+    yhits = concatenate([coincidences[:,1], coincidences[:,5]])*10. # in mm
+    volhits = concatenate([coincidences[:,8], coincidences[:,9]])
+
+    for i in xrange(len(coincidences)):
+      index = int(volhits[i])-1
+      nrs_of_hits[index] += 1
+      xs[index] += xhits[i]
+      ys[index] += yhits[i]
+    xs = xs/nrs_of_hits
+    ys = ys/nrs_of_hits
+
+    strips_centers = get_strips_centers(args.geometries_set)
+
+    fig = plt.figure(figsize=(8, 6))
+    ax = fig.add_subplot(111)
+    ax.set_aspect(aspect=1.)
+    plt.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
+    plt.plot(xhits, yhits, '.', markersize=0.001)
+    plt.plot(xs, ys, '.', markersize=0.5, color='green', label='average hits positions')
+    plt.plot(array(strips_centers)[:,0], array(strips_centers)[:,1], '.', markersize=0.5, color='red', label='strips centers')
+    plt.xlabel('x [mm]')
+    plt.ylabel('y [mm]')
+    plt.savefig("./strips_centers_vs_averages_vs_hits_" + args.geometries_set + OUTPUT_FORMAT)
+
+    identifiers = {}
+    for i in xrange(len(coincidences)):
+      x, y = get_closest_strip_center((xhits[i], yhits[i]), strips_centers)
+      d = sqrt((x-xhits[i])**2 + (y-yhits[i])**2)
+      if d<thickness/2.:
+        identifiers[int(volhits[i])] = [x, y]
+        if len(identifiers) == len(xs):
+          break
+
+    ids = []
+    strips_centers_x = []
+    strips_centers_y = []
+    averages_x = []
+    averages_y = []
+
+    for i in sorted (identifiers.keys()):
+      ids.append(i)
+      strips_centers_x.append(identifiers[i][0])
+      strips_centers_y.append(identifiers[i][1])
+      averages_x.append(xs[i-1])
+      averages_y.append(ys[i-1])
+
+    strips_centers_txt = "./strips_centers_" + args.geometries_set + ".txt"
+    savetxt(strips_centers_txt, array([ids, strips_centers_x, strips_centers_y]).T, fmt='%d\t%.2f\t%.2f')
+
+    fig2 = plt2.figure(figsize=(8, 6))
+    ax2 = fig2.add_subplot(111)
+    plt2.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
+    ax2.set_aspect(aspect=1.)
+    for i in range(len(ids)):
+      plt2.plot([strips_centers_x[i], averages_x[i]], [strips_centers_y[i], averages_y[i]], '-', color='k')
+    plt2.xlabel('x [mm]')
+    plt2.ylabel('y [mm]')
+    plt2.savefig("./strips_centers_vs_averages_differences_" + args.geometries_set + OUTPUT_FORMAT)

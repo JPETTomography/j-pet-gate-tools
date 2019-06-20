@@ -137,7 +137,7 @@
 # R E P E A T E R S
 
 /gate/detector2/repeaters/insert ring
-/gate/detector2/ring/setFirstAngle 3.9130434782608696 deg
+/gate/detector2/ring/setFirstAngle 3.75 deg
 /gate/detector2/ring/setRepeatNumber 48
 
 # A T T A C H M E N T S
@@ -208,7 +208,7 @@
 # R E P E A T E R S
 
 /gate/detector3/repeaters/insert ring
-/gate/detector3/ring/setFirstAngle 1.9565217391304348 deg
+/gate/detector3/ring/setFirstAngle 1.875 deg
 /gate/detector3/ring/setRepeatNumber 96
 
 # A T T A C H M E N T S

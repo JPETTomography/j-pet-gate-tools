@@ -37,7 +37,7 @@ def run_missing_simulations_on_cluster():
         with open("array.pbs", "r") as array_pbs:
           with open("array.pbs.tmp", "w") as array_pbs_tmp:
             for line in array_pbs:
-              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', m).replace('i3d', 'a12h'))
+              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', m))
         os.system('qsub array.pbs.tmp')
         os.unlink('array.pbs.tmp')
 

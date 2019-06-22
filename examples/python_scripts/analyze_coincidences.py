@@ -458,6 +458,11 @@ if __name__ == "__main__":
                       action='store_true',
                       help='if set, then align x and y of the hits to strips centers')
 
+  parser.add_argument('-z', '--zoom',
+                      dest='zoom',
+                      action='store_true',
+                      help='if set, then zoom image with strips centers')
+
   parser.add_argument('--hist1',
                       dest='hist1',
                       type=str,
@@ -559,8 +564,8 @@ if __name__ == "__main__":
      sys.exit(1)
 
     nrs_of_hits = zeros(nr_of_strips)
-    xs = zeros(nr_of_strips)
-    ys = zeros(nr_of_strips)
+    x_averages = zeros(nr_of_strips)
+    y_averages = zeros(nr_of_strips)
 
     xhits = concatenate([coincidences[:,0], coincidences[:,4]])*10. # in mm
     yhits = concatenate([coincidences[:,1], coincidences[:,5]])*10. # in mm
@@ -569,23 +574,41 @@ if __name__ == "__main__":
     for i in xrange(len(coincidences)):
       index = int(volhits[i])-1
       nrs_of_hits[index] += 1
-      xs[index] += xhits[i]
-      ys[index] += yhits[i]
-    xs = xs/nrs_of_hits
-    ys = ys/nrs_of_hits
+      x_averages[index] += xhits[i]
+      y_averages[index] += yhits[i]
+    x_averages = x_averages/nrs_of_hits
+    y_averages = y_averages/nrs_of_hits
 
     strips_centers = get_strips_centers(args.geometries_set)
+    x_centers = array(strips_centers)[:,0]
+    y_centers = array(strips_centers)[:,1]
 
     fig = plt.figure(figsize=(8, 6))
     ax = fig.add_subplot(111)
     ax.set_aspect(aspect=1.)
     plt.subplots_adjust(left=0.15, right=0.95, top=0.95, bottom=0.15)
-    plt.plot(xhits, yhits, '.', markersize=0.001)
-    plt.plot(xs, ys, '.', markersize=0.5, color='green', label='average hits positions')
-    plt.plot(array(strips_centers)[:,0], array(strips_centers)[:,1], '.', markersize=0.5, color='red', label='strips centers')
+
+    MARKERSIZE_HITS = 0.1
+    MARKERSIZE_AVERAGES = 0.5
+    MARKERSIZE_CENTERS = 0.5
+    if args.zoom:
+      MARKERSIZE_HITS = 5
+      MARKERSIZE_AVERAGES = 10
+      MARKERSIZE_CENTERS = 10
+      plt.xlim(405,445)
+      plt.ylim(-20,20)
+      for i in range(len(x_averages)):
+        plt.arrow(x_averages[i], y_averages[i], x_centers[i]-x_averages[i], y_centers[i]-y_averages[i], width=0.2, length_includes_head=True)
+    plt.plot(xhits, yhits, '.', markersize=MARKERSIZE_HITS, label="hits")
+    plt.plot(x_averages, y_averages, '.', markersize=MARKERSIZE_AVERAGES, color='green', label='average hit')
+    plt.plot(x_centers, y_centers, '.', markersize=MARKERSIZE_CENTERS, color='red', label='strip center')
     plt.xlabel('x [mm]')
     plt.ylabel('y [mm]')
-    plt.savefig("./strips_centers_vs_averages_vs_hits_" + args.geometries_set + OUTPUT_FORMAT)
+    suffix = ""
+    if args.zoom:
+      plt.legend(loc="best")
+      suffix = "zoom_"
+    plt.savefig("./strips_centers_vs_averages_vs_hits_" + suffix + args.geometries_set + OUTPUT_FORMAT)
 
     identifiers = {}
     for i in xrange(len(coincidences)):
@@ -593,7 +616,7 @@ if __name__ == "__main__":
       d = sqrt((x-xhits[i])**2 + (y-yhits[i])**2)
       if d<thickness/2.:
         identifiers[int(volhits[i])] = [x, y]
-        if len(identifiers) == len(xs):
+        if len(identifiers) == len(x_averages):
           break
 
     ids = []
@@ -606,8 +629,8 @@ if __name__ == "__main__":
       ids.append(i)
       strips_centers_x.append(identifiers[i][0])
       strips_centers_y.append(identifiers[i][1])
-      averages_x.append(xs[i-1])
-      averages_y.append(ys[i-1])
+      averages_x.append(x_averages[i-1])
+      averages_y.append(y_averages[i-1])
 
     strips_centers_txt = "./strips_centers_" + args.geometries_set + ".txt"
     savetxt(strips_centers_txt, array([ids, strips_centers_x, strips_centers_y]).T, fmt='%d\t%.2f\t%.2f')

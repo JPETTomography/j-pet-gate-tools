@@ -381,7 +381,7 @@ if __name__ == "__main__":
     elif args.type_of_run == 'on-cluster':
       if os.path.isfile("./missing_goja_results.txt"):
         missing_goja_results = loadtxt("./missing_goja_results.txt")
-        if len(missing_gate_results)>0:
+        if len(missing_goja_results)>0:
           analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0)
 
   elif args.mode == "verify":

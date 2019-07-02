@@ -416,7 +416,7 @@ if __name__ == "__main__":
                       dest='geometries_set',
                       type=str,
                       default='djpet-total-body',
-                      help='geometries set: djpet-total-body, lab')
+                      help='geometries set: djpet-total-body, lab192')
 
   parser.add_argument('-oat', '--output-da-dt',
                       dest='path_output_da_dt',

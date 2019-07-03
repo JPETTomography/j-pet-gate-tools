@@ -106,21 +106,34 @@ def blur_sourcePosZ(sourcePosZ,  sigma,  L):
     #result = rnd.gauss(sourcePosZ, sigma)
   return result
 
-def calculate_counters(tim_diffs, ang_diffs):
+def calculate_counters(tim_diffs, ang_diffs, type_of_coincidence=[]):
 
   counter_above = 0
+  counter_above_true = 0
+  counter_above_psca = 0
+  counter_above_dsca = 0
+  counter_above_acci = 0
   counter_below = 0
   for i in xrange(len(tim_diffs)):
     t = tim_diffs[i]
     a = ang_diffs[i]
     try:
       newa = ellipsoid_threshold(t)
-      if a>newa: counter_above += 1
-      else: counter_below += 1
+      if a>newa:
+        counter_above += 1
+        if type_of_coincidence[i]==1: counter_above_true += 1
+        elif type_of_coincidence[i]==2: counter_above_psca += 1
+        elif type_of_coincidence[i]==3: counter_above_dsca += 1
+        elif type_of_coincidence[i]==4: counter_above_acci += 1
+      else:
+        counter_below += 1
     except:
       pass
 
-  return [counter_above, counter_below]
+  if len(type_of_coincidence)==len(tim_diffs):
+    return [counter_above, counter_above_true, counter_above_psca, counter_above_dsca, counter_above_acci, counter_below]
+  else:
+    return [counter_above, counter_below]
 
 def calculate_differences(tim1, tim2, posx1, posy1, posx2, posy2):
 

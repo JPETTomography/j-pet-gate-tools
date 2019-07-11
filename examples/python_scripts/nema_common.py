@@ -114,6 +114,8 @@ def calculate_counters(tim_diffs, ang_diffs, type_of_coincidence=[]):
   counter_above_dsca = 0
   counter_above_acci = 0
   counter_below = 0
+  tim_diffs_above = []
+  ang_diffs_above = []
   for i in xrange(len(tim_diffs)):
     t = tim_diffs[i]
     a = ang_diffs[i]
@@ -125,13 +127,15 @@ def calculate_counters(tim_diffs, ang_diffs, type_of_coincidence=[]):
         elif type_of_coincidence[i]==2: counter_above_psca += 1
         elif type_of_coincidence[i]==3: counter_above_dsca += 1
         elif type_of_coincidence[i]==4: counter_above_acci += 1
+        tim_diffs_above.append(t)
+        ang_diffs_above.append(a)
       else:
         counter_below += 1
     except:
       pass
 
   if len(type_of_coincidence)==len(tim_diffs):
-    return [counter_above, counter_above_true, counter_above_psca, counter_above_dsca, counter_above_acci, counter_below]
+    return [counter_above, counter_above_true, counter_above_psca, counter_above_dsca, counter_above_acci, counter_below, tim_diffs_above, ang_diffs_above]
   else:
     return [counter_above, counter_below]
 

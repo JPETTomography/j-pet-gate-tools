@@ -109,6 +109,8 @@ def get_closest_strip_center(strip_center, strips_centers):
 #  ----------
 #  coincidences : ndarray
 #      Data read from the listmode goja output file using the numpy.loadtxt.
+#  geometries_set : str
+#      Geometries set.
 #  tw : float
 #      Time window, for which the coincidence set was produced [ns].
 #  result_figure_path : str
@@ -117,7 +119,11 @@ def get_closest_strip_center(strip_center, strips_centers):
 #      Number of bins for times differences axis.
 #  a_bins : int
 #      Number of bins for angles differences axis for continous values or number of strips for discrete values.
-#  ylim : tuple
+#  zoom : str
+#      Plot detailed image.
+#  tlim : tuple
+#      Limits of the times differences axis.
+#  alim : tuple
 #      Limits of the angles differences axis.
 #  toc : int
 #      Type of the coincidence. When set to 0, all coincidences are plotted.
@@ -133,7 +139,9 @@ def plot_Da_vs_Dt(coincidences,
                   result_figure_path,
                   t_bins,
                   a_bins,
-                  ylim=[0,180],
+                  zoom,
+                  tlim,
+                  alim,
                   toc=0,
                   discrete=False,
                   imshow_max=0):
@@ -190,21 +198,42 @@ def plot_Da_vs_Dt(coincidences,
     posY2 = array(tmp_posY2)
     times2 = array(tmp_times2)
 
-  label = ""
-  if toc==1: label = "_true"
-  elif toc==2: label = "_psca"
-  elif toc==3: label = "_dsca"
-  elif toc==4: label = "_acci"
+  suffix_toc = ""
+  if toc==1: suffix_toc = "_true"
+  elif toc==2: suffix_toc = "_psca"
+  elif toc==3: suffix_toc = "_dsca"
+  elif toc==4: suffix_toc = "_acci"
+
+  suffix_zoom = ""
+  if zoom: suffix_zoom = "_zoom"
+
+  suffix = suffix_toc + suffix_zoom
 
   # Calculate vectors of times and angles differences:
 
   [tim_diffs, ang_diffs] = calculate_differences(times1, times2, posX1, posY1, posX2, posY2)
+  if toc == 0:
+    [counter_above, counter_above_true, counter_above_psca, counter_above_dsca, counter_above_acci, counter_below, tim_diffs_above, ang_diffs_above] = calculate_counters(tim_diffs, ang_diffs, type_of_coincidence)
+
+    stats_cut = "Number of events above the cut: " + str(counter_above) + "\n" \
+              + "\ttrue: " + str(counter_above_true) + " (" + str(float(counter_above_true)/counter_above*100.) + " % of all above the cut)\n" \
+              + "\tpsca: " + str(counter_above_psca) + " (" + str(float(counter_above_psca)/counter_above*100.) + " % of all above the cut)\n" \
+              + "\tdsca: " + str(counter_above_dsca) + " (" + str(float(counter_above_dsca)/counter_above*100.) + " % of all above the cut)\n" \
+              + "\tacci: " + str(counter_above_acci) + " (" + str(float(counter_above_acci)/counter_above*100.) + " % of all above the cut)\n" \
+              + "Number of events below the cut: " + str(counter_below) + "\n" \
+              + "Percentage of cut events: " + str(float(counter_below)/(counter_above+counter_below)*100.) + "\n"
+    print stats_cut
+    with open(result_figure_path + suffix + '_stats_cut.txt', 'w') as stats_cut_file:
+      stats_cut_file.write(stats_cut)
+
+  if zoom:
+    tim_diffs = tim_diffs_above
+    ang_diffs = ang_diffs_above
 
   # Plot 2D histogram:
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
-  ASPECT = tw/float(ylim[1]-ylim[0]) # force square pixels
 
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
@@ -214,19 +243,31 @@ def plot_Da_vs_Dt(coincidences,
   a_bins_vec = linspace(a_bin_size/2., 180.+a_bin_size/2., a_bins+1)
   t_bins_vec = linspace(0, tw, t_bins+1)
 
-  H, edges_tim_diffs, edges_ang_diffs = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[[0, tw],ylim])
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(tim_diffs, ang_diffs, bins=(t_bins_vec,a_bins_vec), range=[tlim,alim])
   if imshow_max==0:
     imshow_max = H.max()
+
+  if zoom:
+    H_rescaled = zeros(shape(H))
+    FACTOR = sum(H)/1000000.
+    T, A = shape(H)
+    for t in range(T):
+      for a in range(A):
+        H_rescaled[t,a] = H[t,a]/FACTOR
+    H = H_rescaled
+
+  ASPECT = (edges_tim_diffs[-1]-edges_tim_diffs[0])/(edges_ang_diffs[-1]-edges_ang_diffs[0]) # force square pixels
   plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=imshow_max))
   plt.colorbar()
-  plt.ylim(ylim)
+  plt.xlim(tlim)
+  plt.ylim(alim)
   plt.xlabel("Time difference [ns]")
   plt.ylabel("Angle difference [deg.]")
-  plt.savefig(result_figure_path + label + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.savefig(result_figure_path + suffix + OUTPUT_FORMAT, bbox_inches='tight')
 
   # Save 2D histogram to txt file:
 
-  savetxt(result_figure_path + label + ".txt", H)
+  savetxt(result_figure_path + suffix + ".txt", H)
 
   # Ellipsoidal cut obtained using simulations with SF phantom and rod source
   # displaced by 25 cm from the axis of the scanner:
@@ -237,19 +278,7 @@ def plot_Da_vs_Dt(coincidences,
     yyy.append(ellipsoid_threshold(xxx[i]))
   plt.plot(xxx, yyy, color='r', linewidth=2)
 
-  [counter_above, counter_above_true, counter_above_psca, counter_above_dsca, counter_above_acci, counter_below] = calculate_counters(tim_diffs, ang_diffs, type_of_coincidence)
-  stats_cut = "Number of events above the cut: " + str(counter_above) + "\n" \
-            + "\ttrue: " + str(counter_above_true) + " (" + str(float(counter_above_true)/counter_above*100.) + " % of all above the cut)\n" \
-            + "\tpsca: " + str(counter_above_psca) + " (" + str(float(counter_above_psca)/counter_above*100.) + " % of all above the cut)\n" \
-            + "\tdsca: " + str(counter_above_dsca) + " (" + str(float(counter_above_dsca)/counter_above*100.) + " % of all above the cut)\n" \
-            + "\tacci: " + str(counter_above_acci) + " (" + str(float(counter_above_acci)/counter_above*100.) + " % of all above the cut)\n" \
-            + "Number of events below the cut: " + str(counter_below) + "\n" \
-            + "Percentage of cut events: " + str(float(counter_below)/(counter_above+counter_below)*100.) + "\n"
-  print stats_cut
-  with open(result_figure_path + label + '_stats_cut.txt', 'w') as stats_cut_file:
-    stats_cut_file.write(stats_cut)
-
-  plt.savefig(result_figure_path + label + "_with_cut" + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.savefig(result_figure_path + suffix + "_with_cut" + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
   plt.close()
 
@@ -270,17 +299,22 @@ def plot_Da_vs_Dt(coincidences,
   for i in range(len(edges_tim_diffs)-1):
     times.append((edges_tim_diffs[i]+edges_tim_diffs[i+1])/2.)
 
+  LEFT = 0.13
+  RIGHT = 0.97
+  BOTTOM = 0.15
+  TOP = 0.92
+
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
-  plt.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.92)
+  plt.subplots_adjust(left=LEFT, right=RIGHT, bottom=BOTTOM, top=TOP)
   ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
   plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
   bar_width = (times[-1]-times[0])/(len(times)-1)
   plt.bar(times, H_tim_diffs, width=bar_width)
   plt.xlabel("Time difference [ns]")
-  plt.xlim(0, tw)
+  plt.xlim(tlim)
   plt.ylim(0, YLIM)
-  plt.savefig(result_figure_path + label + "_1D_tim_diffs" + OUTPUT_FORMAT)
+  plt.savefig(result_figure_path + suffix + "_1D_tim_diffs" + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
 
@@ -294,15 +328,15 @@ def plot_Da_vs_Dt(coincidences,
 
   fig = plt.figure(figsize=(8, 6))
   ax = fig.add_subplot(111)
-  plt.subplots_adjust(left=0.1, right=0.95, bottom=0.15, top=0.92)
+  plt.subplots_adjust(left=LEFT, right=RIGHT, bottom=BOTTOM, top=TOP)
   ax.yaxis.set_major_formatter(ScalarFormatter(useMathText=True))
   plt.ticklabel_format(style='sci', axis='y', scilimits=(0,0))
   bar_width = (angles[-1]-angles[0])/(len(angles)-1)
   plt.bar(angles, H_ang_diffs, width=bar_width)
   plt.xlabel("Angle difference [deg.]")
-  plt.xlim(bar_width/2., 180+bar_width/2.)
+  plt.xlim(alim)
   plt.ylim(0, YLIM)
-  plt.savefig(result_figure_path + label + "_1D_ang_diffs" + OUTPUT_FORMAT)
+  plt.savefig(result_figure_path + suffix + "_1D_ang_diffs" + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
 
@@ -463,7 +497,7 @@ if __name__ == "__main__":
   parser.add_argument('-z', '--zoom',
                       dest='zoom',
                       action='store_true',
-                      help='if set, then zoom image with strips centers')
+                      help='if set, then zoom image (behaviour dependent on mode)')
 
   parser.add_argument('--hist1',
                       dest='hist1',
@@ -497,35 +531,41 @@ if __name__ == "__main__":
   tw = args.tw
   t_bins = args.t_bins
   a_bins = args.a_bins
+  zoom = args.zoom
   if args.geometries_set == "lab192":
     tw = 5
     a_bins = 96
 
   a_bin_size = 180./a_bins
-  YLIM = [a_bin_size/2.,180.+a_bin_size/2.]
+
+  TLIM = [0, tw]
+  ALIM = [a_bin_size/2., 180.+a_bin_size/2.]
+  if zoom:
+    TLIM = [0, ELLIPSE_PARAM]
+    ALIM = [100.-a_bin_size/2., 180.+a_bin_size/2.]
 
   if args.mode == "plot_at":
 
     "Mode to plot all coincidences from the coincidence file"
 
-    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt,
-      args.t_bins, a_bins, ylim=YLIM, discrete=args.discrete, imshow_max=args.imshow_max)
+    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
+      TLIM, ALIM, discrete=args.discrete, imshow_max=args.imshow_max)
 
   elif args.mode == "plot_at_by_types":
 
     "Mode to plot all coincidences from the coincidence file by type"
 
-    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt,
-      t_bins, a_bins, ylim=YLIM, discrete=args.discrete, toc=1, imshow_max=args.imshow_max)
+    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
+      TLIM, ALIM, discrete=args.discrete, toc=1, imshow_max=args.imshow_max)
     try:
-      plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt,
-        t_bins, a_bins, ylim=YLIM, discrete=args.discrete, toc=2, imshow_max=args.imshow_max)
+      plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
+        TLIM, ALIM, discrete=args.discrete, toc=2, imshow_max=args.imshow_max)
     except:
       print "There are no phantom coincidences in the goja output file."
-    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt,
-      t_bins, a_bins, ylim=YLIM, discrete=args.discrete, toc=3, imshow_max=args.imshow_max)
-    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt,
-      t_bins, a_bins, ylim=YLIM, discrete=args.discrete, toc=4, imshow_max=args.imshow_max)
+    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
+      TLIM, ALIM, discrete=args.discrete, toc=3, imshow_max=args.imshow_max)
+    plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
+      TLIM, ALIM, discrete=args.discrete, toc=4, imshow_max=args.imshow_max)
 
   elif args.mode == "plot_source":
 
@@ -612,7 +652,7 @@ if __name__ == "__main__":
     MARKERSIZE_HITS = 0.1
     MARKERSIZE_AVERAGES = 0.5
     MARKERSIZE_CENTERS = 0.5
-    if args.zoom:
+    if zoom:
       MARKERSIZE_HITS = 5
       MARKERSIZE_AVERAGES = 10
       MARKERSIZE_CENTERS = 10
@@ -626,7 +666,7 @@ if __name__ == "__main__":
     plt.xlabel('x [mm]')
     plt.ylabel('y [mm]')
     suffix = ""
-    if args.zoom:
+    if zoom:
       plt.legend(loc="best")
       suffix = "zoom_"
     plt.savefig("./strips_centers_vs_averages_vs_hits_" + suffix + args.geometries_set + OUTPUT_FORMAT)

@@ -318,6 +318,8 @@ def plot_Da_vs_Dt(coincidences,
   plt.clf()
   plt.close()
 
+  savetxt(result_figure_path + suffix + "_1D_tim_diffs.txt", array([times, H_tim_diffs]).T, fmt='%.5f\t%.5f')
+
   YLIM = 1.1 * max(H_ang_diffs)
   if imshow_max!=0:
     YLIM = imshow_max*10.
@@ -339,6 +341,8 @@ def plot_Da_vs_Dt(coincidences,
   plt.savefig(result_figure_path + suffix + "_1D_ang_diffs" + OUTPUT_FORMAT)
   plt.clf()
   plt.close()
+
+  savetxt(result_figure_path + suffix + "_1D_ang_diffs.txt", array([angles, H_ang_diffs]).T, fmt='%.5f\t%.5f')
 
 ## Plot source position x vs. y using data from GATE simulations.
 #

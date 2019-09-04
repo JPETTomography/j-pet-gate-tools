@@ -50,7 +50,6 @@ class LayersController:
         :param total_strips_no: number of strips (default is 48+48+96)
         :return: None
         """
-        # (0.7/(2 sin(dQ/2))) * cos(dQ/2) + 0.95
         delta_theta = 2 * numpy.pi / total_strips_no
         self.geometry['ZeroLayerRadius'] = \
             round(self.geometry['StripCrossSection'][0] /

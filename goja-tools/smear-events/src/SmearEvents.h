@@ -19,7 +19,7 @@
 #define SMEAREVENTS_H
 // C_SCIN is the effective propagation velocity
 // of the signal along the strip [cm/ns]
-#define C_SCIN 12.6
+static const double C_SCIN=12.6;
 
 typedef std::unordered_map <std::string,
                             std::unordered_map <std::string, std::vector<float>>
@@ -66,8 +66,6 @@ public:
                   const std::string &outputFileName){
         // stream
         std::ifstream inputFile(inputFileName);
-        inputFile.clear();
-        inputFile.seekg(0, std::ios::beg); // move to top
         // output file (added option to delete the content if present)
         std::ofstream outputFile;
         //std::ofstream outputFile(outputFileName);

@@ -354,7 +354,9 @@ def plot_Da_vs_Dt(coincidences,
 #      Data read from the listmode goja output file using the numpy.loadtxt.
 #  result_figure_path : str
 #      Path to the output image file.
-def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
+#  sbins : int
+#      Number of bins in both x and y directions.
+def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path, sbins):
 
   sourcePosX = coincidences[:,13]
   sourcePosY = coincidences[:,14]
@@ -368,7 +370,7 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=100)
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=sbins)
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
@@ -487,6 +489,12 @@ if __name__ == "__main__":
                       default=180,
                       help='number of bins for angles differences axis')
 
+  parser.add_argument('--s_bins',
+                      dest='s_bins',
+                      type=int,
+                      default=100,
+                      help='number of bins in both x and y directions for plot_source mode')
+
   parser.add_argument('--imshow_max',
                       dest='imshow_max',
                       type=float,
@@ -573,7 +581,7 @@ if __name__ == "__main__":
 
   elif args.mode == "plot_source":
 
-    plot_sourcePosX_vs_sourcePosY(coincidences, path_output_sposx_sposy)
+    plot_sourcePosX_vs_sourcePosY(coincidences, path_output_sposx_sposy, args.s_bins)
 
   elif args.mode == "plot_diff":
 

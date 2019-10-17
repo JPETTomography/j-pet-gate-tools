@@ -381,11 +381,14 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path, sbins):
   plt.clf()
   plt.close()
 
-## Calculate (and print) ratios of accidental coincidences using data from GATE simulations.
+## Calculate (and print) statistics about the GOJA coincidences file.
 #
-#  2 ratios are calculated:
+#  Numbers of coincidences grouped by types and 2 ratios are calculated
+#  and printed to the screen.
+#  These ratios are:
 #   - ratio_acci - ratio between accidental and all coincidences
 #   - ratio_acci_to_true - ratio between accidental and true coincidences
+#  Additionally ratios are saved to file.
 #
 #  Parameters
 #  ----------
@@ -398,20 +401,30 @@ def calculate_ratios(coincidences, filename):
   type_of_coincidence = coincidences[:,12]
 
   N_true = 0
+  N_psca = 0
+  N_dsca = 0
   N_acci = 0
   N_all = len(type_of_coincidence)
 
   for i in xrange(N_all):
     if type_of_coincidence[i]==1: N_true += 1
+    elif type_of_coincidence[i]==2: N_psca += 1
+    elif type_of_coincidence[i]==3: N_dsca += 1
     elif type_of_coincidence[i]==4: N_acci += 1
 
   ratio_acci = float(N_acci)/float(N_all)*100.
   ratio_acci_to_true = float(N_acci)/float(N_true)*100.
+  stats_acci = "filename={0}, ratio_acci={1:.2f}%, ratio_acci_to_true={2:.2f}%".format(filename, ratio_acci, ratio_acci_to_true)
 
-  stats_acci = "filename={0}, ratio_acci={1:.2f}%, ratio_acci_to_true={2:.2f}%\n".format(filename, ratio_acci, ratio_acci_to_true)
-  print(stats_acci)
   with open(filename + '_stats_acci.txt', 'w') as stats_acci_file:
-    stats_acci_file.write(stats_acci)
+    stats_acci_file.write(stats_acci + '\n')
+
+  print(stats_acci)
+  print("N_true (toc=1) = " + str(N_true))
+  print("N_psca (toc=2) = " + str(N_psca))
+  print("N_dsca (toc=3) = " + str(N_dsca))
+  print("N_acci (toc=4) = " + str(N_acci))
+  print("N_all          = " + str(N_all))
 
 def plot_diff(hist1, hist2):
 

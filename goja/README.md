@@ -104,12 +104,11 @@ Hints
 
 1) How to check number of coincidences of a given type?
 
-  cat NEMA_IQ_384str_10000000_N0_1000_COINCIDENCES | grep -P '\t1\t' | wc -l
+  analyze_coincidences.py -cf ./output_coincidences -m stats
 
 2) How to kill series of matrix tasks on cluster?
 
   for i in {2680660..2680671}; do qdel ${i}[]; done
-
 
 Help
 ----

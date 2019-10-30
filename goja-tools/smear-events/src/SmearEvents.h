@@ -53,7 +53,7 @@ public:
     // constructor and destructor
     SmearEventsController(const std::string &readout,
                           const Readout &readoutHash,
-                          const int &scanner_length_ID = 1)
+                          int scanner_length_ID = 1)
         : m_readout(readout){
         // first estimate sigmas (standard deviations for Z & t)
         m_sigmas = m_get_sigmas(scanner_length_ID, readoutHash);
@@ -111,7 +111,7 @@ private:
     Vector m_sigmas;
     // Returns vector of {sigma_Z, sigma_t}
     // in (centimetres, nanoseconds) (!!!)
-    Vector m_get_sigmas(const unsigned int &scanner_length_ID,
+    Vector m_get_sigmas(unsigned int scanner_length_ID,
                         const Readout &readoutParams){
         // here, pointers from find() are used
         // since readoutParams is const unordered_map

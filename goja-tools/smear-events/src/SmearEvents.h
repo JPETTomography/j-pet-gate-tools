@@ -1,5 +1,5 @@
 /*! SmearEvents.h
-* Tools for adding some blur to temporal and spatial (Z-coordinate) 
+* Tools for adding some blur to temporal and spatial (Z-coordinate)
 * parameters of events, adopted to list mode ASCII format of GATE simulations
 * author: Roman Shopa
 * Roman.Shopa@ncbj.gov.pl */
@@ -54,8 +54,7 @@ public:
     SmearEventsController(const std::string &readout,
                           const Readout &readoutHash,
                           const int &scanner_length_ID = 1)
-        : m_readout(readout),
-          m_addedBlur({0.,0.,0.,0.}){
+        : m_readout(readout){
         // first estimate sigmas (standard deviations for Z & t)
         m_sigmas = m_get_sigmas(scanner_length_ID, readoutHash);
     }
@@ -75,23 +74,26 @@ public:
         // --- The LOOP ---
         // one row from data file:
         std::string textRow;
-        // set random generator
+        // set random generator, but estimate sigmas first,
+        // i.e. standard deviations for Z & t.
         RandomGenerator randGen(m_sigmas);
+        // temporal 4-dimensional vector (for Z1,t1,Z2,t2)
+        Vector addedBlur{0.,0.,0.,0.};
         // iterator & event counter
         int i(0);
         std::stringstream s_EventNumber;
-
+        // main loop
         while(std::getline(inputFile, textRow)){
             i += 1;
             // parse into values
             Vector dataRow(m_import_text_event(textRow));
             for(int i=0; i<2; i++){
-                m_addedBlur[i*2] = randGen.distributionZ(randGen.generator);
-                m_addedBlur[i*2+1] = randGen.distributionTime(randGen.generator);
+                addedBlur[i*2] = randGen.distributionZ(randGen.generator);
+                addedBlur[i*2+1] = randGen.distributionTime(randGen.generator);
             }
             // blur the data
             Vector dataBlurred = m_blur_hits_and_times(dataRow,
-                                                       m_addedBlur);
+                                                       addedBlur);
             std::string outRow(m_export_event_to_text(dataBlurred));
             // export to output filename
             outputFile << outRow;
@@ -106,9 +108,7 @@ public:
 
 private:
     std::string m_readout;
-    Vector m_sigmas,
-           m_addedBlur; // 4-dimensional vector (for Z1,t1,Z2,t2)
-
+    Vector m_sigmas;
     // Returns vector of {sigma_Z, sigma_t}
     // in (centimetres, nanoseconds) (!!!)
     Vector m_get_sigmas(const unsigned int &scanner_length_ID,
@@ -116,12 +116,18 @@ private:
         // here, pointers from find() are used
         // since readoutParams is const unordered_map
         if(m_readout == "WLS") {
+            // first, set sigma_Z according to WLS from FWHM
             auto search = readoutParams.find("WLS")->second.find("FWHM");
             double sigmaZ = search->second[0]/(2*sqrt(2*log(2)));
-            return { sigmaZ, sigmaZ/C_SCIN };
+            // next, estimate sigma_t as for SiPM (this may need further upgrade!)
+            search = readoutParams.find("SI")->second.find("CRT");
+            double sigmaT =
+                    search->second[scanner_length_ID]/(4*sqrt(log(2)));
+            return { sigmaZ, sigmaT };
         }
         else {
             auto search = readoutParams.find(m_readout)->second.find("CRT");
+            // this time 'search' could be different for PMT and SiPM
             double sigmaT =
                     search->second[scanner_length_ID]/(4*sqrt(log(2)));
             return { sigmaT*C_SCIN, sigmaT };

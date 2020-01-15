@@ -344,7 +344,7 @@ def plot_Da_vs_Dt(coincidences,
 
   savetxt(result_figure_path + suffix + "_1D_ang_diffs.txt", array([angles, H_ang_diffs]).T, fmt='%.5f\t%.5f')
 
-## Plot source position x vs. y using data from GATE simulations.
+## Plot source histograms using data from GATE simulations.
 #
 #  source position - position of the annihilation
 #
@@ -353,15 +353,14 @@ def plot_Da_vs_Dt(coincidences,
 #  coincidences : ndarray
 #      Data read from the listmode goja output file using the numpy.loadtxt.
 #  result_figure_path : str
-#      Path to the output image file.
+#      Base path to the output image file.
 #  sbins : int
 #      Number of bins in both x and y directions.
-def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path, sbins):
+def plot_source(coincidences, result_figure_path, sbins):
 
   sourcePosX = coincidences[:,13]
   sourcePosY = coincidences[:,14]
-
-  # Plot 2D histogram:
+  sourcePosZ = coincidences[:,15]
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
@@ -374,11 +373,29 @@ def plot_sourcePosX_vs_sourcePosY(coincidences, result_figure_path, sbins):
   VMAX = H.max()
   plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
-
   plt.xlabel("sourcePosX [cm]")
   plt.ylabel("sourcePosY [cm]")
-  plt.savefig(result_figure_path + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.savefig(result_figure_path + '_sourcePosX_vs_sourcePosY' + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
+
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosX, bins=sbins)
+  VMAX = H.max()
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.colorbar()
+  plt.xlabel("sourcePosZ [cm]")
+  plt.ylabel("sourcePosX [cm]")
+  plt.savefig(result_figure_path + '_sourcePosZ_vs_sourcePosX' + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.clf()
+
+  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosY, bins=sbins)
+  VMAX = H.max()
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.colorbar()
+  plt.xlabel("sourcePosZ [cm]")
+  plt.ylabel("sourcePosY [cm]")
+  plt.savefig(result_figure_path + '_sourcePosZ_vs_sourcePosY' + OUTPUT_FORMAT, bbox_inches='tight')
+  plt.clf()
+
   plt.close()
 
 ## Calculate (and print) statistics about the GOJA coincidences file.
@@ -551,7 +568,6 @@ if __name__ == "__main__":
     sys.exit(1)
 
   path_output_da_dt = args.path_coincidences_file.split("/")[-1] + '_DA_vs_DT'
-  path_output_sposx_sposy = args.path_coincidences_file.split("/")[-1] + '_sourcePosX_vs_sourcePosY'
 
   tw = args.tw
   t_bins = args.t_bins
@@ -594,7 +610,7 @@ if __name__ == "__main__":
 
   elif args.mode == "plot_source":
 
-    plot_sourcePosX_vs_sourcePosY(coincidences, path_output_sposx_sposy, args.s_bins)
+    plot_source(coincidences, args.path_coincidences_file.split("/")[-1], args.s_bins)
 
   elif args.mode == "plot_diff":
 

@@ -356,11 +356,19 @@ def plot_Da_vs_Dt(coincidences,
 #      Base path to the output image file.
 #  sbins : int
 #      Number of bins in both x and y directions.
-def plot_source(coincidences, result_figure_path, sbins):
+def plot_source(coincidences, result_figure_path, sbins, tomograph_diameter=0, tomograph_length=0):
+
+  is_range_defined = False
+  if tomograph_diameter!=0 and tomograph_length!=0:
+    is_range_defined = True
 
   sourcePosX = coincidences[:,13]
   sourcePosY = coincidences[:,14]
   sourcePosZ = coincidences[:,15]
+
+  XRANGE = [-tomograph_diameter/2., tomograph_diameter/2.]
+  YRANGE = [-tomograph_diameter/2., tomograph_diameter/2.]
+  ZRANGE = [-tomograph_length/2., tomograph_length/2.]
 
   rcParams['font.size'] = 24
   rcParams['legend.fontsize'] = 18
@@ -369,27 +377,43 @@ def plot_source(coincidences, result_figure_path, sbins):
   ax = fig.add_subplot(111)
   plt.subplots_adjust(left=0.20, right=0.9, top=0.9, bottom=0.1)
 
-  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=sbins)
+  H = []
+  edges_tim_diffs = []
+  edges_ang_diffs = []
+
+  if is_range_defined:
+    RANGE = [XRANGE, YRANGE]
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, range=RANGE, bins=sbins)
+  else:
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosX [cm]")
   plt.ylabel("sourcePosY [cm]")
   plt.savefig(result_figure_path + '_sourcePosX_vs_sourcePosY' + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
 
-  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosX, bins=sbins)
+  if is_range_defined:
+    RANGE = [ZRANGE, XRANGE]
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosX, range=RANGE, bins=sbins)
+  else:
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosX, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosZ [cm]")
   plt.ylabel("sourcePosX [cm]")
   plt.savefig(result_figure_path + '_sourcePosZ_vs_sourcePosX' + OUTPUT_FORMAT, bbox_inches='tight')
   plt.clf()
 
-  H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosY, bins=sbins)
+  if is_range_defined:
+    RANGE = [ZRANGE, YRANGE]
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosY, range=RANGE, bins=sbins)
+  else:
+    H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosY, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='auto', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosZ [cm]")
   plt.ylabel("sourcePosY [cm]")
@@ -551,6 +575,16 @@ if __name__ == "__main__":
                       type=str,
                       help='path to hist2 (txt file)')
 
+  parser.add_argument('-td', '--tomograph_diameter',
+                      dest='tomograph_diameter',
+                      type=float,
+                      help='option for plot_source mode; tomograph diameter [cm]')
+
+  parser.add_argument('-tl', '--tomograph_length',
+                      dest='tomograph_length',
+                      type=float,
+                      help='option for plot_source mode; tomograph length [cm]')
+
   args = parser.parse_args()
 
   rcParams['font.size'] = 24
@@ -610,7 +644,10 @@ if __name__ == "__main__":
 
   elif args.mode == "plot_source":
 
-    plot_source(coincidences, args.path_coincidences_file.split("/")[-1], args.s_bins)
+    if args.tomograph_diameter and args.tomograph_length:
+      plot_source(coincidences, args.path_coincidences_file.split("/")[-1], args.s_bins, args.tomograph_diameter, args.tomograph_length)
+    else:
+      plot_source(coincidences, args.path_coincidences_file.split("/")[-1], args.s_bins)
 
   elif args.mode == "plot_diff":
 

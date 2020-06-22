@@ -87,6 +87,39 @@ def get_strips_centers(geometries_set):
           xs.append(xprims[t])
           ys.append(yprims[t])
 
+  elif geometries_set == "lab24modules":
+
+    r = 361.86 # in mm, radius of inside layer
+    n = 24 # number of modules in each layer
+    alpha = 2*pi/n
+
+    strips_per_module = 13
+    thickness = 6. # in mm, thickness of a single scintillator
+    distance = 1 # in mm, distance between the strips in a module
+    module_width = strips_per_module*thickness + (strips_per_module-1)*distance
+    strips_ys = linspace(-module_width/2+thickness/2., module_width/2.-thickness/2., strips_per_module)
+
+    for y in strips_ys:
+      xs.append(r)
+      ys.append(y)
+
+    tmp_xs = xs
+    tmp_ys = ys
+
+    for i in range(n-1):
+      xprims = []
+      yprims = []
+      for t in range(len(tmp_xs)):
+        xprim = tmp_xs[t]*cos(alpha) - tmp_ys[t]*sin(alpha)
+        yprim = tmp_xs[t]*sin(alpha) + tmp_ys[t]*cos(alpha)
+        xprims.append(xprim)
+        yprims.append(yprim)
+      tmp_xs = xprims
+      tmp_ys = yprims
+      for t in range(len(tmp_xs)):
+        xs.append(xprims[t])
+        ys.append(yprims[t])
+
   strips_centers = []
   for i in range(len(xs)):
     strips_centers.append((xs[i], ys[i]))
@@ -523,7 +556,7 @@ if __name__ == "__main__":
                       dest='geometries_set',
                       type=str,
                       default='djpet-total-body',
-                      help='geometries set: djpet-total-body, lab192')
+                      help='geometries set: djpet-total-body, lab192, lab24modules')
 
   parser.add_argument('-of', '--outputformat',
                       dest='outputformat',
@@ -698,6 +731,10 @@ if __name__ == "__main__":
       thickness = 6. # in mm
       nr_of_strips = 24*2*16
 
+    elif args.geometries_set == "lab24modules":
+      thickness = 6. # in mm
+      nr_of_strips = 24*13
+
     else:
      print "Not supported geometries set."
      sys.exit(1)
@@ -717,6 +754,8 @@ if __name__ == "__main__":
       y_averages[index] += yhits[i]
     x_averages = x_averages/nrs_of_hits
     y_averages = y_averages/nrs_of_hits
+
+    print "x_averages=", x_averages, " y_averages=", y_averages, " nrs_of_hits=", nrs_of_hits
 
     strips_centers = get_strips_centers(args.geometries_set)
     x_centers = array(strips_centers)[:,0]

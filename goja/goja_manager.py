@@ -93,7 +93,7 @@ def verify_gate_output(path_gate_output, type_of_run):
     missing_files = []
     output_root = path_gate_output + 'output.root'
     if not os.path.isfile(output_root):
-      print "\tFile ", output_root, " is missing."
+      print("\tFile ", output_root, " is missing.")
       missing_files.append(output_root)
     nr_of_missing_files = len(missing_files)
 

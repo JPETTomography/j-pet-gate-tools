@@ -11,8 +11,8 @@ import subprocess
 import sys
 from getpass import getuser
 
-QUEUE_RUN = 'i3d'
-QUEUE_ANALYZE = 'i12h'
+QUEUE_RUN = 'o14d'
+QUEUE_ANALYZE = 'o12h'
 
 def run_simulation(type_of_run):
 
@@ -101,7 +101,7 @@ def verify_gate_output(path_gate_output, type_of_run):
     VERIFY_GATE_RESULTS_PBS = "verify_gate_results.pbs"
     with open(VERIFY_GATE_RESULTS_PBS, 'w') as file_pbs:
       file_pbs.write('#!/bin/sh\n')
-      file_pbs.write('#PBS -q a12h\n')
+      file_pbs.write('#PBS -q o12h\n')
       file_pbs.write('#PBS -l nodes=1:ppn=1\n')
       file_pbs.write('#PBS -N verify_gate_results.py\n')
       file_pbs.write('#PBS -V\n')
@@ -140,7 +140,7 @@ def verify_goja_output(path_gate_output, path_goja_output, type_of_run):
     VERIFY_GOJA_RESULTS_PBS = "verify_goja_results.pbs"
     with open(VERIFY_GOJA_RESULTS_PBS, 'w') as file_pbs:
       file_pbs.write('#!/bin/sh\n')
-      file_pbs.write('#PBS -q a12h\n')
+      file_pbs.write('#PBS -q o12h\n')
       file_pbs.write('#PBS -l nodes=1:ppn=1\n')
       file_pbs.write('#PBS -N verify_goja_results.py\n')
       file_pbs.write('#PBS -V\n')

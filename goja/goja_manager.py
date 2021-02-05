@@ -19,12 +19,12 @@ def run_simulation(type_of_run):
   command_run = ''
   if type_of_run == "locally":
     command_run += 'Gate main.mac'
-    print '\t' + command_run
+    print('\t' + command_run)
     p = subprocess.Popen(command_run, stdout=subprocess.PIPE, shell=True)
     p.wait()
   else:
     command_run += './Gate_parallel.sh'
-    print '\t' + command_run
+    print('\t' + command_run)
     os.system(command_run)
 
 def run_missing_simulations_on_cluster():
@@ -124,15 +124,15 @@ def verify_goja_output(path_gate_output, path_goja_output, type_of_run):
       if ".root" in fname:
         path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
         if not os.path.isfile(path_coincidences):
-          print "\tFile ", path_coincidences, " is missing."
+          print("\tFile ", path_coincidences, " is missing.")
           missing_files.append(path_coincidences)
         path_realtime = path_goja_output + fname[:-5] + "_realtime"
         if not os.path.isfile(path_realtime):
-          print "\tFile ", path_realtime, " is missing."
+          print("\tFile ", path_realtime, " is missing.")
           missing_files.append(path_realtime)
         path_statistics = path_goja_output + fname[:-5] + "_statistics"
         if not os.path.isfile(path_statistics):
-          print "\tFile ", path_statistics, " is missing."
+          print("\tFile ", path_statistics, " is missing.")
           missing_files.append(path_statistics)
     nr_of_missing_files = len(missing_files)
 
@@ -215,7 +215,7 @@ def concatenate_files(fnames):
           os.unlink(basepath_goja + "_coincidences")
           os.unlink(basepath_goja + "_realtime")
           os.unlink(basepath_goja + "_statistics")
-      print "Goja output succesfully concatenated."
+      print("Goja output succesfully concatenated.")
 
 if __name__ == "__main__":
 
@@ -315,7 +315,7 @@ if __name__ == "__main__":
     path_goja_output = args.path_goja_output
 
   if args.type_of_run=="locally" and not ('run' in args.mode) and not os.path.isdir(path_gate_output):
-    print "Directory " + path_gate_output + " does not exist. " + help_message
+    print("Directory " + path_gate_output + " does not exist. " + help_message)
     sys.exit()
 
   if not os.path.isdir(path_goja_output):
@@ -324,20 +324,20 @@ if __name__ == "__main__":
     except:
       pass
     if not os.path.isdir(path_goja_output):
-      print "Directory " + path_goja_output + " does not exist. " + help_message
+      print("Directory " + path_goja_output + " does not exist. " + help_message)
       sys.exit()
 
   ARRAY_GOJA_PBS = "array_goja.pbs"
 
   if args.mode == "run":
 
-    print "Run:"
+    print("Run:")
 
     run_simulation(args.type_of_run)
 
   elif args.mode == "run-missing":
 
-    print "Run missing:"
+    print("Run missing:")
 
     if args.type_of_run == "locally":
       if verify_gate_output(path_gate_output, args.type_of_run)>0:
@@ -348,13 +348,13 @@ if __name__ == "__main__":
 
   elif args.mode == "analyze":
 
-    print "Analyze:"
+    print("Analyze:")
 
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
       goja_result = path_goja_output + "output"
       goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
-      print goja_command
+      print(goja_command)
       p = subprocess.Popen(goja_command, shell=True)
       p.wait()
 
@@ -365,7 +365,7 @@ if __name__ == "__main__":
 
   elif args.mode == "analyze-missing":
 
-    print "Analyze missing:"
+    print("Analyze missing:")
 
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
@@ -374,7 +374,7 @@ if __name__ == "__main__":
          not os.path.isfile(goja_result + "realtime") or \
          not os.path.isfile(goja_result + "statistics"):
         goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
-        print goja_command
+        print(goja_command)
         p = subprocess.Popen(goja_command, shell=True)
         p.wait()
 
@@ -386,26 +386,26 @@ if __name__ == "__main__":
 
   elif args.mode == "verify":
 
-    print "Verify:"
+    print("Verify:")
 
     verify_gate_output(path_gate_output, args.type_of_run)
     verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
 
   elif args.mode == "verify-gate":
 
-    print "Verify (GATE):"
+    print("Verify (GATE):")
 
     verify_gate_output(path_gate_output, args.type_of_run)
 
   elif args.mode == "verify-goja":
 
-    print "Verify (GOJA):"
+    print("Verify (GOJA):")
 
     verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
 
   elif args.mode == "concatenate":
 
-    print "Concatenate:"
+    print("Concatenate:")
 
     fnames_tmp = os.listdir(path_goja_output)
     fnames_tmp = [fname for fname in fnames_tmp if "_coincidences" in fname]
@@ -422,25 +422,25 @@ if __name__ == "__main__":
 
   elif args.mode == "clear-gate":
 
-    print "Clear (GATE):"
+    print("Clear (GATE):")
     command = 'rm -f ' + path_gate_output + '*'
-    print '\t' + command
+    print('\t' + command)
     os.system(command)
 
   elif args.mode == "clear-goja":
 
-    print "Clear (GOJA):"
+    print("Clear (GOJA):")
     command = 'rm -f ' + path_goja_output + '*'
-    print '\t' + command
+    print('\t' + command)
     os.system(command)
 
   elif args.mode == "clear-cluster-artifacts":
 
-    print "Clear (cluster artifacts):"
+    print("Clear (cluster artifacts):")
     command = 'rm -f *.o* *.e*'
-    print '\t' + command
+    print('\t' + command)
     os.system(command)
 
   else:
 
-    print 'Improper mode. ' + help_message
+    print('Improper mode. ' + help_message)

@@ -194,7 +194,7 @@ def plot_Da_vs_Dt(coincidences,
 
     if not os.path.exists("./strips_centers_" + geometries_set + ".txt"):
 
-      print "You need to run calculate_strips_centers mode firstly."
+      print("You need to run calculate_strips_centers mode firstly.")
 
     else:
 
@@ -216,7 +216,7 @@ def plot_Da_vs_Dt(coincidences,
     tmp_posX2 = []
     tmp_posY2 = []
     tmp_times2 = []
-    for i in xrange(len(type_of_coincidence)):
+    for i in range(len(type_of_coincidence)):
       if type_of_coincidence[i]==toc:
         tmp_posX1.append(posX1[i])
         tmp_posY1.append(posY1[i])
@@ -255,7 +255,7 @@ def plot_Da_vs_Dt(coincidences,
               + "\tacci: " + str(counter_above_acci) + " (" + str(float(counter_above_acci)/counter_above*100.) + " % of all above the cut)\n" \
               + "Number of events below the cut: " + str(counter_below) + "\n" \
               + "Percentage of cut events: " + str(float(counter_below)/(counter_above+counter_below)*100.) + "\n"
-    print stats_cut
+    print(stats_cut)
     with open(result_figure_path + suffix + '_stats_cut.txt', 'w') as stats_cut_file:
       stats_cut_file.write(stats_cut)
 
@@ -307,7 +307,7 @@ def plot_Da_vs_Dt(coincidences,
 
   xxx = linspace(0,ELLIPSE_PARAM,100)
   yyy = []
-  for i in xrange(len(xxx)):
+  for i in range(len(xxx)):
     yyy.append(ellipsoid_threshold(xxx[i]))
   plt.plot(xxx, yyy, color='r', linewidth=2)
 
@@ -480,7 +480,7 @@ def calculate_ratios(coincidences, filename):
   N_acci = 0
   N_all = len(type_of_coincidence)
 
-  for i in xrange(N_all):
+  for i in range(N_all):
     if type_of_coincidence[i]==1: N_true += 1
     elif type_of_coincidence[i]==2: N_psca += 1
     elif type_of_coincidence[i]==3: N_dsca += 1
@@ -631,7 +631,7 @@ if __name__ == "__main__":
   if path_coincidences_file != '':
     coincidences = loadtxt(path_coincidences_file)
   else:
-    print "You need to specify path to the coincidences file obtained using the GOJA tool with option -cf."
+    print("You need to specify path to the coincidences file obtained using the GOJA tool with option -cf.")
     sys.exit(1)
 
   path_output_da_dt = args.path_coincidences_file.split("/")[-1] + '_DA_vs_DT'
@@ -669,7 +669,7 @@ if __name__ == "__main__":
       plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
         TLIM, ALIM, discrete=args.discrete, toc=2, imshow_max=args.imshow_max)
     except:
-      print "There are no phantom coincidences in the goja output file."
+      print("There are no phantom coincidences in the goja output file.")
     plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
       TLIM, ALIM, discrete=args.discrete, toc=3, imshow_max=args.imshow_max)
     plot_Da_vs_Dt(coincidences, args.geometries_set, tw, path_output_da_dt, t_bins, a_bins, zoom,
@@ -716,8 +716,8 @@ if __name__ == "__main__":
   elif args.mode == "calculate_strips_centers":
 
     if args.path_coincidences_file == '':
-      print "You need to provide the coincidences file for the " + args.geometries_set \
-            + " geometries set (the best would be from the point source simulation)."
+      print("You need to provide the coincidences file for the " + args.geometries_set \
+            + " geometries set (the best would be from the point source simulation).")
       sys.exit(1)
 
     thickness = 0.
@@ -736,7 +736,7 @@ if __name__ == "__main__":
       nr_of_strips = 24*13
 
     else:
-     print "Not supported geometries set."
+     print("Not supported geometries set.")
      sys.exit(1)
 
     nrs_of_hits = zeros(nr_of_strips)
@@ -747,7 +747,7 @@ if __name__ == "__main__":
     yhits = concatenate([coincidences[:,1], coincidences[:,5]])*10. # in mm
     volhits = concatenate([coincidences[:,8], coincidences[:,9]])
 
-    for i in xrange(len(coincidences)):
+    for i in range(len(coincidences)):
       index = int(volhits[i])-1
       nrs_of_hits[index] += 1
       x_averages[index] += xhits[i]
@@ -755,7 +755,7 @@ if __name__ == "__main__":
     x_averages = x_averages/nrs_of_hits
     y_averages = y_averages/nrs_of_hits
 
-    print "x_averages=", x_averages, " y_averages=", y_averages, " nrs_of_hits=", nrs_of_hits
+    print("x_averages=" + str(x_averages) + " y_averages=" + str(y_averages) + " nrs_of_hits=" + str(nrs_of_hits))
 
     strips_centers = get_strips_centers(args.geometries_set)
     x_centers = array(strips_centers)[:,0]
@@ -789,7 +789,7 @@ if __name__ == "__main__":
     plt.savefig("./strips_centers_vs_averages_vs_hits_" + suffix + args.geometries_set + OUTPUT_FORMAT)
 
     identifiers = {}
-    for i in xrange(len(coincidences)):
+    for i in range(len(coincidences)):
       x, y = get_closest_strip_center((xhits[i], yhits[i]), strips_centers)
       d = sqrt((x-xhits[i])**2 + (y-yhits[i])**2)
       if d<thickness/2.:

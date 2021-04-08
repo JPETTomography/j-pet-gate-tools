@@ -14,6 +14,10 @@ from getpass import getuser
 QUEUE_RUN = 'o14d'
 QUEUE_ANALYZE = 'o12h'
 
+# Paths:
+ARRAY_PBS_GOJA = "array_goja.pbs"
+ARRAY_PBS_MISSING = "array.pbs.missing"
+
 def run_simulation(type_of_run):
 
   command_run = ''
@@ -35,11 +39,10 @@ def run_missing_simulations_on_cluster():
       for m in missing_gate_results:
         m = m.replace('\n', '')
         with open("array.pbs", "r") as array_pbs:
-          with open("array.pbs.tmp", "w") as array_pbs_tmp:
+          with open(ARRAY_PBS_MISSING, "w") as array_pbs_missing:
             for line in array_pbs:
-              array_pbs_tmp.write(line.replace('${PBS_ARRAYID}', m))
-        os.system('qsub array.pbs.tmp')
-        os.unlink('array.pbs.tmp')
+              array_pbs_missing.write(line.replace('${PBS_ARRAYID}', m))
+        os.system('qsub ' + ARRAY_PBS_MISSING)
 
 def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0):
 
@@ -60,8 +63,8 @@ def analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, e
     gate_result = path_gate_output + "output" + ss + ".root"
     goja_result = path_goja_output + "output" + ss
     goja_command = get_goja_command(gate_result, goja_result, eth, eth0, tw, N0)
-    # generate ARRAY_GOJA_PBS:
-    with open(ARRAY_GOJA_PBS, 'w') as array_pbs:
+    # generate ARRAY_PBS_GOJA:
+    with open(ARRAY_PBS_GOJA, 'w') as array_pbs:
       array_pbs.write('#!/bin/sh\n')
       array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
       array_pbs.write('#PBS -l nodes=1:ppn=1\n')
@@ -71,10 +74,8 @@ def analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, e
       array_pbs.write(goja_command + '\n')
       array_pbs.write('exit 0;\n')
     # push into queue:
-    qsub_command = 'qsub ' + ARRAY_GOJA_PBS
+    qsub_command = 'qsub ' + ARRAY_PBS_GOJA
     os.system(qsub_command)
-    # remove ARRAY_GOJA_PBS:
-    os.unlink(ARRAY_GOJA_PBS)
 
 def get_nr_of_splits(simulation_path):
 
@@ -327,8 +328,6 @@ if __name__ == "__main__":
       print("Directory " + path_goja_output + " does not exist. " + help_message)
       sys.exit()
 
-  ARRAY_GOJA_PBS = "array_goja.pbs"
-
   if args.mode == "run":
 
     print("Run:")
@@ -437,7 +436,7 @@ if __name__ == "__main__":
   elif args.mode == "clear-cluster-artifacts":
 
     print("Clear (cluster artifacts):")
-    command = 'rm -f *.o* *.e*'
+    command = 'rm -f *.o* *.e* ' + ARRAY_PBS_GOJA + ' ' + ARRAY_PBS_MISSING
     print('\t' + command)
     os.system(command)
 

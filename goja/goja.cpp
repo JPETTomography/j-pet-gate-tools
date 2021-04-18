@@ -130,7 +130,7 @@ int main (int argc, char* argv[]) {
   if (vm.count("save-real-time-to")) {
     ofstream f;
     f.open(vm["save-real-time-to"].as<string>());
-    f << real_time << endl;
+    f << real_time/1e12 << endl; // convert to seconds
     f.close();
   }
 

@@ -290,7 +290,7 @@ def plot_Da_vs_Dt(coincidences,
     H = H_rescaled
 
   ASPECT = (edges_tim_diffs[-1]-edges_tim_diffs[0])/(edges_ang_diffs[-1]-edges_ang_diffs[0]) # force square pixels
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=imshow_max))
+  plt.imshow(H.T, interpolation='none', origin='lower', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=imshow_max))
   plt.colorbar()
   plt.xlim(tlim)
   plt.ylim(alim)
@@ -420,7 +420,7 @@ def plot_source(coincidences, result_figure_path, sbins, tomograph_diameter=0, t
   else:
     H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosX, sourcePosY, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='lower', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosX [cm]")
   plt.ylabel("sourcePosY [cm]")
@@ -433,7 +433,7 @@ def plot_source(coincidences, result_figure_path, sbins, tomograph_diameter=0, t
   else:
     H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosX, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='lower', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosZ [cm]")
   plt.ylabel("sourcePosX [cm]")
@@ -446,7 +446,7 @@ def plot_source(coincidences, result_figure_path, sbins, tomograph_diameter=0, t
   else:
     H, edges_tim_diffs, edges_ang_diffs = histogram2d(sourcePosZ, sourcePosY, bins=sbins)
   VMAX = H.max()
-  plt.imshow(H.T, interpolation='none', origin='low', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
+  plt.imshow(H.T, interpolation='none', origin='lower', extent=[edges_tim_diffs[0], edges_tim_diffs[-1], edges_ang_diffs[0], edges_ang_diffs[-1]], aspect='equal', norm=LogNorm(vmin=1, vmax=VMAX))
   plt.colorbar()
   plt.xlabel("sourcePosZ [cm]")
   plt.ylabel("sourcePosY [cm]")
@@ -520,7 +520,7 @@ def plot_diff(hist1, hist2):
 
   ASPECT = TLIM/float(ALIM) # force square pixels
 
-  plt.imshow(hist.T, interpolation='none', origin='low', extent=[0, 5, 0, 180], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=hist.max()))
+  plt.imshow(hist.T, interpolation='none', origin='lower', extent=[0, 5, 0, 180], aspect=ASPECT, norm=LogNorm(vmin=1, vmax=hist.max()))
   plt.colorbar()
 
   plt.xlabel("Time difference [ns]")

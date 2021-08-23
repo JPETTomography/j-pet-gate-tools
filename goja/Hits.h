@@ -47,11 +47,6 @@ public :
    Float_t         localPosX;
    Float_t         localPosY;
    Float_t         localPosZ;
-   Int_t           baseID;
-   Int_t           level1ID;
-   Int_t           level2ID;
-   Int_t           level3ID;
-   Int_t           level4ID;
    Int_t           layerID;
    Int_t           photonID;
    Int_t           nPhantomCompton;
@@ -85,11 +80,6 @@ public :
    TBranch        *b_localPosX;   //!
    TBranch        *b_localPosY;   //!
    TBranch        *b_localPosZ;   //!
-   TBranch        *b_baseID;   //!
-   TBranch        *b_level1ID;   //!
-   TBranch        *b_level2ID;   //!
-   TBranch        *b_level3ID;   //!
-   TBranch        *b_level4ID;   //!
    TBranch        *b_layerID;   //!
    TBranch        *b_photonID;   //!
    TBranch        *b_nPhantomCompton;   //!
@@ -208,11 +198,6 @@ void Hits::Init(TTree *tree)
    fChain->SetBranchAddress("localPosX", &localPosX, &b_localPosX);
    fChain->SetBranchAddress("localPosY", &localPosY, &b_localPosY);
    fChain->SetBranchAddress("localPosZ", &localPosZ, &b_localPosZ);
-   fChain->SetBranchAddress("baseID", &baseID, &b_baseID);
-   fChain->SetBranchAddress("level1ID", &level1ID, &b_level1ID);
-   fChain->SetBranchAddress("level2ID", &level2ID, &b_level2ID);
-   fChain->SetBranchAddress("level3ID", &level3ID, &b_level3ID);
-   fChain->SetBranchAddress("level4ID", &level4ID, &b_level4ID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
    fChain->SetBranchAddress("photonID", &photonID, &b_photonID);
    fChain->SetBranchAddress("nPhantomCompton", &nPhantomCompton, &b_nPhantomCompton);

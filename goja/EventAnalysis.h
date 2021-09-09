@@ -23,6 +23,8 @@ enum EventType {
 };
 
 void sort_hits(vector<Hit> &hits, string key);
+Hit add_hits(Hit &h1, Hit &h2, string winner);
+Hit add_hits(vector<Hit> &hits, string winner); // TODO: develop in further steps
 
 class EventAnalysis {
 
@@ -35,9 +37,10 @@ public :
   EventAnalysis();
 
   void select_coincident_hits(vector<Hit> &hits);
+  void select_coincident_singles(vector<Hit> &hits);
   EventType verify_type_of_coincidence(Hit &h1, Hit &h2);
   void print_coincidences();
-  void analyze_event(vector<Hit> &hits);
+  void analyze_event(vector<Hit> &hits, bool singles = true);
 
 };
 

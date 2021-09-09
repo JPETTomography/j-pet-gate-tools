@@ -80,6 +80,7 @@ LoopResults Hits::Loop() {
     cout << "lr.counter_compton_hits_over_the_ETH0=" << lr.counter_compton_hits_over_the_ETH0 << endl;
   }
 
+  bool singles = false;//TODO: move to GOJA arguments
   vector<Hit> event;
   int start_window_eventID = 0;
   double start_window_time = 0.;
@@ -105,7 +106,7 @@ LoopResults Hits::Loop() {
         lr.multiplicities.push_back(event.size());
         if (event.size()>=2) { // if the number of hits in the current event is at least 2
           EventAnalysis ea;
-          ea.analyze_event(event); // then the current event is analyzed
+          ea.analyze_event(event, singles); // then the current event is analyzed
         }
         event.clear(); // the current event is destroyed
         if (hit.edep>COMPTON_E_TH) { // start forming the event with the hit with edep>E_TH
@@ -122,7 +123,7 @@ LoopResults Hits::Loop() {
     lr.multiplicities.push_back(event.size());
     if (event.size()>=2) { // if the number of hits in the last event is at least 2
       EventAnalysis ea;
-      ea.analyze_event(event); // then the last event is analyzed
+      ea.analyze_event(event, singles); // then the last event is analyzed
     }
     event.clear(); // the last event is destroyed
   }

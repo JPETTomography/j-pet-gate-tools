@@ -29,6 +29,41 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
+Hit add_hits(Hit &h1, Hit &h2, string winner="centroidWinner") {
+  Hit h;
+  h.eventID = h1.eventID;
+  h.volumeID = h1.volumeID;
+  h.trackID = h1.trackID;
+  h.parentID = h1.parentID;
+  h.primaryID = h1.primaryID;
+  h.time = min(h1.time, h2.time);
+  h.edep = h1.edep + h2.edep;
+  if (winner == "centroidWinner") {
+    h.posX = (h1.posX+h2.posX)/2.;
+    h.posY = (h1.posY+h2.posY)/2.;
+    h.posZ = (h1.posZ+h2.posZ)/2.;
+  }
+  else if (winner == "energyWinner") {
+    if (h1.edep>=h2.edep) {
+      h.posX = h1.posX;
+      h.posY = h1.posY;
+      h.posZ = h1.posZ;
+    }
+    else {
+      h.posX = h2.posX;
+      h.posY = h2.posY;
+      h.posZ = h2.posZ;
+    }
+  }
+  h.sourcePosX = h1.sourcePosX;
+  h.sourcePosY = h1.sourcePosY;
+  h.sourcePosZ = h1.sourcePosZ;
+  h.nPhantomCompton = h1.nPhantomCompton;
+  h.nCrystalCompton = h1.nCrystalCompton;
+  return h;
+}
+
+
 //================================================================================
 // DEFINITIONS OF CLASS FUNCTIONS - BASIC ANALYSIS
 //================================================================================
@@ -47,6 +82,50 @@ void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
   for (unsigned int i=0; i<hits.size(); i++) {
     if (hits[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
+  }
+  N = coincident_hits.size();
+
+}
+
+void EventAnalysis::select_coincident_singles(vector<Hit> &hits) {
+
+  bool debug = true; // TODO: rmove
+
+  N0 = hits.size();
+  if (debug) std::cout << "N0=" << N0 << std::endl;
+
+  if (debug) for (unsigned int i=0; i<hits.size(); i++) {
+      cout << hits[i].volumeID << endl;
+  }
+
+  vector<Hit> singles;
+  int volumeIDlast = hits[0].volumeID;
+  vector<Hit> tmp;
+  tmp.push_back(hits[0]);
+  for (unsigned int i=1; i<hits.size(); i++) {
+    if (hits[i].volumeID == volumeIDlast) {
+      if (debug) cout << "\tvolumeIDs equal" << endl;
+      tmp.push_back(hits[i]);
+    }
+    else {
+      if (debug) cout << "\tvolumeIDs different" << endl;
+      if (debug) std::cout << "tmp.size()==" << tmp.size() << std::endl;
+      if (tmp.size()==1) {
+        singles.push_back(tmp[0]);
+      }
+      else if (tmp.size()>1) {
+        singles.push_back(add_hits(tmp[0], tmp[1])); // TODO: simplified: assumption that there are maximally 2 photons in single volume
+      }
+      if (debug) std::cout << "\tNtmp=" << tmp.size() << std::endl;
+      tmp.clear();
+    }
+    volumeIDlast = hits[i].volumeID;
+  }
+  if (debug) std::cout << "Nsingles=" << singles.size() << std::endl;
+
+  double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+  for (unsigned int i=0; i<singles.size(); i++) {
+    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(singles[i]);
   }
   N = coincident_hits.size();
 
@@ -117,14 +196,20 @@ void EventAnalysis::print_coincidences() {
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void EventAnalysis::analyze_event(vector<Hit> &hits)
+void EventAnalysis::analyze_event(vector<Hit> &hits, bool singles)
 {
 
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
 
   sort_hits(hits, "TIME");
-  select_coincident_hits(hits);
+
+  if (singles) {
+    select_coincident_singles(hits);
+  }
+  else {
+    select_coincident_hits(hits);
+  }
 
   if (N==MAX_N and N0<=MAX_N0) print_coincidences();
 

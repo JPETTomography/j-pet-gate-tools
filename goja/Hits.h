@@ -200,7 +200,9 @@ void Hits::Init(TTree *tree)
    fChain->SetBranchAddress("localPosX", &localPosX, &b_localPosX);
    fChain->SetBranchAddress("localPosY", &localPosY, &b_localPosY);
    fChain->SetBranchAddress("localPosZ", &localPosZ, &b_localPosZ);
-   fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
+   string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+   if (systemType == "cylindricalPET")
+     fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
    fChain->SetBranchAddress("photonID", &photonID, &b_photonID);
    fChain->SetBranchAddress("nPhantomCompton", &nPhantomCompton, &b_nPhantomCompton);

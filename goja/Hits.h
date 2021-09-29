@@ -47,6 +47,7 @@ public :
    Float_t         localPosX;
    Float_t         localPosY;
    Float_t         localPosZ;
+   Int_t           rsectorID;
    Int_t           layerID;
    Int_t           photonID;
    Int_t           nPhantomCompton;
@@ -80,6 +81,7 @@ public :
    TBranch        *b_localPosX;   //!
    TBranch        *b_localPosY;   //!
    TBranch        *b_localPosZ;   //!
+   TBranch        *b_rsectorID;
    TBranch        *b_layerID;   //!
    TBranch        *b_photonID;   //!
    TBranch        *b_nPhantomCompton;   //!
@@ -198,6 +200,7 @@ void Hits::Init(TTree *tree)
    fChain->SetBranchAddress("localPosX", &localPosX, &b_localPosX);
    fChain->SetBranchAddress("localPosY", &localPosY, &b_localPosY);
    fChain->SetBranchAddress("localPosZ", &localPosZ, &b_localPosZ);
+   fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
    fChain->SetBranchAddress("photonID", &photonID, &b_photonID);
    fChain->SetBranchAddress("nPhantomCompton", &nPhantomCompton, &b_nPhantomCompton);

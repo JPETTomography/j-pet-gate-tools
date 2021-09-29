@@ -43,6 +43,8 @@ LoopResults Hits::Loop(bool singles) {
     Hit hit;
     hit.eventID = eventID;
     hit.volumeID = volumeID[1]+1; // numbering from 1 not from 0
+    hit.rsectorID = rsectorID;
+    hit.layerID = layerID;
     hit.trackID = trackID;
     hit.parentID = parentID;
     hit.primaryID = primaryID;

@@ -1,8 +1,10 @@
 #include "Hit.h"
 
 Hit::Hit() {
-  eventID= -1;
-  volumeID= -1;
+  eventID = -1;
+  volumeID = -1;
+  rsectorID = -1;
+  layerID = -1;
   trackID = -1;
   parentID = -1;
   primaryID = -1;
@@ -20,6 +22,8 @@ Hit::Hit() {
 
 void Hit::print_hit() {
   cout << "eventID=" << eventID << endl;
+  cout << "rsectorID=" << rsectorID << endl;
+  cout << "layerID=" << layerID << endl;
   cout << "volumeID=" << volumeID << endl;
   cout << "trackID=" << trackID << endl;
   cout << "parentID=" << parentID << endl;

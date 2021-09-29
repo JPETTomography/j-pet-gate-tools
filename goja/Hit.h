@@ -11,7 +11,9 @@ class Hit {
 public :
 
   int eventID;          // ID of the event
-  int volumeID;         // ID of the detecting volume
+  int volumeID;         // volume detection in 'scanner' GATE systemType
+  int rsectorID;        // volume detection in 'cylindricalPET' GATE systemType
+  int layerID;          // volume detection in 'cylindricalPET' GATE systemType
   int trackID;          // ID of the track
   int parentID;         // ID of the parent particle
   int primaryID;        // ID of the primary particle

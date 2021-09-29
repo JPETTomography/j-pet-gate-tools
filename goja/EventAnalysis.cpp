@@ -1,4 +1,6 @@
 #include <map>
+#include <string>
+#include <sstream>
 
 #include "EventAnalysis.h"
 
@@ -91,40 +93,31 @@ void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
 
 void EventAnalysis::select_coincident_singles(vector<Hit> &hits) {
 
-  if (DEBUG) {
-    cout << "Hits:" << endl;
-    for (unsigned int i=0; i<hits.size(); i++) {
-      cout << '\t' << hits[i].volumeID << endl;
-    }
-    cout << '\t' << "# hits: " << hits.size() << endl;
-  }
-
-  map<int, Hit> singles;
+  map<string, Hit> singles;
   for (unsigned int i=0; i<hits.size(); i++) {
-    int volumeID = hits[i].volumeID;
-    if (singles.find(volumeID) == singles.end() ) {
-      singles[volumeID] = hits[i];
+    stringstream IDss;
+    string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+    if (systemType == "scanner")
+      IDss << hits[i].volumeID;
+    else if (systemType == "cylindricalPET")
+      IDss << hits[i].rsectorID << '_' << hits[i].layerID;
+    string ID = IDss.str();
+    if (singles.find(ID) == singles.end() ) {
+      singles[ID] = hits[i];
     } else {
-      singles[volumeID] = add_hits(singles[volumeID], hits[i]);
+      singles[ID] = add_hits(singles[ID], hits[i]);
     }
   }
   N0 = singles.size();
 
-  if (DEBUG) {
-    cout << "Singles:" << endl;
-    map<int, Hit>::iterator it = singles.begin();
-    while(it != singles.end()) {
-      cout << '\t' << it->first << endl;
-      it++;
-    }
-    cout << '\t' << "# singles: " << singles.size() << endl;
-  }
-
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
-  for (unsigned int i=0; i<singles.size(); i++) {
-    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(singles[i]);
+  map<string, Hit>::iterator it = singles.begin();
+  while(it != singles.end()) {
+    if ((it->second).edep>COMPTON_E_TH) coincident_hits.push_back(it->second);
+    it++;
   }
   N = coincident_hits.size();
+
 }
 
 EventType EventAnalysis::verify_type_of_coincidence(Hit &h1, Hit &h2) {

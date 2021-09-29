@@ -14,7 +14,7 @@ using namespace std;
 #include "EventAnalysis.h"
 #include "Common.h"
 
-LoopResults Hits::Loop() {
+LoopResults Hits::Loop(bool singles) {
 
   double COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
@@ -80,7 +80,6 @@ LoopResults Hits::Loop() {
     cout << "lr.counter_compton_hits_over_the_ETH0=" << lr.counter_compton_hits_over_the_ETH0 << endl;
   }
 
-  bool singles = false;//TODO: move to GOJA arguments
   vector<Hit> event;
   int start_window_eventID = 0;
   double start_window_time = 0.;

@@ -5,9 +5,6 @@ Hit::Hit() {
   volumeID = -1;
   rsectorID = -1;
   layerID = -1;
-  trackID = -1;
-  parentID = -1;
-  primaryID = -1;
   time = -1;
   edep = -1;
   posX = 0.;
@@ -25,9 +22,6 @@ void Hit::print_hit() {
   cout << "rsectorID=" << rsectorID << endl;
   cout << "layerID=" << layerID << endl;
   cout << "volumeID=" << volumeID << endl;
-  cout << "trackID=" << trackID << endl;
-  cout << "parentID=" << parentID << endl;
-  cout << "primaryID=" << primaryID << endl;
   cout << "time=" << time << endl;
   cout << "edep=" << edep << endl;
   cout << "hit position = [" << posX << ", " << posY << ", " << posZ << "]" << endl;

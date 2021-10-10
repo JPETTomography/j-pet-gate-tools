@@ -58,6 +58,7 @@ int main (int argc, char* argv[]) {
   ("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
   ("singles", po::bool_switch(&singles), "merge hits to singles")
   ("system-type", po::value<string>(), "GATE systemType: scanner or cylindricalPET")
+  ("tree-name", po::value<string>(), "tree name: Hits or HESingles (only for cylindricalPET system type)")
 
   // Input options:
   ("root", po::value<string>(), "file path of the single GATE *.root file,"
@@ -94,6 +95,7 @@ int main (int argc, char* argv[]) {
   SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "1000");
   SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
   SET_GOJA_ENV_VAR("system-type", "GOJA_SYSTEM_TYPE", "scanner");
+  SET_GOJA_ENV_VAR("tree-name", "GOJA_TREE_NAME", "Hits");
 
   double real_time = 0.;
   vector<int> multiplicities;

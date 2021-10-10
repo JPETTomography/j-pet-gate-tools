@@ -31,30 +31,25 @@ struct LoopResults {
 
 class Hits {
 public :
+
+   std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
+
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
    // Declaration of leaf types
    Int_t           PDGEncoding;
-   Int_t           trackID;
-   Int_t           parentID;
    Double_t        time;
    Float_t         edep;
-   Float_t         stepLength;
    Float_t         posX;
    Float_t         posY;
    Float_t         posZ;
-   Float_t         localPosX;
-   Float_t         localPosY;
-   Float_t         localPosZ;
    Int_t           rsectorID;
    Int_t           layerID;
-   Int_t           photonID;
    Int_t           nPhantomCompton;
    Int_t           nCrystalCompton;
    Int_t           nPhantomRayleigh;
    Int_t           nCrystalRayleigh;
-   Int_t           primaryID;
    Float_t         sourcePosX;
    Float_t         sourcePosY;
    Float_t         sourcePosZ;
@@ -70,25 +65,17 @@ public :
 
    // List of branches
    TBranch        *b_PDGEncoding;   //!
-   TBranch        *b_trackID;   //!
-   TBranch        *b_parentID;   //!
    TBranch        *b_time;   //!
    TBranch        *b_edep;   //!
-   TBranch        *b_stepLength;   //!
    TBranch        *b_posX;   //!
    TBranch        *b_posY;   //!
    TBranch        *b_posZ;   //!
-   TBranch        *b_localPosX;   //!
-   TBranch        *b_localPosY;   //!
-   TBranch        *b_localPosZ;   //!
    TBranch        *b_rsectorID;
    TBranch        *b_layerID;   //!
-   TBranch        *b_photonID;   //!
    TBranch        *b_nPhantomCompton;   //!
    TBranch        *b_nCrystalCompton;   //!
    TBranch        *b_nPhantomRayleigh;   //!
    TBranch        *b_nCrystalRayleigh;   //!
-   TBranch        *b_primaryID;   //!
    TBranch        *b_sourcePosX;   //!
    TBranch        *b_sourcePosY;   //!
    TBranch        *b_sourcePosZ;   //!
@@ -119,6 +106,7 @@ Hits::Hits(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+
    if (tree == 0) {
 
 #ifdef SINGLE_TREE
@@ -128,16 +116,16 @@ Hits::Hits(TTree *tree) : fChain(0)
       if (!f || !f->IsOpen()) {
          f = new TFile("Memory Directory");
       }
-      f->GetObject("Hits",tree);
+      f->GetObject(tree_name.c_str(),tree);
 
 #else // SINGLE_TREE
 
       // The following code should be used if you want this class to access a chain
       // of trees.
-      TChain * chain = new TChain("Hits","");
+      TChain * chain = new TChain(tree_name.c_str(),"");
       char* root_filename;
       root_filename = getenv("GOJA_ROOT_FILENAME");
-      std::string root_filename_string = std::string(root_filename) + "/Hits";
+      std::string root_filename_string = std::string(root_filename) + std::string("/") + tree_name;
       chain->Add(root_filename_string.c_str());
 
       tree = chain;
@@ -188,28 +176,34 @@ void Hits::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   fChain->SetBranchAddress("PDGEncoding", &PDGEncoding, &b_PDGEncoding);
-   fChain->SetBranchAddress("trackID", &trackID, &b_trackID);
-   fChain->SetBranchAddress("parentID", &parentID, &b_parentID);
+   if (tree_name == "Hits") {
+     fChain->SetBranchAddress("edep", &edep, &b_edep);
+     fChain->SetBranchAddress("posX", &posX, &b_posX);
+     fChain->SetBranchAddress("posY", &posY, &b_posY);
+     fChain->SetBranchAddress("posZ", &posZ, &b_posZ);
+     fChain->SetBranchAddress("nPhantomCompton", &nPhantomCompton, &b_nPhantomCompton);
+     fChain->SetBranchAddress("nCrystalCompton", &nCrystalCompton, &b_nCrystalCompton);
+     fChain->SetBranchAddress("nPhantomRayleigh", &nPhantomRayleigh, &b_nPhantomRayleigh);
+     fChain->SetBranchAddress("nCrystalRayleigh", &nCrystalRayleigh, &b_nCrystalRayleigh);
+     fChain->SetBranchAddress("PDGEncoding", &PDGEncoding, &b_PDGEncoding);
+     fChain->SetBranchAddress("processName", processName, &b_processName);
+     fChain->SetBranchAddress("volumeID", volumeID, &b_volumeID);
+   }
+   else if (tree_name == "HESingles") {
+     fChain->SetBranchAddress("energy", &edep, &b_edep);
+     fChain->SetBranchAddress("globalPosX", &posX, &b_posX);
+     fChain->SetBranchAddress("globalPosY", &posY, &b_posY);
+     fChain->SetBranchAddress("globalPosZ", &posZ, &b_posZ);
+     fChain->SetBranchAddress("comptonPhantom", &nPhantomCompton, &b_nPhantomCompton);
+     fChain->SetBranchAddress("comptonCrystal", &nCrystalCompton, &b_nCrystalCompton);
+     fChain->SetBranchAddress("RayleighPhantom", &nPhantomRayleigh, &b_nPhantomRayleigh);
+     fChain->SetBranchAddress("RayleighCrystal", &nCrystalRayleigh, &b_nCrystalRayleigh);
+   }
    fChain->SetBranchAddress("time", &time, &b_time);
-   fChain->SetBranchAddress("edep", &edep, &b_edep);
-   fChain->SetBranchAddress("stepLength", &stepLength, &b_stepLength);
-   fChain->SetBranchAddress("posX", &posX, &b_posX);
-   fChain->SetBranchAddress("posY", &posY, &b_posY);
-   fChain->SetBranchAddress("posZ", &posZ, &b_posZ);
-   fChain->SetBranchAddress("localPosX", &localPosX, &b_localPosX);
-   fChain->SetBranchAddress("localPosY", &localPosY, &b_localPosY);
-   fChain->SetBranchAddress("localPosZ", &localPosZ, &b_localPosZ);
    string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
    if (systemType == "cylindricalPET")
      fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
-   fChain->SetBranchAddress("photonID", &photonID, &b_photonID);
-   fChain->SetBranchAddress("nPhantomCompton", &nPhantomCompton, &b_nPhantomCompton);
-   fChain->SetBranchAddress("nCrystalCompton", &nCrystalCompton, &b_nCrystalCompton);
-   fChain->SetBranchAddress("nPhantomRayleigh", &nPhantomRayleigh, &b_nPhantomRayleigh);
-   fChain->SetBranchAddress("nCrystalRayleigh", &nCrystalRayleigh, &b_nCrystalRayleigh);
-   fChain->SetBranchAddress("primaryID", &primaryID, &b_primaryID);
    fChain->SetBranchAddress("sourcePosX", &sourcePosX, &b_sourcePosX);
    fChain->SetBranchAddress("sourcePosY", &sourcePosY, &b_sourcePosY);
    fChain->SetBranchAddress("sourcePosZ", &sourcePosZ, &b_sourcePosZ);
@@ -218,8 +212,6 @@ void Hits::Init(TTree *tree)
    fChain->SetBranchAddress("runID", &runID, &b_runID);
    fChain->SetBranchAddress("axialPos", &axialPos, &b_axialPos);
    fChain->SetBranchAddress("rotationAngle", &rotationAngle, &b_rotationAngle);
-   fChain->SetBranchAddress("volumeID", volumeID, &b_volumeID);
-   fChain->SetBranchAddress("processName", processName, &b_processName);
    fChain->SetBranchAddress("comptVolName", comptVolName, &b_comptVolName);
    fChain->SetBranchAddress("RayleighVolName", RayleighVolName, &b_RayleighVolName);
    Notify();

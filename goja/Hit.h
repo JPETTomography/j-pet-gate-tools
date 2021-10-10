@@ -14,9 +14,6 @@ public :
   int volumeID;         // volume detection in 'scanner' GATE systemType
   int rsectorID;        // volume detection in 'cylindricalPET' GATE systemType
   int layerID;          // volume detection in 'cylindricalPET' GATE systemType
-  int trackID;          // ID of the track
-  int parentID;         // ID of the parent particle
-  int primaryID;        // ID of the primary particle
   double time;          // time from the start of the simulation [s]
   double edep;          // deposited energy [MeV]
   double posX;          // absolute x position of the hit [mm]

@@ -37,9 +37,6 @@ Hit add_hits(Hit &h1, Hit &h2, string winner="centroidWinner") {
   Hit h;
   h.eventID = h1.eventID;
   h.volumeID = h1.volumeID;
-  h.trackID = h1.trackID;
-  h.parentID = h1.parentID;
-  h.primaryID = h1.primaryID;
   h.time = min(h1.time, h2.time);
   h.edep = h1.edep + h2.edep;
   if (winner == "centroidWinner") {

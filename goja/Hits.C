@@ -45,9 +45,6 @@ LoopResults Hits::Loop(bool singles) {
     hit.volumeID = volumeID[1]+1; // numbering from 1 not from 0
     hit.rsectorID = rsectorID;
     hit.layerID = layerID;
-    hit.trackID = trackID;
-    hit.parentID = parentID;
-    hit.primaryID = primaryID;
     hit.time = time*1e12; // convert to ps
     hit.edep = edep*1e3; // convert to keV
     hit.posX = posX;
@@ -60,12 +57,16 @@ LoopResults Hits::Loop(bool singles) {
     hit.nCrystalCompton = nCrystalCompton;
     string procName = string(processName);
 
-    bool hit_is_compton = (procName=="Compton" or procName=="compt"); // the photon is scattered using Compton scattering
+    bool hit_is_compton = true;
+    std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
+    if (tree_name == "Hits")
+        hit_is_compton = (procName=="Compton" or procName=="compt"); // the photon is scattered using Compton scattering
     if (hit_is_compton) {
       lr.counter_all_compton_hits += 1;
-      bool hit_is_proper = hit.edep>COMPTON_E_TH_0 and // deposited energy is bigger than the noise threshold
-                           nPhantomRayleigh==0 and nCrystalRayleigh==0 and // the photon is not scattered using Rayleigh scattering
-                           PDGEncoding==22; // gamma photon
+      bool hit_is_proper = hit.edep>COMPTON_E_TH_0 // deposited energy is bigger than the noise threshold
+                           and nPhantomRayleigh==0 and nCrystalRayleigh==0; // the photon is not scattered using Rayleigh scattering
+      if (tree_name == "Hits")
+          hit_is_proper = hit_is_proper and PDGEncoding==22; // gamma photon
       if (hit_is_proper) {
         hits.push_back(hit);
       }

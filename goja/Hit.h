@@ -14,8 +14,8 @@ public :
   int volumeID = -1;         // volume detection in 'scanner' GATE systemType
   int rsectorID = -1;        // volume detection in 'cylindricalPET' GATE systemType
   int layerID = -1;          // volume detection in 'cylindricalPET' GATE systemType
-  double time = -1;          // time from the start of the simulation [s]
-  double edep = -1;          // deposited energy [MeV]
+  double time = 0.;          // time from the start of the simulation [s]
+  double edep = 0.;          // deposited energy [MeV]
   double posX = 0.;          // absolute x position of the hit [mm]
   double posY = 0.;          // absolute y position of the hit [mm]
   double posZ = 0.;          // absolute z position of the hit [mm]

@@ -33,14 +33,14 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
-Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWinner) {
+Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWinnerNaivelyWeighted) {
 
   Hit h;
   h.eventID = h1.eventID;
   h.volumeID = h1.volumeID;
   h.time = min(h1.time, h2.time);
   h.edep = h1.edep + h2.edep;
-  if (winner == kCentroidWinner) {
+  if (winner == kCentroidWinnerNaivelyWeighted) {
     h.posX = (h1.posX+h2.posX)/2.;
     h.posY = (h1.posY+h2.posY)/2.;
     h.posZ = (h1.posZ+h2.posZ)/2.;
@@ -62,6 +62,56 @@ Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWin
   h.sourcePosZ = h1.sourcePosZ;
   h.nPhantomCompton = h1.nPhantomCompton;
   h.nCrystalCompton = h1.nCrystalCompton;
+  return h;
+
+}
+
+Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeighted) {
+
+  const unsigned int N = hits.size();
+  Hit h;
+  h.eventID = hits[0].eventID;
+  h.volumeID = hits[0].volumeID;
+  for (unsigned int i=0; i<N; i++) h.edep += hits[i].edep;
+  if (winner == kCentroidWinnerNaivelyWeighted) {
+    for (unsigned int i=0; i<N; i++) {
+      h.time += hits[i].time;
+      h.posX += hits[i].posX;
+      h.posY += hits[i].posY;
+      h.posZ += hits[i].posZ;
+    }
+    h.time /= N;
+    h.posX /= N;
+    h.posY /= N;
+    h.posZ /= N;
+  }
+  else if (winner == kCentroidWinnerEnergyWeighted) {
+    for (unsigned int i=0; i<N; i++) {
+      h.time += hits[i].time;
+      h.posX += hits[i].posX;
+      h.posY += hits[i].posY;
+      h.posZ += hits[i].posZ;
+    }
+    h.time /= h.edep;
+    h.posX /= h.edep;
+    h.posY /= h.edep;
+    h.posZ /= h.edep;
+  }
+  else if (winner == kEnergyWinner) {
+    std::vector<double> energies;
+    for (unsigned int i = 0; i<N; i++) energies.push_back(hits[i].edep);
+    unsigned int max_index = std::distance(energies.begin(),
+                                           std::max_element(energies.begin(), energies.end()));
+    h.time = hits[max_index].time;
+    h.posX = hits[max_index].posX;
+    h.posY = hits[max_index].posY;
+    h.posZ = hits[max_index].posZ;
+  }
+  h.sourcePosX = hits[0].sourcePosX;
+  h.sourcePosY = hits[0].sourcePosY;
+  h.sourcePosZ = hits[0].sourcePosZ;
+  h.nPhantomCompton = hits[0].nPhantomCompton;
+  h.nCrystalCompton = hits[0].nCrystalCompton;
   return h;
 
 }

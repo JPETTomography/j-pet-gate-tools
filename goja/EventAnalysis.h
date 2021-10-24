@@ -24,13 +24,14 @@ enum EventType {
 
 enum AveragingMethod {
   kUnspecifiedAM = 0,
-  kCentroidWinner = 1,
-  kEnergyWinner = 2
+  kCentroidWinnerNaivelyWeighted = 1,
+  kCentroidWinnerEnergyWeighted = 2,
+  kEnergyWinner = 3
 };
 
 void sort_hits(vector<Hit> &hits, string key);
-Hit add_hits(const Hit &h1, const Hit &h2, string winner);
-Hit add_hits(vector<Hit> &hits, string winner); // TODO: develop in further steps
+Hit add_hits(const Hit &h1, const Hit &h2, const AveragingMethod winner);
+Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
 class EventAnalysis {
 

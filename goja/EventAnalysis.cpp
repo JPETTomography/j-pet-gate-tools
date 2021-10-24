@@ -33,18 +33,19 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
-Hit add_hits(Hit &h1, Hit &h2, string winner="centroidWinner") {
+Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWinner) {
+
   Hit h;
   h.eventID = h1.eventID;
   h.volumeID = h1.volumeID;
   h.time = min(h1.time, h2.time);
   h.edep = h1.edep + h2.edep;
-  if (winner == "centroidWinner") {
+  if (winner == kCentroidWinner) {
     h.posX = (h1.posX+h2.posX)/2.;
     h.posY = (h1.posY+h2.posY)/2.;
     h.posZ = (h1.posZ+h2.posZ)/2.;
   }
-  else if (winner == "energyWinner") {
+  else if (winner == kEnergyWinner) {
     if (h1.edep>=h2.edep) {
       h.posX = h1.posX;
       h.posY = h1.posY;
@@ -62,6 +63,7 @@ Hit add_hits(Hit &h1, Hit &h2, string winner="centroidWinner") {
   h.nPhantomCompton = h1.nPhantomCompton;
   h.nCrystalCompton = h1.nCrystalCompton;
   return h;
+
 }
 
 
@@ -88,17 +90,16 @@ void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
 
 }
 
-void EventAnalysis::select_coincident_singles(vector<Hit> &hits) {
+void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
 
   map<string, Hit> singles;
   for (unsigned int i=0; i<hits.size(); i++) {
-    stringstream IDss;
+    string ID;
     string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
     if (systemType == "scanner")
-      IDss << hits[i].volumeID;
+      ID = std::to_string(hits[i].volumeID);
     else if (systemType == "cylindricalPET")
-      IDss << hits[i].rsectorID << '_' << hits[i].layerID;
-    string ID = IDss.str();
+      ID = std::to_string(hits[i].rsectorID) + '_' + std::to_string(hits[i].layerID);
     if (singles.find(ID) == singles.end() ) {
       singles[ID] = hits[i];
     } else {
@@ -107,7 +108,7 @@ void EventAnalysis::select_coincident_singles(vector<Hit> &hits) {
   }
   N0 = singles.size();
 
-  double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+  const double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
   map<string, Hit>::iterator it = singles.begin();
   while(it != singles.end()) {
     if ((it->second).edep>COMPTON_E_TH) coincident_hits.push_back(it->second);

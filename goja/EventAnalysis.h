@@ -22,8 +22,14 @@ enum EventType {
   kAccidental = 4
 };
 
+enum AveragingMethod {
+  kUnspecifiedAM = 0,
+  kCentroidWinner = 1,
+  kEnergyWinner = 2
+};
+
 void sort_hits(vector<Hit> &hits, string key);
-Hit add_hits(Hit &h1, Hit &h2, string winner);
+Hit add_hits(const Hit &h1, const Hit &h2, string winner);
 Hit add_hits(vector<Hit> &hits, string winner); // TODO: develop in further steps
 
 class EventAnalysis {
@@ -37,7 +43,7 @@ public :
   EventAnalysis();
 
   void select_coincident_hits(vector<Hit> &hits);
-  void select_coincident_singles(vector<Hit> &hits);
+  void select_coincident_singles(const std::vector<Hit> &hits);
   EventType verify_type_of_coincidence(Hit &h1, Hit &h2);
   void print_coincidences();
   void analyze_event(vector<Hit> &hits, bool singles = true);

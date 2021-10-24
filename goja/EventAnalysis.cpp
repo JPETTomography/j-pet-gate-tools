@@ -131,8 +131,9 @@ EventAnalysis::EventAnalysis() {
 
 void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
 
-  N0 = hits.size();
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+
+  N0 = hits.size();
   for (unsigned int i=0; i<hits.size(); i++) {
     if (hits[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
   }
@@ -142,27 +143,35 @@ void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
 
 void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
 
-  map<string, Hit> singles;
+  const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+  const double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+
+  map<string, vector<Hit>> singles_tmp;
   for (unsigned int i=0; i<hits.size(); i++) {
     string ID;
-    string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
     if (systemType == "scanner")
       ID = std::to_string(hits[i].volumeID);
     else if (systemType == "cylindricalPET")
       ID = std::to_string(hits[i].rsectorID) + '_' + std::to_string(hits[i].layerID);
-    if (singles.find(ID) == singles.end() ) {
-      singles[ID] = hits[i];
+    if (singles_tmp.find(ID) == singles_tmp.end() ) {
+      vector<Hit> tmp;
+      tmp.push_back(hits[i]);
+      singles_tmp[ID] = tmp;
     } else {
-      singles[ID] = add_hits(singles[ID], hits[i]);
+      singles_tmp[ID].push_back(hits[i]);
     }
   }
-  N0 = singles.size();
 
-  const double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
-  map<string, Hit>::iterator it = singles.begin();
-  while(it != singles.end()) {
-    if ((it->second).edep>COMPTON_E_TH) coincident_hits.push_back(it->second);
-    it++;
+  vector<Hit> singles;
+  map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
+  while(it_tmp != singles_tmp.end()) {
+    singles.push_back(add_hits(it_tmp->second, kCentroidWinnerEnergyWeighted));
+    it_tmp++;
+  }
+
+  N0 = singles.size();
+  for (unsigned int i=0; i<singles.size(); i++) {
+    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
   }
   N = coincident_hits.size();
 

@@ -33,39 +33,6 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
-Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWinnerNaivelyWeighted) {
-
-  Hit h;
-  h.eventID = h1.eventID;
-  h.volumeID = h1.volumeID;
-  h.time = min(h1.time, h2.time);
-  h.edep = h1.edep + h2.edep;
-  if (winner == kCentroidWinnerNaivelyWeighted) {
-    h.posX = (h1.posX+h2.posX)/2.;
-    h.posY = (h1.posY+h2.posY)/2.;
-    h.posZ = (h1.posZ+h2.posZ)/2.;
-  }
-  else if (winner == kEnergyWinner) {
-    if (h1.edep>=h2.edep) {
-      h.posX = h1.posX;
-      h.posY = h1.posY;
-      h.posZ = h1.posZ;
-    }
-    else {
-      h.posX = h2.posX;
-      h.posY = h2.posY;
-      h.posZ = h2.posZ;
-    }
-  }
-  h.sourcePosX = h1.sourcePosX;
-  h.sourcePosY = h1.sourcePosY;
-  h.sourcePosZ = h1.sourcePosZ;
-  h.nPhantomCompton = h1.nPhantomCompton;
-  h.nCrystalCompton = h1.nCrystalCompton;
-  return h;
-
-}
-
 Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
 
   const unsigned int N = hits.size();

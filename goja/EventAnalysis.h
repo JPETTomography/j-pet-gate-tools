@@ -31,7 +31,6 @@ enum AveragingMethod {
 };
 
 void sort_hits(vector<Hit> &hits, string key);
-Hit add_hits(const Hit &h1, const Hit &h2, const AveragingMethod winner);
 Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
 class EventAnalysis {

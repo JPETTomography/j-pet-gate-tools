@@ -26,7 +26,8 @@ enum AveragingMethod {
   kUnspecifiedAM = 0,
   kCentroidWinnerNaivelyWeighted = 1,
   kCentroidWinnerEnergyWeighted = 2,
-  kEnergyWinner = 3
+  kCentroidWinnerEnergyWeightedFirstTime = 3,
+  kEnergyWinner = 4
 };
 
 void sort_hits(vector<Hit> &hits, string key);

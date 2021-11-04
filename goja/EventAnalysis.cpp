@@ -66,7 +66,7 @@ Hit add_hits(const Hit &h1, const Hit &h2, AveragingMethod winner = kCentroidWin
 
 }
 
-Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeighted) {
+Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
 
   const unsigned int N = hits.size();
   Hit h;
@@ -87,12 +87,27 @@ Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentr
   }
   else if (winner == kCentroidWinnerEnergyWeighted) {
     for (unsigned int i=0; i<N; i++) {
-      h.time += hits[i].time;
-      h.posX += hits[i].posX;
-      h.posY += hits[i].posY;
-      h.posZ += hits[i].posZ;
+      h.time += hits[i].time * hits[i].edep;
+      h.posX += hits[i].posX * hits[i].edep;
+      h.posY += hits[i].posY * hits[i].edep;
+      h.posZ += hits[i].posZ * hits[i].edep;
     }
     h.time /= h.edep;
+    h.posX /= h.edep;
+    h.posY /= h.edep;
+    h.posZ /= h.edep;
+  }
+  else if (winner == kCentroidWinnerEnergyWeightedFirstTime) {
+    std::vector<double> times;
+    for (unsigned int i = 0; i<N; i++) times.push_back(hits[i].time);
+    unsigned int min_index = std::distance(times.begin(),
+                                           std::min_element(times.begin(), times.end()));
+    h.time = hits[min_index].time;
+    for (unsigned int i=0; i<N; i++) {
+      h.posX += hits[i].posX * hits[i].edep;
+      h.posY += hits[i].posY * hits[i].edep;
+      h.posZ += hits[i].posZ * hits[i].edep;
+    }
     h.posX /= h.edep;
     h.posY /= h.edep;
     h.posZ /= h.edep;
@@ -165,7 +180,7 @@ void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
   vector<Hit> singles;
   map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
   while(it_tmp != singles_tmp.end()) {
-    singles.push_back(add_hits(it_tmp->second, kCentroidWinnerEnergyWeighted));
+    singles.push_back(add_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
     it_tmp++;
   }
 

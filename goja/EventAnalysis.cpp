@@ -1,4 +1,5 @@
 #include <map>
+//#include <math.h>
 #include <string>
 #include <sstream>
 
@@ -34,6 +35,18 @@ void sort_hits(vector<Hit> &hits, string key) {
 }
 
 Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
+
+  /*
+  const unsigned int multiplicity = hits.size();
+  double x1 = hits[0].posX;
+  double y1 = hits[0].posY;
+  double z1 = hits[0].posZ;
+  double x2 = hits[multiplicity-1].posX;
+  double y2 = hits[multiplicity-1].posY;
+  double z2 = hits[multiplicity-1].posZ;
+  double distance = sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
+  std::cout << multiplicity << '\t' << distance << std::endl;
+  */
 
   const unsigned int N = hits.size();
   Hit h;
@@ -189,6 +202,8 @@ EventType EventAnalysis::verify_type_of_coincidence(Hit &h1, Hit &h2) {
 //================================================================================
 
 void EventAnalysis::print_coincidences() {
+
+  //return;
 
   cout.setf(ios::fixed);
 

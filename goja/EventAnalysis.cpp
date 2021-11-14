@@ -239,7 +239,7 @@ void EventAnalysis::print_coincidences() {
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void EventAnalysis::analyze_event(vector<Hit> &hits, bool singles)
+void EventAnalysis::analyze_event(vector<Hit> &hits, bool hits_are_singles)
 {
 
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
@@ -247,7 +247,7 @@ void EventAnalysis::analyze_event(vector<Hit> &hits, bool singles)
 
   sort_hits(hits, "TIME");
 
-  if (singles) {
+  if (hits_are_singles) {
     select_coincident_singles(hits);
   }
   else {

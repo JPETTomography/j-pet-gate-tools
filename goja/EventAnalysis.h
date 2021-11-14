@@ -47,7 +47,7 @@ public :
   void select_coincident_singles(const std::vector<Hit> &hits);
   EventType verify_type_of_coincidence(Hit &h1, Hit &h2);
   void print_coincidences();
-  void analyze_event(vector<Hit> &hits, bool singles = true);
+  void analyze_event(vector<Hit> &hits, bool hits_are_singles = true);
 
 };
 

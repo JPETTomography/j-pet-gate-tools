@@ -166,7 +166,7 @@ void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
 
   N0 = singles.size();
   for (unsigned int i=0; i<singles.size(); i++) {
-    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
+    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(singles[i]);
   }
   N = coincident_hits.size();
 

@@ -10,21 +10,20 @@ class Hit {
 
 public :
 
-  int eventID;          // ID of the event
-  int volumeID;         // ID of the detecting volume
-  int trackID;          // ID of the track
-  int parentID;         // ID of the parent particle
-  int primaryID;        // ID of the primary particle
-  double time;          // time from the start of the simulation [s]
-  double edep;          // deposited energy [MeV]
-  double posX;          // absolute x position of the hit [mm]
-  double posY;          // absolute y position of the hit [mm]
-  double posZ;          // absolute z position of the hit [mm]
-  double sourcePosX;    // absolute x position of the source of the hit [mm]
-  double sourcePosY;    // absolute y position of the source of the hit [mm]
-  double sourcePosZ;    // absolute z position of the source of the hit [mm]
-  int nPhantomCompton;  // number of Compton scatterings in the phantom in a track
-  int nCrystalCompton;  // number of Compton scatterings in the detecting volumes in a track
+  int eventID = -1;          // ID of the event
+  int volumeID = -1;         // volume detection in 'scanner' GATE systemType
+  int rsectorID = -1;        // volume detection in 'cylindricalPET' GATE systemType
+  int layerID = -1;          // volume detection in 'cylindricalPET' GATE systemType
+  double time = 0.;          // time from the start of the simulation [s]
+  double edep = 0.;          // deposited energy [MeV]
+  double posX = 0.;          // absolute x position of the hit [mm]
+  double posY = 0.;          // absolute y position of the hit [mm]
+  double posZ = 0.;          // absolute z position of the hit [mm]
+  double sourcePosX = 0.;    // absolute x position of the source of the hit [mm]
+  double sourcePosY = 0.;    // absolute y position of the source of the hit [mm]
+  double sourcePosZ = 0.;    // absolute z position of the source of the hit [mm]
+  int nPhantomCompton = -1;  // number of Compton scatterings in the phantom in a track
+  int nCrystalCompton = -1;  // number of Compton scatterings in the detecting volumes in a track
 
   Hit();
   void print_hit();

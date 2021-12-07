@@ -1,3 +1,8 @@
+#include <map>
+//#include <math.h>
+#include <string>
+#include <sstream>
+
 #include "EventAnalysis.h"
 
 //================================================================================
@@ -29,6 +34,73 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
+Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
+
+
+  const unsigned int N = hits.size();
+  Hit h;
+  h.eventID = hits[0].eventID;
+  h.volumeID = hits[0].volumeID;
+  for (unsigned int i=0; i<N; i++) h.edep += hits[i].edep;
+  if (winner == kCentroidWinnerNaivelyWeighted) {
+    for (unsigned int i=0; i<N; i++) {
+      h.time += hits[i].time;
+      h.posX += hits[i].posX;
+      h.posY += hits[i].posY;
+      h.posZ += hits[i].posZ;
+    }
+    h.time /= N;
+    h.posX /= N;
+    h.posY /= N;
+    h.posZ /= N;
+  }
+  else if (winner == kCentroidWinnerEnergyWeighted) {
+    for (unsigned int i=0; i<N; i++) {
+      h.time += hits[i].time * hits[i].edep;
+      h.posX += hits[i].posX * hits[i].edep;
+      h.posY += hits[i].posY * hits[i].edep;
+      h.posZ += hits[i].posZ * hits[i].edep;
+    }
+    h.time /= h.edep;
+    h.posX /= h.edep;
+    h.posY /= h.edep;
+    h.posZ /= h.edep;
+  }
+  else if (winner == kCentroidWinnerEnergyWeightedFirstTime) {
+    std::vector<double> times;
+    for (unsigned int i = 0; i<N; i++) times.push_back(hits[i].time);
+    unsigned int min_index = std::distance(times.begin(),
+                                           std::min_element(times.begin(), times.end()));
+    h.time = hits[min_index].time;
+    for (unsigned int i=0; i<N; i++) {
+      h.posX += hits[i].posX * hits[i].edep;
+      h.posY += hits[i].posY * hits[i].edep;
+      h.posZ += hits[i].posZ * hits[i].edep;
+    }
+    h.posX /= h.edep;
+    h.posY /= h.edep;
+    h.posZ /= h.edep;
+  }
+  else if (winner == kEnergyWinner) {
+    std::vector<double> energies;
+    for (unsigned int i = 0; i<N; i++) energies.push_back(hits[i].edep);
+    unsigned int max_index = std::distance(energies.begin(),
+                                           std::max_element(energies.begin(), energies.end()));
+    h.time = hits[max_index].time;
+    h.posX = hits[max_index].posX;
+    h.posY = hits[max_index].posY;
+    h.posZ = hits[max_index].posZ;
+  }
+  h.sourcePosX = hits[0].sourcePosX;
+  h.sourcePosY = hits[0].sourcePosY;
+  h.sourcePosZ = hits[0].sourcePosZ;
+  h.nPhantomCompton = hits[0].nPhantomCompton;
+  h.nCrystalCompton = hits[0].nCrystalCompton;
+  return h;
+
+}
+
+
 //================================================================================
 // DEFINITIONS OF CLASS FUNCTIONS - BASIC ANALYSIS
 //================================================================================
@@ -43,10 +115,47 @@ EventAnalysis::EventAnalysis() {
 
 void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
 
-  N0 = hits.size();
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+
+  N0 = hits.size();
   for (unsigned int i=0; i<hits.size(); i++) {
     if (hits[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
+  }
+  N = coincident_hits.size();
+
+}
+
+void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
+
+  const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+  const double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
+
+  map<string, vector<Hit>> singles_tmp;
+  for (unsigned int i=0; i<hits.size(); i++) {
+    string ID;
+    if (systemType == "scanner")
+      ID = std::to_string(hits[i].volumeID);
+    else if (systemType == "cylindricalPET")
+      ID = std::to_string(hits[i].rsectorID) + '_' + std::to_string(hits[i].layerID);
+    if (singles_tmp.find(ID) == singles_tmp.end() ) {
+      vector<Hit> tmp;
+      tmp.push_back(hits[i]);
+      singles_tmp[ID] = tmp;
+    } else {
+      singles_tmp[ID].push_back(hits[i]);
+    }
+  }
+
+  vector<Hit> singles;
+  map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
+  while(it_tmp != singles_tmp.end()) {
+    singles.push_back(add_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
+    it_tmp++;
+  }
+
+  N0 = singles.size();
+  for (unsigned int i=0; i<singles.size(); i++) {
+    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(singles[i]);
   }
   N = coincident_hits.size();
 
@@ -83,6 +192,8 @@ EventType EventAnalysis::verify_type_of_coincidence(Hit &h1, Hit &h2) {
 
 void EventAnalysis::print_coincidences() {
 
+  //return;
+
   cout.setf(ios::fixed);
 
   Hit h1 = coincident_hits[0];
@@ -117,14 +228,20 @@ void EventAnalysis::print_coincidences() {
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void EventAnalysis::analyze_event(vector<Hit> &hits)
+void EventAnalysis::analyze_event(vector<Hit> &hits, bool hits_are_singles)
 {
 
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
 
   sort_hits(hits, "TIME");
-  select_coincident_hits(hits);
+
+  if (hits_are_singles) {
+    select_coincident_singles(hits);
+  }
+  else {
+    select_coincident_hits(hits);
+  }
 
   if (N==MAX_N and N0<=MAX_N0) print_coincidences();
 

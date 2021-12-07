@@ -4,19 +4,19 @@ project(goja)
 
 # CFLAGS:
 
-add_definitions(-std=c++11 -Wall -Wunused-parameter)
+add_definitions(-std=c++14 -Wall -Wunused-parameter)
 
 # Searching for dependencies:
 
 list(APPEND CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT 5 REQUIRED COMPONENTS Tree)
+find_package(ROOT 6.24 REQUIRED COMPONENTS Tree)
 if(ROOT_USE_FILE)
   include(${ROOT_USE_FILE})
 endif()
 message(STATUS "ROOT version: ${ROOT_VERSION}")
 add_definitions(${ROOT_DEFINITIONS})
 
-find_package(Boost 1.50.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.77.0 REQUIRED COMPONENTS program_options)
 add_definitions(${Boost_DEFINITIONS})
 
 include_directories(${ROOT_INCLUDE_DIR} ${Boost_INCLUDE_DIR})

@@ -14,7 +14,7 @@ using namespace std;
 #include "EventAnalysis.h"
 #include "Common.h"
 
-LoopResults Hits::Loop() {
+LoopResults Hits::Loop(bool singles) {
 
   double COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
@@ -43,9 +43,8 @@ LoopResults Hits::Loop() {
     Hit hit;
     hit.eventID = eventID;
     hit.volumeID = volumeID[1]+1; // numbering from 1 not from 0
-    hit.trackID = trackID;
-    hit.parentID = parentID;
-    hit.primaryID = primaryID;
+    hit.rsectorID = rsectorID;
+    hit.layerID = layerID;
     hit.time = time*1e12; // convert to ps
     hit.edep = edep*1e3; // convert to keV
     hit.posX = posX;
@@ -58,12 +57,16 @@ LoopResults Hits::Loop() {
     hit.nCrystalCompton = nCrystalCompton;
     string procName = string(processName);
 
-    bool hit_is_compton = (procName=="Compton" or procName=="compt"); // the photon is scattered using Compton scattering
+    bool hit_is_compton = true;
+    std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
+    if (tree_name == "Hits")
+        hit_is_compton = (procName=="Compton" or procName=="compt"); // the photon is scattered using Compton scattering
     if (hit_is_compton) {
       lr.counter_all_compton_hits += 1;
-      bool hit_is_proper = hit.edep>COMPTON_E_TH_0 and // deposited energy is bigger than the noise threshold
-                           nPhantomRayleigh==0 and nCrystalRayleigh==0 and // the photon is not scattered using Rayleigh scattering
-                           PDGEncoding==22; // gamma photon
+      bool hit_is_proper = hit.edep>COMPTON_E_TH_0 // deposited energy is bigger than the noise threshold
+                           and nPhantomRayleigh==0 and nCrystalRayleigh==0; // the photon is not scattered using Rayleigh scattering
+      if (tree_name == "Hits")
+          hit_is_proper = hit_is_proper and PDGEncoding==22; // gamma photon
       if (hit_is_proper) {
         hits.push_back(hit);
       }
@@ -105,7 +108,7 @@ LoopResults Hits::Loop() {
         lr.multiplicities.push_back(event.size());
         if (event.size()>=2) { // if the number of hits in the current event is at least 2
           EventAnalysis ea;
-          ea.analyze_event(event); // then the current event is analyzed
+          ea.analyze_event(event, singles); // then the current event is analyzed
         }
         event.clear(); // the current event is destroyed
         if (hit.edep>COMPTON_E_TH) { // start forming the event with the hit with edep>E_TH
@@ -122,7 +125,7 @@ LoopResults Hits::Loop() {
     lr.multiplicities.push_back(event.size());
     if (event.size()>=2) { // if the number of hits in the last event is at least 2
       EventAnalysis ea;
-      ea.analyze_event(event); // then the last event is analyzed
+      ea.analyze_event(event, singles); // then the last event is analyzed
     }
     event.clear(); // the last event is destroyed
   }

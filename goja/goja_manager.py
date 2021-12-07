@@ -56,12 +56,12 @@ def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0):
                + " > " + goja_result + "_coincidences"
   return goja_command
 
-def analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, eth, eth0, tw, N0):
+def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_goja_output, splits, eth, eth0, tw, N0):
 
   for s in splits:
     ss = str(int(s))
-    gate_result = path_gate_output + "output" + ss + ".root"
-    goja_result = path_goja_output + "output" + ss
+    gate_result = path_gate_output + single_file_prefix + ss + ".root"
+    goja_result = path_goja_output + single_file_prefix + ss
     goja_command = get_goja_command(gate_result, goja_result, eth, eth0, tw, N0)
     # generate ARRAY_PBS_GOJA:
     with open(ARRAY_PBS_GOJA, 'w') as array_pbs:
@@ -231,6 +231,12 @@ if __name__ == "__main__":
                       default="",
                       help='path to dir with the splitted GATE results')
 
+  parser.add_argument('-sfp', '--single-file-prefix',
+                      dest='single_file_prefix',
+                      type=str,
+                      default="output",
+                      help='single file prefix')
+
   parser.add_argument('-gj', '--goja-output',
                       dest='path_goja_output',
                       type=str,
@@ -272,6 +278,12 @@ if __name__ == "__main__":
                       type=int,
                       default=1000,
                       help='maximum number of events above the noise energy threshold in the coincidence window [for mode \'analyze\']')
+
+  parser.add_argument('-nos', '--nr-of-splits',
+                      dest='nr_of_splits',
+                      type=int,
+                      default=0,
+                      help='number of splits')
 
   parser.add_argument('-r', '--run',
                       dest='type_of_run',
@@ -351,16 +363,19 @@ if __name__ == "__main__":
 
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
-      goja_result = path_goja_output + "output"
+      goja_result = path_goja_output + args.single_file_prefix
       goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
       print(goja_command)
       p = subprocess.Popen(goja_command, shell=True)
       p.wait()
 
     elif args.type_of_run == 'on-cluster':
-      nr_of_splits = get_nr_of_splits(args.simulation_path)
+      if args.nr_of_splits == 0:
+        nr_of_splits = get_nr_of_splits(args.simulation_path)
+      else:
+          nr_of_splits = args.nr_of_splits
       splits = linspace(1, nr_of_splits, nr_of_splits)
-      analyze_simulations_on_cluster(path_gate_output, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0)
+      analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0)
 
   elif args.mode == "analyze-missing":
 
@@ -368,7 +383,7 @@ if __name__ == "__main__":
 
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
-      goja_result = path_goja_output + "output"
+      goja_result = path_goja_output + args.single_file_prefix
       if not os.path.isfile(goja_result + "coincidences") or \
          not os.path.isfile(goja_result + "realtime") or \
          not os.path.isfile(goja_result + "statistics"):

@@ -42,16 +42,25 @@ namespace po = boost::program_options;
  */
 int main (int argc, char* argv[]) {
 
-  po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");
+  bool singles = false;
 
+  po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");
   desc.add_options()
+
   ("help", "produce help message")
+
+  // Forming coincidences options:
   ("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
   ("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.0 MeV)")
   ("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
   ("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
   ("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (includes N, default: 1000)")
   ("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
+  ("singles", po::bool_switch(&singles), "merge hits to singles")
+  ("system-type", po::value<string>(), "GATE systemType: scanner or cylindricalPET")
+  ("tree-name", po::value<string>(), "tree name: Hits or HESingles (only for cylindricalPET system type)")
+
+  // Input options:
   ("root", po::value<string>(), "file path of the single GATE *.root file,"
                                 "for example --root=output.root")
   ("root-many", po::value<string>(), "file path of the base GATE *.root file "
@@ -62,6 +71,8 @@ int main (int argc, char* argv[]) {
                                      "to output/output100.root "
                                      "(base name is specified in the GATE macro using the following command: "
                                      "/gate/output/root/setFileName output/output)")
+
+  // Output options:
   ("save-real-time-to", po::value<string>(), "save real time of the simulation to the file path "
                                              "(necessary when the input consists of many files [option --root-many] "
                                              "and some of them may be broken [for example not closed properly])")
@@ -83,6 +94,8 @@ int main (int argc, char* argv[]) {
   SET_GOJA_ENV_VAR("N", "GOJA_MAX_N", "2");
   SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "1000");
   SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
+  SET_GOJA_ENV_VAR("system-type", "GOJA_SYSTEM_TYPE", "scanner");
+  SET_GOJA_ENV_VAR("tree-name", "GOJA_TREE_NAME", "Hits");
 
   double real_time = 0.;
   vector<int> multiplicities;
@@ -99,7 +112,7 @@ int main (int argc, char* argv[]) {
     ss << vm["root"].as<string>();
     setenv("GOJA_ROOT_FILENAME", ss.str().c_str(), 1);
     Hits h;
-    LoopResults lr = h.Loop();
+    LoopResults lr = h.Loop(singles);
     real_time = lr.real_time;
     multiplicities = lr.multiplicities;
     counter_all_compton_hits = lr.counter_all_compton_hits;
@@ -121,7 +134,7 @@ int main (int argc, char* argv[]) {
       string root_filename = basename + to_string(i) + ".root";
       setenv("GOJA_ROOT_FILENAME", root_filename.c_str(), 1);
       Hits h;
-      LoopResults lr = h.Loop();
+      LoopResults lr = h.Loop(singles);
       real_time += lr.real_time;
       multiplicities.insert(multiplicities.end(), lr.multiplicities.begin(), lr.multiplicities.end());
     }

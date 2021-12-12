@@ -4,6 +4,22 @@ GOJA is an acronym of GATE Output J-PET Analyzer. It may be used to
 parse the GATE *.root output files and extract sets of coincidences
 from them.
 
+Available processing options
+----------------------------
+
+1) GOJA uses both scanner (default) or cylindricalPET GATE geometries. It assumes that the hits tree is called Hits, while the singles tree (only in cylindricalPET geometry) is called HESingles.
+
+2) Coincidences may be formed with raw hits (based on tree Hits), from GOJA-merged singles (based on tree Hits) or GATE-marged singles (based on tree HEsingles).
+
+3) There are currently 3 modes of merging hits into singles in GOJA (may be set with a switch in the code):
+   a) kCentroidWinnerNaivelyWeighted: time and position of the single is set to mean values for merged hits,
+   b) kCentroidWinnerEnergyWeighted: time and position of the single is set to mean values for merged hits weighted with the energies of these hits,
+   c) kCentroidWinnerEnergyWeightedFirstTime: time of the single is set to time of the first merged hit, while the position of the single is set to mean value for merged hits weighted with the energies of these hits (default option),
+   d) kEnergyWinner: single takes time and position from the hit with highest energy.
+   In all modes, energy of the single is the sum of the energies of merged hits.
+
+4) The definition of the coincidence may be adjusted with the lenght of time window (--tw) and energy threshold (--eth). Default: 3 ns, 200 keV.
+
 Dependencies
 ------------
 

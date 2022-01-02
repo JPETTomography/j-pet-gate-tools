@@ -50,7 +50,7 @@ jobs:
         source ../../cern-root/root/bin/thisroot.sh
         ./goja --root input_files/in_cylindircalPET_Hits.root --system-type cylindricalPET > output_files/out_cylindricalPET_hits
         ./goja --root input_files/in_cylindircalPET_Hits.root --system-type cylindricalPET --singles > output_files/out_cylindricalPET_singles_from_hits
-        ./goja --root input_filesin_cylindircalPET_HESingles.root --system-type cylindricalPET --tree-name HESingles > output_files/out_cylindricalPET_singles
+        ./goja --root input_files/in_cylindircalPET_HESingles.root --system-type cylindricalPET --tree-name HESingles > output_files/out_cylindricalPET_singles
 
         diff output_files/out_cylindricalPET_hits compare_files/out_cylindricalPET_hits
         diff output_files/out_cylindricalPET_singles_from_hits compare_files/out_cylindricalPET_singles_from_hits

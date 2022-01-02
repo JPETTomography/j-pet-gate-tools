@@ -35,6 +35,7 @@ jobs:
 
     - name: Download test files
       run: |
+        cd goja/build
         mkdir input_files && cd input_files
         wget http://sphinx.if.uj.edu.pl/~rakoczy/totalBody/in_cylindircalPET_HESingles.root
         wget http://sphinx.if.uj.edu.pl/~rakoczy/totalBody/in_cylindircalPET_Hits.root
@@ -42,9 +43,9 @@ jobs:
         wget http://sphinx.if.uj.edu.pl/~rakoczy/totalBody/out_cylindricalPET_hits
         wget http://sphinx.if.uj.edu.pl/~rakoczy/totalBody/out_cylindricalPET_singles
         wget http://sphinx.if.uj.edu.pl/~rakoczy/totalBody/out_cylindricalPET_singles_from_hits
-        cd ..
     - name: Run tests
       run: |
+        cd goja/build
         mkdir output_files
         ./goja --root input_files/in_cylindircalPET_Hits.root --system-type cylindricalPET > output_files/out_cylindricalPET_hits
         ./goja --root input_files/in_cylindircalPET_Hits.root --system-type cylindricalPET --singles > output_files/out_cylindricalPET_singles_from_hits

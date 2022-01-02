@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.9)
 
 project(goja)
 
@@ -16,7 +16,7 @@ endif()
 message(STATUS "ROOT version: ${ROOT_VERSION}")
 add_definitions(${ROOT_DEFINITIONS})
 
-find_package(Boost 1.77.0 REQUIRED COMPONENTS program_options)
+find_package(Boost 1.71.0 REQUIRED COMPONENTS program_options)
 add_definitions(${Boost_DEFINITIONS})
 
 include_directories(${ROOT_INCLUDE_DIR} ${Boost_INCLUDE_DIR})

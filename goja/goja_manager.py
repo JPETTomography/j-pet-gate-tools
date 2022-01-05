@@ -309,9 +309,10 @@ if __name__ == "__main__":
                       dest='ego',
                       type=str,
                       default='',
-                      help='extra GOJA options')
+                      help='extra GOJA options, forward options with + instead of -, eg. ++singles not --singles')
 
   args = parser.parse_args()
+  args.ego = args.ego.replace('+','-')
 
   current_path = os.getcwd()
 

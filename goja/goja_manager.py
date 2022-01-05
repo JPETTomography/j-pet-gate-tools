@@ -44,9 +44,9 @@ def run_missing_simulations_on_cluster():
               array_pbs_missing.write(line.replace('${PBS_ARRAYID}', m))
         os.system('qsub ' + ARRAY_PBS_MISSING)
 
-def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0):
+def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0, ego):
 
-  goja_command = "goja --root " + gate_result \
+  goja_command = "goja " + ego + " --root " + gate_result \
                + " --eth " + str(eth) \
                + " --eth0 " + str(eth0) \
                + " --tw " + str(tw) \
@@ -56,13 +56,13 @@ def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0):
                + " > " + goja_result + "_coincidences"
   return goja_command
 
-def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_goja_output, splits, eth, eth0, tw, N0):
+def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_goja_output, splits, eth, eth0, tw, N0, ego):
 
   for s in splits:
     ss = str(int(s))
     gate_result = path_gate_output + single_file_prefix + ss + ".root"
     goja_result = path_goja_output + single_file_prefix + ss
-    goja_command = get_goja_command(gate_result, goja_result, eth, eth0, tw, N0)
+    goja_command = get_goja_command(gate_result, goja_result, eth, eth0, tw, N0, ego)
     # generate ARRAY_PBS_GOJA:
     with open(ARRAY_PBS_GOJA, 'w') as array_pbs:
       array_pbs.write('#!/bin/sh\n')
@@ -305,6 +305,12 @@ if __name__ == "__main__":
                       action='store_true',
                       help='use lustre file system (if not nfs is used)')
 
+  parser.add_argument('-ego', '--extra-goja-options',
+                      dest='ego',
+                      type=str,
+                      default='',
+                      help='extra GOJA options')
+
   args = parser.parse_args()
 
   current_path = os.getcwd()
@@ -364,7 +370,7 @@ if __name__ == "__main__":
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
       goja_result = path_goja_output + args.single_file_prefix
-      goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
+      goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0, args.ego)
       print(goja_command)
       p = subprocess.Popen(goja_command, shell=True)
       p.wait()
@@ -375,7 +381,7 @@ if __name__ == "__main__":
       else:
           nr_of_splits = args.nr_of_splits
       splits = linspace(1, nr_of_splits, nr_of_splits)
-      analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0)
+      analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0, args.ego)
 
   elif args.mode == "analyze-missing":
 
@@ -387,7 +393,7 @@ if __name__ == "__main__":
       if not os.path.isfile(goja_result + "coincidences") or \
          not os.path.isfile(goja_result + "realtime") or \
          not os.path.isfile(goja_result + "statistics"):
-        goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0)
+        goja_command = get_goja_command(gate_result, goja_result, args.eth, args.eth0, args.tw, args.N0, args.ego)
         print(goja_command)
         p = subprocess.Popen(goja_command, shell=True)
         p.wait()
@@ -396,7 +402,7 @@ if __name__ == "__main__":
       if os.path.isfile("./missing_goja_results.txt"):
         missing_goja_results = loadtxt("./missing_goja_results.txt")
         if len(missing_goja_results)>0:
-          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0)
+          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0, args.ego)
 
   elif args.mode == "verify":
 

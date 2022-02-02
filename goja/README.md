@@ -49,12 +49,12 @@ Columns 1-4 contain information about the 1st hit:
 1) posX1 [cm]
 2) posY1 [cm]
 3) posZ1 [cm]
-4) time1 [ns]
+4) time1 [ps]
 Columns 5-8 contain information about the 2nd hit:
 5) posX2 [cm]
 6) posY2 [cm]
 7) posZ2 [cm]
-8) time2 [ns]
+8) time2 [ps]
 Next columns contain following information:
 9) volumeID of the 1st hit
 10) volumeID of the 2nd hit

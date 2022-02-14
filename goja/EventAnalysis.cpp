@@ -36,7 +36,6 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
 
-
   const unsigned int N = hits.size();
   Hit h;
   h.eventID = hits[0].eventID;
@@ -191,8 +190,6 @@ EventType EventAnalysis::verify_type_of_coincidence(Hit &h1, Hit &h2) {
 //================================================================================
 
 void EventAnalysis::print_coincidences() {
-
-  //return;
 
   cout.setf(ios::fixed);
 

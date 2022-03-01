@@ -11,9 +11,6 @@ import subprocess
 import sys
 from getpass import getuser
 
-QUEUE_RUN = 'o14d'
-QUEUE_ANALYZE = 'o12h'
-
 # Paths:
 ARRAY_PBS_GOJA = "array_goja.pbs"
 ARRAY_PBS_MISSING = "array.pbs.missing"
@@ -56,7 +53,7 @@ def get_goja_command(gate_result, goja_result, eth, eth0, tw, N0, ego):
                + " > " + goja_result + "_coincidences"
   return goja_command
 
-def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_goja_output, splits, eth, eth0, tw, N0, ego):
+def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_goja_output, splits, eth, eth0, tw, N0, ego, cis_queue):
 
   for s in splits:
     ss = str(int(s))
@@ -66,7 +63,7 @@ def analyze_simulations_on_cluster(path_gate_output, single_file_prefix, path_go
     # generate ARRAY_PBS_GOJA:
     with open(ARRAY_PBS_GOJA, 'w') as array_pbs:
       array_pbs.write('#!/bin/sh\n')
-      array_pbs.write('#PBS -q ' + QUEUE_ANALYZE + '\n')
+      array_pbs.write('#PBS -q ' + cis_queue + '\n')
       array_pbs.write('#PBS -l nodes=1:ppn=1\n')
       array_pbs.write('#PBS -N GOJA' + ss + '\n')
       array_pbs.write('#PBS -V\n')
@@ -86,7 +83,7 @@ def get_nr_of_splits(simulation_path):
         nr_of_splits = int((line.split('=')[1]).replace('\"', '').replace('\'', '').replace('\n', ''))
   return nr_of_splits
 
-def verify_gate_output(path_gate_output, type_of_run):
+def verify_gate_output(path_gate_output, type_of_run, cis_queue):
 
   nr_of_missing_files = 0
 
@@ -102,7 +99,7 @@ def verify_gate_output(path_gate_output, type_of_run):
     VERIFY_GATE_RESULTS_PBS = "verify_gate_results.pbs"
     with open(VERIFY_GATE_RESULTS_PBS, 'w') as file_pbs:
       file_pbs.write('#!/bin/sh\n')
-      file_pbs.write('#PBS -q o12h\n')
+      file_pbs.write('#PBS -q ' + cis_queue + '\n')
       file_pbs.write('#PBS -l nodes=1:ppn=1\n')
       file_pbs.write('#PBS -N verify_gate_results.py\n')
       file_pbs.write('#PBS -V\n')
@@ -115,7 +112,7 @@ def verify_gate_output(path_gate_output, type_of_run):
 
   return nr_of_missing_files
 
-def verify_goja_output(path_gate_output, path_goja_output, type_of_run):
+def verify_goja_output(path_gate_output, path_goja_output, type_of_run, cis_queue):
 
   nr_of_missing_files = 0
   missing_files = []
@@ -141,7 +138,7 @@ def verify_goja_output(path_gate_output, path_goja_output, type_of_run):
     VERIFY_GOJA_RESULTS_PBS = "verify_goja_results.pbs"
     with open(VERIFY_GOJA_RESULTS_PBS, 'w') as file_pbs:
       file_pbs.write('#!/bin/sh\n')
-      file_pbs.write('#PBS -q o12h\n')
+      file_pbs.write('#PBS -q ' + cis_queue + '\n')
       file_pbs.write('#PBS -l nodes=1:ppn=1\n')
       file_pbs.write('#PBS -N verify_goja_results.py\n')
       file_pbs.write('#PBS -V\n')
@@ -311,6 +308,12 @@ if __name__ == "__main__":
                       default='',
                       help='extra GOJA options, forward options with + instead of -, eg. ++singles not --singles')
 
+  parser.add_argument('-cq', '--cis-queue',
+                      dest='cis_queue',
+                      type=str,
+                      default='o12h',
+                      help='[cis.gov.pl cluster specific option] CIS queue name')
+
   args = parser.parse_args()
   args.ego = args.ego.replace('+','-')
 
@@ -358,7 +361,7 @@ if __name__ == "__main__":
     print("Run missing:")
 
     if args.type_of_run == "locally":
-      if verify_gate_output(path_gate_output, args.type_of_run)>0:
+      if verify_gate_output(path_gate_output, args.type_of_run, args.cis_queue)>0:
         run_simulation(args.type_of_run)
     else:
       if os.path.isfile("./missing_gate_results.txt"):
@@ -382,7 +385,7 @@ if __name__ == "__main__":
       else:
           nr_of_splits = args.nr_of_splits
       splits = linspace(1, nr_of_splits, nr_of_splits)
-      analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0, args.ego)
+      analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, splits, args.eth, args.eth0, args.tw, args.N0, args.ego, args.cis_queue)
 
   elif args.mode == "analyze-missing":
 
@@ -403,26 +406,26 @@ if __name__ == "__main__":
       if os.path.isfile("./missing_goja_results.txt"):
         missing_goja_results = loadtxt("./missing_goja_results.txt")
         if len(missing_goja_results)>0:
-          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0, args.ego)
+          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0, args.ego, args.cis_queue)
 
   elif args.mode == "verify":
 
     print("Verify:")
 
-    verify_gate_output(path_gate_output, args.type_of_run)
-    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
+    verify_gate_output(path_gate_output, args.type_of_run, args.cis_queue)
+    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run, args.cis_queue)
 
   elif args.mode == "verify-gate":
 
     print("Verify (GATE):")
 
-    verify_gate_output(path_gate_output, args.type_of_run)
+    verify_gate_output(path_gate_output, args.type_of_run, args.cis_queue)
 
   elif args.mode == "verify-goja":
 
     print("Verify (GOJA):")
 
-    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run)
+    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run, args.cis_queue)
 
   elif args.mode == "concatenate":
 

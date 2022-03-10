@@ -9,6 +9,7 @@ from matplotlib import rcParams
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import ScalarFormatter
 from numpy import *
+import pandas as pd
 import sys
 
 from nema_common import *
@@ -550,7 +551,7 @@ if __name__ == "__main__":
                       dest='mode',
                       type=str,
                       default="plot_at",
-                      help='mode of the script: plot_at, plot_at_by_types, plot_source, plot_diff, stats, plot_strips_centers, calculate_strips_centers')
+                      help='mode of the script: plot_at, plot_at_by_types, plot_source, plot_diff, stats, plot_strips_centers, calculate_strips_centers, split_coincidences')
 
   parser.add_argument('-gs', '--geometries-set',
                       dest='geometries_set',
@@ -822,3 +823,17 @@ if __name__ == "__main__":
     plt2.xlabel('x [mm]')
     plt2.ylabel('y [mm]')
     plt2.savefig("./strips_centers_vs_averages_differences_" + args.geometries_set + OUTPUT_FORMAT)
+
+  elif args.mode == "split_coincidences":
+
+    coincidences_df = pd.DataFrame(coincidences, columns=["posX1", "posY1", "posZ1", "time1",
+                                              "posX2", "posY2", "posZ2", "time2",
+                                              "volumeID1", "volumeID2", "edep1", "edep2", "toc",
+                                              "sourcePosX1", "sourcePosY1", "sourcePosZ1",
+                                              "sourcePosX2", "sourcePosY2", "sourcePosZ2"])
+    coincidences_df = coincidences_df.astype({"volumeID1": int, "volumeID2": int, "toc": int})
+
+    coincidences_df[coincidences_df["toc"]==1].to_csv(path_coincidences_file + '_true', sep='\t', index=False, header=False)
+    coincidences_df[coincidences_df["toc"]==2].to_csv(path_coincidences_file + '_dsca', sep='\t', index=False, header=False)
+    coincidences_df[coincidences_df["toc"]==3].to_csv(path_coincidences_file + '_psca', sep='\t', index=False, header=False)
+    coincidences_df[coincidences_df["toc"]==4].to_csv(path_coincidences_file + '_acci', sep='\t', index=False, header=False)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -14,6 +14,7 @@ from getpass import getuser
 # Paths:
 ARRAY_PBS_GOJA = "array_goja.pbs"
 ARRAY_PBS_MISSING = "array.pbs.missing"
+missing_goja_results_path = "./missing_goja_results.txt"
 
 def run_simulation(type_of_run):
 
@@ -112,26 +113,30 @@ def verify_gate_output(path_gate_output, type_of_run, cis_queue):
 
   return nr_of_missing_files
 
-def verify_goja_output(path_gate_output, path_goja_output, type_of_run, cis_queue):
+def verify_goja_output(path_gate_output, path_goja_output, single_file_prefix, type_of_run, cis_queue):
 
   nr_of_missing_files = 0
   missing_files = []
+  missing_splits = []
 
   if type_of_run == "locally":
     for fname in os.listdir(path_gate_output):
       if ".root" in fname:
+        split = fname[:-5].replace(single_file_prefix, '')
         path_coincidences = path_goja_output + fname[:-5] + "_coincidences"
         if not os.path.isfile(path_coincidences):
-          print("\tFile ", path_coincidences, " is missing.")
+          print(f"\tFile {path_coincidences} is missing.")
           missing_files.append(path_coincidences)
         path_realtime = path_goja_output + fname[:-5] + "_realtime"
         if not os.path.isfile(path_realtime):
-          print("\tFile ", path_realtime, " is missing.")
+          print(f"\tFile {path_realtime} is missing.")
           missing_files.append(path_realtime)
         path_statistics = path_goja_output + fname[:-5] + "_statistics"
         if not os.path.isfile(path_statistics):
-          print("\tFile ", path_statistics, " is missing.")
+          print(f"\tFile {path_statistics} is missing.")
           missing_files.append(path_statistics)
+        if not os.path.isfile(path_coincidences) or not os.path.isfile(path_realtime) or not os.path.isfile(path_statistics):
+          missing_splits.append(int(split))
     nr_of_missing_files = len(missing_files)
 
   elif type_of_run == "on-cluster":
@@ -148,6 +153,8 @@ def verify_goja_output(path_gate_output, path_goja_output, type_of_run, cis_queu
     # push into queue:
     qsub_command = 'qsub ' + VERIFY_GOJA_RESULTS_PBS
     os.system(qsub_command)
+
+  savetxt(missing_goja_results_path, array(sorted(missing_splits)), fmt="%d")
 
   return nr_of_missing_files, missing_files
 
@@ -391,6 +398,10 @@ if __name__ == "__main__":
 
     print("Analyze missing:")
 
+    if not os.path.isfile(missing_goja_results_path):
+      print("No missing GOJA files. To verify mode verify-goja.")
+      sys.exit()
+
     if args.type_of_run == 'locally':
       gate_result = path_gate_output + "output.root"
       goja_result = path_goja_output + args.single_file_prefix
@@ -403,17 +414,17 @@ if __name__ == "__main__":
         p.wait()
 
     elif args.type_of_run == 'on-cluster':
-      if os.path.isfile("./missing_goja_results.txt"):
-        missing_goja_results = loadtxt("./missing_goja_results.txt")
-        if len(missing_goja_results)>0:
-          analyze_simulations_on_cluster(path_gate_output, path_goja_output, missing_goja_results, args.eth, args.eth0, args.tw, args.N0, args.ego, args.cis_queue)
+      if os.path.isfile(missing_goja_results_path):
+        missing_splits = loadtxt(missing_goja_results_path)
+        if len(missing_splits)>0:
+          analyze_simulations_on_cluster(path_gate_output, args.single_file_prefix, path_goja_output, missing_splits, args.eth, args.eth0, args.tw, args.N0, args.ego, args.cis_queue)
 
   elif args.mode == "verify":
 
     print("Verify:")
 
     verify_gate_output(path_gate_output, args.type_of_run, args.cis_queue)
-    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run, args.cis_queue)
+    verify_goja_output(path_gate_output, path_goja_output, args.single_file_prefix, args.type_of_run, args.cis_queue)
 
   elif args.mode == "verify-gate":
 
@@ -425,7 +436,7 @@ if __name__ == "__main__":
 
     print("Verify (GOJA):")
 
-    verify_goja_output(path_gate_output, path_goja_output, args.type_of_run, args.cis_queue)
+    verify_goja_output(path_gate_output, path_goja_output, args.single_file_prefix, args.type_of_run, args.cis_queue)
 
   elif args.mode == "concatenate":
 

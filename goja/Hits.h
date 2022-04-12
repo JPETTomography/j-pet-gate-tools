@@ -13,7 +13,7 @@
 #include "Hit.h"
 
 struct ConfigParams {
-  explicit ConfigParams(bool singles) {
+  void Init(bool singles) {
     COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
     COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
     TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))*1e3; // [TIME_WINDOW]=ps
@@ -119,7 +119,8 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
-   void FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigParams& params, LoopResults& lr);
+   static void FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigParams& params, LoopResults& lr);
+   static void RunTests();
 };
 
 #endif

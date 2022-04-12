@@ -16,8 +16,8 @@
 using namespace std;
 
 LoopResults Hits::Loop(bool singles) {
-
-  ConfigParams params(singles);
+  ConfigParams params;
+  params.Init(singles);
 
   LoopResults lr;
   if (fChain == 0)
@@ -160,4 +160,21 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
     if (DEBUG)
       cout << "lr.counter_compton_hits_over_the_ETH="
            << lr.counter_compton_hits_over_the_ETH << endl;
+}
+
+
+void Hits::RunTests() 
+{
+  Hit hit1;
+  hit1.time = 10;
+  Hit hit2;
+  hit2.time = 20;
+  vector<Hit> hits = {hit1,hit2};
+  ConfigParams params;
+  params.TIME_WINDOW =5;
+  params.EVENTS_SEPARATION_USING_TIME_WINDOW = 1;
+  params.EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 0;
+  LoopResults res;
+  Hits::FindAndDumpCoincidences(hits,params,res);
+
 }

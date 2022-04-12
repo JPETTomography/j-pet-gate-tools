@@ -16,6 +16,7 @@
 using namespace std;
 
 LoopResults Hits::Loop(bool singles) {
+  std::cout << "starting Loop" << std::endl;
 
   double COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
@@ -26,11 +27,14 @@ LoopResults Hits::Loop(bool singles) {
   else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
   EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
 
+  std::cout << "reading input params" << std::endl;
   LoopResults lr;
   if (fChain == 0)
     return lr;
 
+  std::cout << "fChain->GetEntriesFast()" << std::endl;
   Long64_t nentries = fChain->GetEntriesFast();
+  std::cout << "after fChain->GetEntriesFast()" << std::endl;
   vector<Hit> hits;
 
   auto hitIsCompton = [](const string& procName, const string& treeName)->bool { 
@@ -47,6 +51,7 @@ LoopResults Hits::Loop(bool singles) {
       return hit_is_proper;
   };
 
+  std::cout << "before for entries" << std::endl;
   for (Long64_t jentry=0; jentry<nentries; jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
@@ -66,18 +71,28 @@ LoopResults Hits::Loop(bool singles) {
     hit.sourcePosZ = sourcePosZ;
     hit.nPhantomCompton = nPhantomCompton;
     hit.nCrystalCompton = nCrystalCompton;
-    string procName = string(processName);
+    std::string procName = std::string(processName);
 
     std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
+    std::cout << "before hitIsCompton" << std::endl;
+    std::cout << "procName:"<< procName << std::endl;
+    std::cout << "procesName:"<< procName.c_str() << std::endl;
+    std::cout << "procesName[0]:"<< processName[0] << std::endl;
+    std::cout << "procesName[1]:"<< processName[1] << std::endl;
+    std::cout << "tree_name:"<< tree_name << std::endl;
         
     if(hitIsCompton(procName, tree_name)) { // the photon is scattered using Compton scattering
       lr.counter_all_compton_hits += 1;
+      std::cout << "hitIsCompton" << std::endl;
       if (hitIsProper(hit, tree_name, PDGEncoding, nPhantomRayleigh, nCrystalRayleigh, COMPTON_E_TH_0)) {
+        std::cout << "hitIsProper" << std::endl;
         hits.push_back(hit);
       }
     }
   }
 
+  std::cout << "after for" << std::endl;
+  std::cout << "hits size-2:" << hits.size() << std::endl;
   if (EVENTS_SEPARATION_USING_TIME_WINDOW) {
     sort_hits(hits, "TIME");
   } else {
@@ -88,26 +103,34 @@ LoopResults Hits::Loop(bool singles) {
       assert(1 == 0);
     }
   }
+  std::cout << "after for" << std::endl;
+  std::cout << "hits size-1:" << hits.size() << std::endl;
 
-    lr.counter_compton_hits_over_the_ETH0 = hits.size();
-    if (DEBUG) {
-      cout.setf(ios::fixed);
-      cout << "lr.counter_all_compton_hits=" << lr.counter_all_compton_hits
-           << endl;
-      cout << "lr.counter_compton_hits_over_the_ETH0="
-           << lr.counter_compton_hits_over_the_ETH0 << endl;
-    }
-
-    FindAndDumpCoincidences(hits, COMPTON_E_TH, singles, EVENTS_SEPARATION_USING_TIME_WINDOW, EVENTS_SEPARATION_USING_IDS_OF_EVENTS, TIME_WINDOW, lr);
-    return lr;
+  lr.counter_compton_hits_over_the_ETH0 = hits.size();
+  if (DEBUG) {
+    cout.setf(ios::fixed);
+    cout << "lr.counter_all_compton_hits=" << lr.counter_all_compton_hits
+         << endl;
+    cout << "lr.counter_compton_hits_over_the_ETH0="
+         << lr.counter_compton_hits_over_the_ETH0 << endl;
   }
 
-void Hits::FindAndDumpCoincidences(std::vector<Hit> &hits, double compton_e_th, bool singles, int EVENTS_SEPARATION_USING_TIME_WINDOW, int EVENTS_SEPARATION_USING_IDS_OF_EVENTS, double TIME_WINDOW,  LoopResults& lr)
+  std::cout << "hits size0:" << hits.size() << std::endl;
+  std::cout << "before FindAndDumpCoincidences" << std::endl;
+  FindAndDumpCoincidences(hits, COMPTON_E_TH, singles, EVENTS_SEPARATION_USING_TIME_WINDOW, EVENTS_SEPARATION_USING_IDS_OF_EVENTS, TIME_WINDOW, lr);
+  std::cout << "after FindAndDumpCoincidences" << std::endl;
+  return lr;
+}
+
+void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_e_th, bool singles, int EVENTS_SEPARATION_USING_TIME_WINDOW, int EVENTS_SEPARATION_USING_IDS_OF_EVENTS, double TIME_WINDOW,  LoopResults& lr)
 {
+  std::cout << "starting  FindAndDumpCoincidences" << std::endl;
+  std::cout << "hits size1:" << hits.size() << std::endl;
     vector<Hit> event;
     int start_window_eventID = 0;
     double start_window_time = 0.;
     for (unsigned int i = 0; i < hits.size(); i++) {
+      std::cout << "starting  for loop for i:"<< i << std::endl;
       auto hit = hits[i];
       if (DEBUG)
         cout << "hit.edep=" << hit.edep << "\thit.time=" << hit.time
@@ -151,6 +174,8 @@ void Hits::FindAndDumpCoincidences(std::vector<Hit> &hits, double compton_e_th, 
       }
     }
     // the last event
+
+    std::cout << "before the last event" << std::endl;
     if (event.size() >= 1) {
       lr.multiplicities.push_back(event.size());
       if (event.size() >=
@@ -161,8 +186,11 @@ void Hits::FindAndDumpCoincidences(std::vector<Hit> &hits, double compton_e_th, 
       event.clear(); // the last event is destroyed
     }
 
-    lr.real_time = hits[hits.size() - 1].time - hits[0].time;
+    std::cout << "some real_time shit" << std::endl;
+    std::cout << "hits size:" << hits.size() << std::endl;
+    lr.real_time = hits.at(hits.size() - 1).time - hits.at(0).time;
     if (DEBUG)
       cout << "lr.counter_compton_hits_over_the_ETH="
            << lr.counter_compton_hits_over_the_ETH << endl;
+    std::cout << "finito" << std::endl;
 }

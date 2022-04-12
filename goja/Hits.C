@@ -9,10 +9,12 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 #include <math.h>
 
 #include "EventAnalysis.h"
 #include "Common.h"
+
 
 LoopResults Hits::Loop(bool singles) {
 
@@ -30,15 +32,12 @@ LoopResults Hits::Loop(bool singles) {
     return lr;
 
   Long64_t nentries = fChain->GetEntriesFast();
-  Long64_t nbytes = 0, nb = 0;
 
   vector<Hit> hits;
 
   for (Long64_t jentry=0; jentry<nentries; jentry++) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
-    nb = fChain->GetEntry(jentry);
-    nbytes += nb;
 
     Hit hit;
     hit.eventID = eventID;
@@ -98,9 +97,13 @@ LoopResults Hits::Loop(bool singles) {
       }
     }
     else {
-      bool hit_in_event;
-      if (EVENTS_SEPARATION_USING_TIME_WINDOW) hit_in_event = (hit.time-start_window_time)<TIME_WINDOW;
-      else if (EVENTS_SEPARATION_USING_IDS_OF_EVENTS) hit_in_event = hit.eventID==start_window_eventID;
+      bool hit_in_event = false;
+      if (EVENTS_SEPARATION_USING_TIME_WINDOW) {
+        hit_in_event = (hit.time - start_window_time) < TIME_WINDOW;
+      } else {
+        if (EVENTS_SEPARATION_USING_IDS_OF_EVENTS)
+          hit_in_event = hit.eventID == start_window_eventID;
+      }
       if (hit_in_event) { // if the current hit belongs to the current event
         event.push_back(hit); // then it is added to the current event
       }

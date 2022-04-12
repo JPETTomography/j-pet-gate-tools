@@ -12,6 +12,27 @@
 
 #include "Hit.h"
 
+struct ConfigParams {
+  explicit ConfigParams(bool singles) {
+    COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
+    COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
+    TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))*1e3; // [TIME_WINDOW]=ps
+    int sep = int(atof(getenv("GOJA_SEP")));
+    if (sep==0) EVENTS_SEPARATION_USING_TIME_WINDOW=1;
+    else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
+    EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
+    SINGLES = singles;
+  }
+
+  double COMPTON_E_TH_0 = -1;
+  double COMPTON_E_TH= -1;
+  double TIME_WINDOW =-1;
+  int EVENTS_SEPARATION_USING_TIME_WINDOW = -1; 
+  int EVENTS_SEPARATION_USING_IDS_OF_EVENTS = -1; 
+  bool SINGLES = false;
+
+};
+
 struct LoopResults {
   LoopResults() : real_time(0.),
                   multiplicities(std::vector<int>()),
@@ -98,7 +119,7 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 
-   void FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_e_th, bool singles, int EVENTS_SEPARATION_USING_TIME_WINDOW, int EVENTS_SEPARATION_USING_IDS_OF_EVENTS, double TIME_WINDOW, LoopResults& lr);
+   void FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigParams& params, LoopResults& lr);
 };
 
 #endif

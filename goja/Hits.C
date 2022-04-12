@@ -17,14 +17,7 @@ using namespace std;
 
 LoopResults Hits::Loop(bool singles) {
 
-  double COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
-  double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
-  double TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))*1e3; // [TIME_WINDOW]=ps
-  int EVENTS_SEPARATION_USING_TIME_WINDOW, EVENTS_SEPARATION_USING_IDS_OF_EVENTS;
-  int sep = int(atof(getenv("GOJA_SEP")));
-  if (sep==0) EVENTS_SEPARATION_USING_TIME_WINDOW=1;
-  else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
-  EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
+  ConfigParams params(singles);
 
   LoopResults lr;
   if (fChain == 0)
@@ -73,16 +66,16 @@ LoopResults Hits::Loop(bool singles) {
         
     if(hitIsCompton(procName, tree_name)) { // the photon is scattered using Compton scattering
       lr.counter_all_compton_hits += 1;
-      if (hitIsProper(hit, tree_name, PDGEncoding, nPhantomRayleigh, nCrystalRayleigh, COMPTON_E_TH_0)) {
+      if (hitIsProper(hit, tree_name, PDGEncoding, nPhantomRayleigh, nCrystalRayleigh, params.COMPTON_E_TH_0)) {
         hits.push_back(hit);
       }
     }
   }
 
-  if (EVENTS_SEPARATION_USING_TIME_WINDOW) {
+  if (params.EVENTS_SEPARATION_USING_TIME_WINDOW) {
     sort_hits(hits, "TIME");
   } else {
-    if (EVENTS_SEPARATION_USING_IDS_OF_EVENTS) {
+    if (params.EVENTS_SEPARATION_USING_IDS_OF_EVENTS) {
       sort_hits(hits, "EVENTID");
     } else {
       // this should never happen
@@ -99,11 +92,11 @@ LoopResults Hits::Loop(bool singles) {
          << lr.counter_compton_hits_over_the_ETH0 << endl;
   }
 
-  FindAndDumpCoincidences(hits, COMPTON_E_TH, singles, EVENTS_SEPARATION_USING_TIME_WINDOW, EVENTS_SEPARATION_USING_IDS_OF_EVENTS, TIME_WINDOW, lr);
+  FindAndDumpCoincidences(hits, params, lr);
   return lr;
 }
 
-void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_e_th, bool singles, int EVENTS_SEPARATION_USING_TIME_WINDOW, int EVENTS_SEPARATION_USING_IDS_OF_EVENTS, double TIME_WINDOW,  LoopResults& lr)
+void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigParams& params, LoopResults& lr)
 {
     vector<Hit> event;
     int start_window_eventID = 0;
@@ -115,7 +108,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_
              << "\tstart_window_time=" << start_window_time
              << "\thit.eventID=" << hit.eventID << endl;
       if (event.size() == 0) {
-        if (hit.edep > compton_e_th) {
+        if (hit.edep > params.COMPTON_E_TH) {
           event.push_back(
               hit); // start forming the event with the hit with edep>E_TH
           start_window_time = hit.time;
@@ -124,10 +117,10 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_
         }
       } else {
         bool hit_in_event = false;
-        if (EVENTS_SEPARATION_USING_TIME_WINDOW) {
-          hit_in_event = (hit.time - start_window_time) < TIME_WINDOW;
+        if (params.EVENTS_SEPARATION_USING_TIME_WINDOW) {
+          hit_in_event = (hit.time - start_window_time) < params.TIME_WINDOW;
         } else {
-          if (EVENTS_SEPARATION_USING_IDS_OF_EVENTS)
+          if (params.EVENTS_SEPARATION_USING_IDS_OF_EVENTS)
             hit_in_event = hit.eventID == start_window_eventID;
         }
         if (hit_in_event) { // if the current hit belongs to the current event
@@ -138,10 +131,10 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_
               2) { // if the number of hits in the current event is at least 2
             EventAnalysis ea;
             ea.analyze_event(event,
-                             singles); // then the current event is analyzed
+                             params.SINGLES); // then the current event is analyzed
           }
           event.clear();                 // the current event is destroyed
-          if (hit.edep > compton_e_th) { // start forming the event with the hit
+          if (hit.edep > params.COMPTON_E_TH) { // start forming the event with the hit
                                          // with edep>E_TH
             event.push_back(hit);
             start_window_time = hit.time;
@@ -158,7 +151,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, double compton_
       if (event.size() >=
           2) { // if the number of hits in the last event is at least 2
         EventAnalysis ea;
-        ea.analyze_event(event, singles); // then the last event is analyzed
+        ea.analyze_event(event, params.SINGLES); // then the last event is analyzed
       }
       event.clear(); // the last event is destroyed
     }

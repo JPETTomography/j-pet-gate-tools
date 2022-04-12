@@ -97,6 +97,8 @@ public :
    virtual LoopResults Loop(bool singles);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+
+   void FindAndDumpCoincidences(std::vector<Hit> &hits, double compton_e_th, bool singles, int EVENTS_SEPARATION_USING_TIME_WINDOW, int EVENTS_SEPARATION_USING_IDS_OF_EVENTS, double TIME_WINDOW, LoopResults& lr);
 };
 
 #endif

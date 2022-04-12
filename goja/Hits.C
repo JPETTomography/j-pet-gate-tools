@@ -4,8 +4,6 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,6 +13,7 @@ using namespace std;
 #include "EventAnalysis.h"
 #include "Common.h"
 
+using namespace std;
 
 LoopResults Hits::Loop(bool singles) {
 

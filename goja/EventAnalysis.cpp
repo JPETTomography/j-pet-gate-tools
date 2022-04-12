@@ -5,6 +5,8 @@
 
 #include "EventAnalysis.h"
 
+using namespace std;
+
 //================================================================================
 // MATHEMATICAL AND ADDITIONAL FUNCTIONS
 //================================================================================
@@ -112,7 +114,7 @@ EventAnalysis::EventAnalysis() {
 
 }
 
-void EventAnalysis::select_coincident_hits(vector<Hit> &hits) {
+void EventAnalysis::select_coincident_hits(const vector<Hit> &hits) {
 
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
 
@@ -160,7 +162,7 @@ void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
 
 }
 
-EventType EventAnalysis::verify_type_of_coincidence(Hit &h1, Hit &h2) {
+EventType EventAnalysis::verify_type_of_coincidence(const Hit &h1,const  Hit &h2) const {
 
   EventType t = kUnspecified;
 

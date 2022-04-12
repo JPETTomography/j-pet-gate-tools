@@ -1,8 +1,6 @@
 #ifndef EventAnalysis_h
 #define EventAnalysis_h
 
-using namespace std;
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,12 +28,12 @@ enum AveragingMethod {
   kEnergyWinner = 4
 };
 
-void sort_hits(vector<Hit> &hits, string key);
+void sort_hits(std::vector<Hit> &hits, std::string key);
 Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
 class EventAnalysis {
 
-  vector<Hit> coincident_hits;
+  std::vector<Hit> coincident_hits;
   int N;
   int N0;
 
@@ -43,11 +41,11 @@ public :
 
   EventAnalysis();
 
-  void select_coincident_hits(vector<Hit> &hits);
+  void select_coincident_hits(const std::vector<Hit>& hits);
   void select_coincident_singles(const std::vector<Hit> &hits);
-  EventType verify_type_of_coincidence(Hit &h1, Hit &h2);
+  EventType verify_type_of_coincidence(const Hit &h1,const Hit &h2) const;
   void print_coincidences();
-  void analyze_event(vector<Hit> &hits, bool hits_are_singles = true);
+  void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
 
 };
 

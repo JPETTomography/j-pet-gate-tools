@@ -14,12 +14,12 @@
 
 struct LoopResults {
   LoopResults() : real_time(0.),
-                  multiplicities(vector<int>()),
+                  multiplicities(std::vector<int>()),
                   counter_all_compton_hits(0),
                   counter_compton_hits_over_the_ETH0(0),
                   counter_compton_hits_over_the_ETH(0) {}
   double real_time;
-  vector<int> multiplicities;
+  std::vector<int> multiplicities;
   int counter_all_compton_hits;
   int counter_compton_hits_over_the_ETH0;
   int counter_compton_hits_over_the_ETH;
@@ -200,7 +200,7 @@ void Hits::Init(TTree *tree)
      fChain->SetBranchAddress("RayleighCrystal", &nCrystalRayleigh, &b_nCrystalRayleigh);
    }
    fChain->SetBranchAddress("time", &time, &b_time);
-   string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+  std::string systemType = std::string(getenv("GOJA_SYSTEM_TYPE"));
    if (systemType == "cylindricalPET")
      fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);

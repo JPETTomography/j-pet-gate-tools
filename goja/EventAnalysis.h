@@ -29,7 +29,7 @@ enum AveragingMethod {
 };
 
 void sort_hits(std::vector<Hit> &hits, std::string key);
-Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
+Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
 class EventAnalysis {
 
@@ -44,7 +44,7 @@ public :
   void select_coincident_hits(const std::vector<Hit>& hits);
   void select_coincident_singles(const std::vector<Hit> &hits);
   EventType verify_type_of_coincidence(const Hit &h1,const Hit &h2) const;
-  void print_coincidences();
+  void print_coincidences(const std::vector<Hit>& hits);
   void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
 
 };

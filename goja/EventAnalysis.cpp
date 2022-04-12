@@ -1,7 +1,7 @@
 #include <map>
-//#include <math.h>
 #include <string>
 #include <sstream>
+#include <cassert>
 
 #include "EventAnalysis.h"
 
@@ -36,27 +36,27 @@ void sort_hits(vector<Hit> &hits, string key) {
 
 }
 
-Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
+Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
 
-  const unsigned int N = hits.size();
+  const unsigned int nHits = hits.size();
   Hit h;
   h.eventID = hits[0].eventID;
   h.volumeID = hits[0].volumeID;
-  for (unsigned int i=0; i<N; i++) h.edep += hits[i].edep;
+  for (unsigned int i=0; i<nHits; i++) h.edep += hits[i].edep;
   if (winner == kCentroidWinnerNaivelyWeighted) {
-    for (unsigned int i=0; i<N; i++) {
+    for (unsigned int i=0; i<nHits; i++) {
       h.time += hits[i].time;
       h.posX += hits[i].posX;
       h.posY += hits[i].posY;
       h.posZ += hits[i].posZ;
     }
-    h.time /= N;
-    h.posX /= N;
-    h.posY /= N;
-    h.posZ /= N;
+    h.time /= nHits;
+    h.posX /= nHits;
+    h.posY /= nHits;
+    h.posZ /= nHits;
   }
   else if (winner == kCentroidWinnerEnergyWeighted) {
-    for (unsigned int i=0; i<N; i++) {
+    for (unsigned int i=0; i<nHits; i++) {
       h.time += hits[i].time * hits[i].edep;
       h.posX += hits[i].posX * hits[i].edep;
       h.posY += hits[i].posY * hits[i].edep;
@@ -69,11 +69,11 @@ Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentr
   }
   else if (winner == kCentroidWinnerEnergyWeightedFirstTime) {
     std::vector<double> times;
-    for (unsigned int i = 0; i<N; i++) times.push_back(hits[i].time);
+    for (unsigned int i = 0; i<nHits; i++) times.push_back(hits[i].time);
     unsigned int min_index = std::distance(times.begin(),
                                            std::min_element(times.begin(), times.end()));
     h.time = hits[min_index].time;
-    for (unsigned int i=0; i<N; i++) {
+    for (unsigned int i=0; i<nHits; i++) {
       h.posX += hits[i].posX * hits[i].edep;
       h.posY += hits[i].posY * hits[i].edep;
       h.posZ += hits[i].posZ * hits[i].edep;
@@ -84,7 +84,7 @@ Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentr
   }
   else if (winner == kEnergyWinner) {
     std::vector<double> energies;
-    for (unsigned int i = 0; i<N; i++) energies.push_back(hits[i].edep);
+    for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
     unsigned int max_index = std::distance(energies.begin(),
                                            std::max_element(energies.begin(), energies.end()));
     h.time = hits[max_index].time;
@@ -98,7 +98,6 @@ Hit add_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentr
   h.nPhantomCompton = hits[0].nPhantomCompton;
   h.nCrystalCompton = hits[0].nCrystalCompton;
   return h;
-
 }
 
 
@@ -150,7 +149,7 @@ void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
   vector<Hit> singles;
   map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
   while(it_tmp != singles_tmp.end()) {
-    singles.push_back(add_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
+    singles.push_back(merge_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
     it_tmp++;
   }
 
@@ -191,12 +190,13 @@ EventType EventAnalysis::verify_type_of_coincidence(const Hit &h1,const  Hit &h2
 // PRINTING
 //================================================================================
 
-void EventAnalysis::print_coincidences() {
+void EventAnalysis::print_coincidences(const std::vector<Hit>& hits) {
 
+  assert(hits.size() ==2);
   cout.setf(ios::fixed);
 
-  Hit h1 = coincident_hits[0];
-  Hit h2 = coincident_hits[1];
+  Hit h1 = hits[0];
+  Hit h2 = hits[1];
 
   cout.precision(2);
   cout << h1.posX/10. << "\t" << h1.posY/10. << "\t" << h1.posZ/10. << "\t";
@@ -242,7 +242,7 @@ void EventAnalysis::analyze_event(vector<Hit> &hits, bool hits_are_singles)
     select_coincident_hits(hits);
   }
 
-  if (N==MAX_N and N0<=MAX_N0) print_coincidences();
+  if (N==MAX_N and N0<=MAX_N0) print_coincidences(coincident_hits);
 
   if (DEBUG) {
     cout.setf(ios::fixed);

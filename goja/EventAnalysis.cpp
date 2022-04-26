@@ -119,8 +119,6 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
   return h;
 }
 
-
-
 namespace event_analysis{
 
 
@@ -156,20 +154,14 @@ std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vec
     }
   }
 
+  /// WK: Why it is always centroid here?
   vector<Hit> singles;
   map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
   while(it_tmp != singles_tmp.end()) {
     singles.push_back(merge_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
     it_tmp++;
   }
-
-  int nb_above_noise_treshold = singles.size();
-  std::vector<Hit> selected_hits;
-  for (unsigned int i=0; i<singles.size(); i++) {
-    if (singles[i].edep>compton_energy_threshold) selected_hits.push_back(singles[i]);
-  }
-  int nb_above_compton_threshold = selected_hits.size();
-  return std::make_tuple(nb_above_noise_treshold, nb_above_compton_threshold, selected_hits);
+  return select_coincident_hits(singles, compton_energy_threshold);
 }
 
 EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
@@ -250,10 +242,10 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
 
   std::vector<Hit> selected_hits;
   if (hits_are_singles) {
-    std::tie(N0, N, selected_hits)=select_coincident_singles(hits, COMPTON_E_TH);
+    std::tie(N0, N, selected_hits) = select_coincident_singles(hits, COMPTON_E_TH);
   }
   else {
-    std::tie(N0, N, selected_hits)= select_coincident_hits(hits, COMPTON_E_TH);
+    std::tie(N0, N, selected_hits) = select_coincident_hits(hits, COMPTON_E_TH);
   }
 
   /// WK: Why N==MAX_N and N0<=MAX_N0

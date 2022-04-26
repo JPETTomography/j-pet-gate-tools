@@ -101,8 +101,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
     vector<Hit> event;
     int start_window_eventID = 0;
     double start_window_time = 0.;
-    for (unsigned int i = 0; i < hits.size(); i++) {
-      auto hit = hits[i];
+    for (const auto &hit : hits) {
       if (DEBUG)
         cout << "hit.edep=" << hit.edep << "\thit.time=" << hit.time
              << "\tstart_window_time=" << start_window_time

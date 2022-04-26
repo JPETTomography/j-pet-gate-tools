@@ -260,4 +260,4 @@ void Hits::Show(Long64_t entry)
    fChain->Show(entry);
 }
 
-#endif // #ifdef Hits_cxx
+#endif

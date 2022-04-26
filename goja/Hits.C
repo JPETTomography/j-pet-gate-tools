@@ -92,7 +92,7 @@ LoopResults Hits::Loop(bool singles) {
          << lr.counter_compton_hits_over_the_ETH0 << endl;
   }
 
-  FindAndDumpCoincidences(hits, params, lr);
+  Hits::FindAndDumpCoincidences(hits, params, lr);
   return lr;
 }
 
@@ -129,8 +129,8 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
           lr.multiplicities.push_back(event.size());
           if (event.size() >=
               2) { // if the number of hits in the current event is at least 2
-            EventAnalysis ea;
-            ea.analyze_event(event,
+            
+            event_analysis::analyze_event(event,
                              params.SINGLES); // then the current event is analyzed
           }
           event.clear();                 // the current event is destroyed
@@ -150,8 +150,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
       lr.multiplicities.push_back(event.size());
       if (event.size() >=
           2) { // if the number of hits in the last event is at least 2
-        EventAnalysis ea;
-        ea.analyze_event(event, params.SINGLES); // then the last event is analyzed
+        event_analysis::analyze_event(event, params.SINGLES); // then the last event is analyzed
       }
       event.clear(); // the last event is destroyed
     }

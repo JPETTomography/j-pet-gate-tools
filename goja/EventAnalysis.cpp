@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "EventAnalysis.h"
+#include "Hits.h"
 
 using namespace std;
 
@@ -119,34 +120,25 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
 }
 
 
-//================================================================================
-// DEFINITIONS OF CLASS FUNCTIONS - BASIC ANALYSIS
-//================================================================================
 
-EventAnalysis::EventAnalysis() {
+namespace event_analysis{
 
-  coincident_hits.clear();
-  N0 = 0;
-  N = 0;
 
-}
+std::tuple<int, int, std::vector<Hit>> select_coincident_hits(const vector<Hit> &hits, double compton_energy_threshold) 
+{
+  std::vector<Hit> selected_hits;
 
-void EventAnalysis::select_coincident_hits(const vector<Hit> &hits) {
-
-  double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
-
-  N0 = hits.size();
+  int nb_above_noise_treshold = hits.size();
   for (unsigned int i=0; i<hits.size(); i++) {
-    if (hits[i].edep>COMPTON_E_TH) coincident_hits.push_back(hits[i]);
+    if (hits[i].edep> compton_energy_threshold) selected_hits.push_back(hits[i]);
   }
-  N = coincident_hits.size();
-
+  int nb_above_compton_threshold = selected_hits.size();
+  return std::make_tuple(nb_above_noise_treshold, nb_above_compton_threshold, selected_hits);
 }
 
-void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
+std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold) {
 
   const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
-  const double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
 
   map<string, vector<Hit>> singles_tmp;
   for (unsigned int i=0; i<hits.size(); i++) {
@@ -171,15 +163,16 @@ void EventAnalysis::select_coincident_singles(const std::vector<Hit> &hits) {
     it_tmp++;
   }
 
-  N0 = singles.size();
+  int nb_above_noise_treshold = singles.size();
+  std::vector<Hit> selected_hits;
   for (unsigned int i=0; i<singles.size(); i++) {
-    if (singles[i].edep>COMPTON_E_TH) coincident_hits.push_back(singles[i]);
+    if (singles[i].edep>compton_energy_threshold) selected_hits.push_back(singles[i]);
   }
-  N = coincident_hits.size();
-
+  int nb_above_compton_threshold = selected_hits.size();
+  return std::make_tuple(nb_above_noise_treshold, nb_above_compton_threshold, selected_hits);
 }
 
-EventType EventAnalysis::verify_type_of_coincidence(const Hit &h1,const  Hit &h2) const {
+EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
 
   EventType t = kUnspecified;
 
@@ -208,7 +201,7 @@ EventType EventAnalysis::verify_type_of_coincidence(const Hit &h1,const  Hit &h2
 // PRINTING
 //================================================================================
 
-void EventAnalysis::print_coincidences(const std::vector<Hit>& hits) {
+void print_coincidences(const std::vector<Hit>& hits) {
 
   assert(hits.size() ==2);
   cout.setf(ios::fixed);
@@ -245,22 +238,26 @@ void EventAnalysis::print_coincidences(const std::vector<Hit>& hits) {
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void EventAnalysis::analyze_event(vector<Hit> &hits, bool hits_are_singles)
+void analyze_event(vector<Hit> &hits, bool hits_are_singles)
 {
 
+  double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
-
+  int N =0;
+  int N0 =0;
   sort_hits(hits, "TIME");
 
+  std::vector<Hit> selected_hits;
   if (hits_are_singles) {
-    select_coincident_singles(hits);
+    std::tie(N0, N, selected_hits)=select_coincident_singles(hits, COMPTON_E_TH);
   }
   else {
-    select_coincident_hits(hits);
+    std::tie(N0, N, selected_hits)= select_coincident_hits(hits, COMPTON_E_TH);
   }
 
-  if (N==MAX_N and N0<=MAX_N0) print_coincidences(coincident_hits);
+  /// WK: Why N==MAX_N and N0<=MAX_N0
+  if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
 
   if (DEBUG) {
     cout.setf(ios::fixed);
@@ -285,4 +282,5 @@ void EventAnalysis::analyze_event(vector<Hit> &hits, bool hits_are_singles)
     }
   }
 
+}
 }

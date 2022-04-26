@@ -43,8 +43,11 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
   h.eventID = hits[0].eventID;
   h.volumeID = hits[0].volumeID;
   for (unsigned int i=0; i<nHits; i++) h.edep += hits[i].edep;
-  if (winner == kCentroidWinnerNaivelyWeighted) {
-    for (unsigned int i=0; i<nHits; i++) {
+
+  switch (winner) {
+
+  case kCentroidWinnerNaivelyWeighted: {
+    for (unsigned int i = 0; i < nHits; i++) {
       h.time += hits[i].time;
       h.posX += hits[i].posX;
       h.posY += hits[i].posY;
@@ -54,9 +57,11 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
     h.posX /= nHits;
     h.posY /= nHits;
     h.posZ /= nHits;
+    break;
   }
-  else if (winner == kCentroidWinnerEnergyWeighted) {
-    for (unsigned int i=0; i<nHits; i++) {
+
+  case kCentroidWinnerEnergyWeighted: {
+    for (unsigned int i = 0; i < nHits; i++) {
       h.time += hits[i].time * hits[i].edep;
       h.posX += hits[i].posX * hits[i].edep;
       h.posY += hits[i].posY * hits[i].edep;
@@ -66,14 +71,17 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
     h.posX /= h.edep;
     h.posY /= h.edep;
     h.posZ /= h.edep;
+    break;
   }
-  else if (winner == kCentroidWinnerEnergyWeightedFirstTime) {
+
+  case kCentroidWinnerEnergyWeightedFirstTime: {
     std::vector<double> times;
-    for (unsigned int i = 0; i<nHits; i++) times.push_back(hits[i].time);
-    unsigned int min_index = std::distance(times.begin(),
-                                           std::min_element(times.begin(), times.end()));
+    for (unsigned int i = 0; i < nHits; i++)
+      times.push_back(hits[i].time);
+    unsigned int min_index = std::distance(
+        times.begin(), std::min_element(times.begin(), times.end()));
     h.time = hits[min_index].time;
-    for (unsigned int i=0; i<nHits; i++) {
+    for (unsigned int i = 0; i < nHits; i++) {
       h.posX += hits[i].posX * hits[i].edep;
       h.posY += hits[i].posY * hits[i].edep;
       h.posZ += hits[i].posZ * hits[i].edep;
@@ -81,16 +89,26 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
     h.posX /= h.edep;
     h.posY /= h.edep;
     h.posZ /= h.edep;
+    break;
   }
-  else if (winner == kEnergyWinner) {
+
+  case kEnergyWinner: {
     std::vector<double> energies;
-    for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
-    unsigned int max_index = std::distance(energies.begin(),
-                                           std::max_element(energies.begin(), energies.end()));
+    // for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
+    unsigned int max_index = std::distance(
+        energies.begin(), std::max_element(energies.begin(), energies.end()));
     h.time = hits[max_index].time;
     h.posX = hits[max_index].posX;
     h.posY = hits[max_index].posY;
     h.posZ = hits[max_index].posZ;
+    break;
+  }
+
+  default: {
+    /// should never happen
+    assert(1 == 0);
+    break;
+  }
   }
   h.sourcePosX = hits[0].sourcePosX;
   h.sourcePosY = hits[0].sourcePosY;

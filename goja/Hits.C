@@ -73,10 +73,10 @@ LoopResults Hits::Loop(bool singles) {
   }
 
   if (params.EVENTS_SEPARATION_USING_TIME_WINDOW) {
-    sort_hits(hits, "TIME");
+    event_analysis::sort_hits(hits, "TIME");
   } else {
     if (params.EVENTS_SEPARATION_USING_IDS_OF_EVENTS) {
-      sort_hits(hits, "EVENTID");
+      event_analysis::sort_hits(hits, "EVENTID");
     } else {
       // this should never happen
       assert(1 == 0);

@@ -9,6 +9,7 @@
 
 #include "boost/program_options.hpp"
 
+#include "EventAnalysis.h"
 #include "Hits.h"
 
 #define SET_GOJA_ENV_VAR(option, variable, default_value) { \
@@ -92,6 +93,7 @@ int main (int argc, char* argv[]) {
 
   if(areTestsOn) {
     Hits::RunTests();
+    event_analysis::RunTests();
     return 1;
   }
 

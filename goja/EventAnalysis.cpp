@@ -14,6 +14,8 @@ using namespace std;
 
 // struct used for sorting vectors of hits (functor)
 
+namespace event_analysis{
+
 struct EntityComp {
 
   string property;
@@ -38,8 +40,16 @@ void sort_hits(vector<Hit> &hits, string key) {
 }
 
 Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCentroidWinnerEnergyWeightedFirstTime) {
-
   const unsigned int nHits = hits.size();
+  /// WK: temporary checks for debugs to be switched off
+  assert(nHits > 0); 
+  if (nHits > 0) {
+    auto eID = hits[0].eventID;
+    auto vID = hits[0].volumeID;
+    assert(std::all_of(hits.begin(), hits.end(), [eID](const Hit& h)->bool { return h.eventID == eID; }));
+    assert(std::all_of(hits.begin(), hits.end(), [vID](const Hit& h)->bool { return h.volumeID == vID; }));
+  } 
+  /// WK: end
   Hit h;
   h.eventID = hits[0].eventID;
   h.volumeID = hits[0].volumeID;
@@ -119,7 +129,6 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
   return h;
 }
 
-namespace event_analysis{
 
 
 std::tuple<int, int, std::vector<Hit>> select_coincident_hits(const vector<Hit> &hits, double compton_energy_threshold) 
@@ -274,5 +283,29 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
     }
   }
 
+}
+
+void RunTests()
+{
+  const double epsilon = 0.000001;
+  Hit h1;
+  h1.edep = 10;
+  Hit h2;
+  h2.edep = 80;
+  Hit h3;
+  h2.edep = 50;
+  std::vector<Hit> hits = {h1, h2, h3};
+  for (auto& h : hits)
+  {
+    h.eventID = 10;
+    h.volumeID = 9;
+  }
+  auto mergedHit = merge_hits(hits, kEnergyWinner);
+  std::cout << mergedHit.edep << std::endl;
+  // WK: this test breaks I guess the energy of the merged hit is wrongly assigned
+  /// It should be the energy of the highest hit, so 80
+  // assert(std::abs(mergedHit.edep - 80) < epsilon);
+  assert(mergedHit.eventID == 10);
+  assert(mergedHit.volumeID == 9);
 }
 }

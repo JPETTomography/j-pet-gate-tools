@@ -12,6 +12,8 @@
 #include "Hit.h"
 #include "Common.h"
 
+namespace event_analysis{
+
 enum EventType {
   kUnspecified = 0,
   kTrue = 1,
@@ -31,7 +33,7 @@ enum AveragingMethod {
 void sort_hits(std::vector<Hit> &hits, std::string key);
 Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
-namespace event_analysis{
+  void RunTests();
   /// returns number of hits above noise energy threshold, number of hits above Compton energy threshold, and selected hits
   std::tuple<int, int, std::vector<Hit>> select_coincident_hits(const std::vector<Hit> &hits, double compton_energy_threshold);
   /// returns number of singles above noise energy threshold, number of singles above Compton energy threshold, and selected singles

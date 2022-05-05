@@ -163,11 +163,10 @@ std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vec
     }
   }
 
-  /// WK: Why it is always centroid here?
   vector<Hit> singles;
   map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
   while(it_tmp != singles_tmp.end()) {
-    singles.push_back(merge_hits(it_tmp->second, kCentroidWinnerEnergyWeightedFirstTime));
+    singles.push_back(merge_hits(it_tmp->second, AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))))));
     it_tmp++;
   }
   return select_coincident_hits(singles, compton_energy_threshold);
@@ -245,8 +244,8 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
-  int N =0;
-  int N0 =0;
+  int N = 0;
+  int N0 = 0;
   sort_hits(hits, "TIME");
 
   std::vector<Hit> selected_hits;
@@ -257,7 +256,9 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
     std::tie(N0, N, selected_hits) = select_coincident_hits(hits, COMPTON_E_TH);
   }
 
-  /// WK: Why N==MAX_N and N0<=MAX_N0
+  // If number of selected singles/hits equals maximum number of events above the fixed energy threshold in the coincidence window
+  // and number of all hits in the event is equal or smaller than maximum number of events above the noise energy threshold in the coincidence window
+  // then print the coincidence:
   if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
 
   if (DEBUG) {

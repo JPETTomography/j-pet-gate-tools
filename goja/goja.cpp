@@ -9,6 +9,7 @@
 
 #include "boost/program_options.hpp"
 
+#include "EventAnalysis.h"
 #include "Hits.h"
 
 #define SET_GOJA_ENV_VAR(option, variable, default_value) { \
@@ -43,12 +44,14 @@ namespace po = boost::program_options;
 int main (int argc, char* argv[]) {
 
   bool singles = false;
+  bool areTestsOn = false;
 
   po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");
   desc.add_options()
 
   ("help", "produce help message")
-
+  // running tests:
+  ("test",po::bool_switch(&areTestsOn), "runs tests")
   // Forming coincidences options:
   ("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
   ("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.0 MeV)")
@@ -85,6 +88,12 @@ int main (int argc, char* argv[]) {
 
   if (argc == 1 or vm.count("help")) {
     cout << desc << "\n";
+    return 1;
+  }
+
+  if(areTestsOn) {
+    Hits::RunTests();
+    event_analysis::RunTests();
     return 1;
   }
 

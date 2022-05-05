@@ -4,11 +4,8 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
+struct Hit {
 
-class Hit {
-
-public :
 
   int eventID = -1;          // ID of the event
   int volumeID = -1;         // volume detection in 'scanner' GATE systemType

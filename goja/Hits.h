@@ -12,14 +12,35 @@
 
 #include "Hit.h"
 
+struct ConfigParams {
+  void Init(bool singles) {
+    COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
+    COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
+    TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))*1e3; // [TIME_WINDOW]=ps
+    int sep = int(atof(getenv("GOJA_SEP")));
+    if (sep==0) EVENTS_SEPARATION_USING_TIME_WINDOW=1;
+    else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
+    EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
+    SINGLES = singles;
+  }
+
+  double COMPTON_E_TH_0 = -1;
+  double COMPTON_E_TH= -1;
+  double TIME_WINDOW =-1;
+  int EVENTS_SEPARATION_USING_TIME_WINDOW = -1; 
+  int EVENTS_SEPARATION_USING_IDS_OF_EVENTS = -1; 
+  bool SINGLES = false;
+
+};
+
 struct LoopResults {
   LoopResults() : real_time(0.),
-                  multiplicities(vector<int>()),
+                  multiplicities(std::vector<int>()),
                   counter_all_compton_hits(0),
                   counter_compton_hits_over_the_ETH0(0),
                   counter_compton_hits_over_the_ETH(0) {}
   double real_time;
-  vector<int> multiplicities;
+  std::vector<int> multiplicities;
   int counter_all_compton_hits;
   int counter_compton_hits_over_the_ETH0;
   int counter_compton_hits_over_the_ETH;
@@ -97,6 +118,9 @@ public :
    virtual LoopResults Loop(bool singles);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+
+   static void FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigParams& params, LoopResults& lr);
+   static void RunTests();
 };
 
 #endif
@@ -200,7 +224,7 @@ void Hits::Init(TTree *tree)
      fChain->SetBranchAddress("RayleighCrystal", &nCrystalRayleigh, &b_nCrystalRayleigh);
    }
    fChain->SetBranchAddress("time", &time, &b_time);
-   string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+  std::string systemType = std::string(getenv("GOJA_SYSTEM_TYPE"));
    if (systemType == "cylindricalPET")
      fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
@@ -236,4 +260,4 @@ void Hits::Show(Long64_t entry)
    fChain->Show(entry);
 }
 
-#endif // #ifdef Hits_cxx
+#endif

@@ -9,7 +9,7 @@ add_definitions(-std=c++14 -Wall -Wunused-parameter)
 # Searching for dependencies:
 
 list(APPEND CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake)
-find_package(ROOT 6.24 REQUIRED COMPONENTS Tree)
+find_package(ROOT 6.22 REQUIRED COMPONENTS Tree)
 if(ROOT_USE_FILE)
   include(${ROOT_USE_FILE})
 endif()

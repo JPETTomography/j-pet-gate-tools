@@ -116,7 +116,7 @@ def calculate_counters(tim_diffs, ang_diffs, type_of_coincidence=[]):
   counter_below = 0
   tim_diffs_above = []
   ang_diffs_above = []
-  for i in xrange(len(tim_diffs)):
+  for i in range(len(tim_diffs)):
     t = tim_diffs[i]
     a = ang_diffs[i]
     try:

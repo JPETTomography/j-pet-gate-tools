@@ -203,13 +203,9 @@ EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
 // PRINTING
 //================================================================================
 
-void print_coincidences(const std::vector<Hit>& hits) {
+void print_coincidence(const Hit h1, const Hit h2) {
 
-  assert(hits.size() ==2);
   cout.setf(ios::fixed);
-
-  Hit h1 = hits[0];
-  Hit h2 = hits[1];
 
   cout.precision(2);
   cout << h1.posX/10. << "\t" << h1.posY/10. << "\t" << h1.posZ/10. << "\t";
@@ -233,6 +229,14 @@ void print_coincidences(const std::vector<Hit>& hits) {
   cout.precision(2);
   cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
   cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << endl;
+
+}
+
+void print_coincidences(const std::vector<Hit>& hits) {
+
+  for (unsigned int i=0; i<hits.size()-1; i++) {
+    print_coincidence(hits[i], hits[i+1]);
+  }
 
 }
 
@@ -262,6 +266,7 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
   // and number of all hits in the event is equal or smaller than maximum number of events above the noise energy threshold in the coincidence window
   // then print the coincidence:
   if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
+  //if (N>=2 and N<=MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
 
   if (DEBUG) {
     cout.setf(ios::fixed);

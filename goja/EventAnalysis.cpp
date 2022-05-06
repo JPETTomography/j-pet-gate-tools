@@ -53,6 +53,7 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
   Hit h;
   h.eventID = hits[0].eventID;
   h.volumeID = hits[0].volumeID;
+  // Energy of single4 == sum of energies of hits:
   for (unsigned int i=0; i<nHits; i++) h.edep += hits[i].edep;
 
   switch (winner) {
@@ -105,9 +106,10 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
 
   case kEnergyWinner: {
     std::vector<double> energies;
-    // for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
+    for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
     unsigned int max_index = std::distance(
         energies.begin(), std::max_element(energies.begin(), energies.end()));
+    std::cout << max_index << std::endl;
     h.time = hits[max_index].time;
     h.posX = hits[max_index].posX;
     h.posY = hits[max_index].posY;
@@ -286,27 +288,41 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
 
 }
 
+// TODO: check positions
 void RunTests()
 {
   const double epsilon = 0.000001;
+
   Hit h1;
   h1.edep = 10;
+  h1.posX = 1; h1.posY = 2; h1.posZ = 3;
   Hit h2;
   h2.edep = 80;
+  h2.posX = 2; h2.posY = 3; h2.posZ = 4;
   Hit h3;
-  h2.edep = 50;
+  h3.edep = 50;
+  h3.posX = 7; h3.posY = 4; h3.posZ = 5;
   std::vector<Hit> hits = {h1, h2, h3};
+
   for (auto& h : hits)
   {
     h.eventID = 10;
     h.volumeID = 9;
   }
-  auto mergedHit = merge_hits(hits, kEnergyWinner);
-  std::cout << mergedHit.edep << std::endl;
-  // WK: this test breaks I guess the energy of the merged hit is wrongly assigned
-  /// It should be the energy of the highest hit, so 80
-  // assert(std::abs(mergedHit.edep - 80) < epsilon);
-  assert(mergedHit.eventID == 10);
-  assert(mergedHit.volumeID == 9);
+
+  auto single1 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
+  std::cout << single1.posX << " " << single1.posY << " " << single1.posZ << " " << std::endl;
+
+  auto single2 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
+  std::cout << single2.posX << " " << single2.posY << " " << single2.posZ << " " << std::endl;
+
+  auto single3 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
+  std::cout << single3.posX << " " << single3.posY << " " << single3.posZ << " " << std::endl;
+
+  auto single4 = merge_hits(hits, kEnergyWinner);
+  assert(single4.eventID == 10);
+  assert(single4.volumeID == 9);
+  assert(std::abs(single4.edep - 140) < epsilon); // Energy of single4 == sum of energies of hits
+  std::cout << single4.posX << " " << single4.posY << " " << single4.posZ << " " << std::endl;
 }
 }

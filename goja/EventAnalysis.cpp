@@ -109,7 +109,6 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
     for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
     unsigned int max_index = std::distance(
         energies.begin(), std::max_element(energies.begin(), energies.end()));
-    std::cout << max_index << std::endl;
     h.time = hits[max_index].time;
     h.posX = hits[max_index].posX;
     h.posY = hits[max_index].posY;
@@ -131,8 +130,6 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
   return h;
 }
 
-
-
 std::tuple<int, int, std::vector<Hit>> select_coincident_hits(const vector<Hit> &hits, double compton_energy_threshold) 
 {
   std::vector<Hit> selected_hits;
@@ -145,9 +142,8 @@ std::tuple<int, int, std::vector<Hit>> select_coincident_hits(const vector<Hit> 
   return std::make_tuple(nb_above_noise_treshold, nb_above_compton_threshold, selected_hits);
 }
 
-std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold) {
-
-  const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+std::tuple<int, int, std::vector<Hit>> select_coincident_singles (const std::vector<Hit> &hits,
+  double compton_energy_threshold, const std::string& systemType, const AveragingMethod averagingMethod = kCentroidWinnerEnergyWeightedFirstTime) {
 
   map<string, vector<Hit>> singles_tmp;
   for (unsigned int i=0; i<hits.size(); i++) {
@@ -156,7 +152,7 @@ std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vec
       ID = std::to_string(hits[i].volumeID);
     else if (systemType == "cylindricalPET")
       ID = std::to_string(hits[i].rsectorID) + '_' + std::to_string(hits[i].layerID);
-    if (singles_tmp.find(ID) == singles_tmp.end() ) {
+    if (singles_tmp.find(ID) == singles_tmp.end()) {
       vector<Hit> tmp;
       tmp.push_back(hits[i]);
       singles_tmp[ID] = tmp;
@@ -168,7 +164,7 @@ std::tuple<int, int, std::vector<Hit>>  select_coincident_singles(const std::vec
   vector<Hit> singles;
   map<string, vector<Hit>>::iterator it_tmp = singles_tmp.begin();
   while(it_tmp != singles_tmp.end()) {
-    singles.push_back(merge_hits(it_tmp->second, AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))))));
+    singles.push_back(merge_hits(it_tmp->second, averagingMethod));
     it_tmp++;
   }
   return select_coincident_hits(singles, compton_energy_threshold);
@@ -203,7 +199,7 @@ EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
 // PRINTING
 //================================================================================
 
-void print_coincidence(const Hit h1, const Hit h2) {
+void print_coincidence(const Hit& h1, const Hit& h2) {
 
   cout.setf(ios::fixed);
 
@@ -252,11 +248,14 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
   int N = 0;
   int N0 = 0;
+  const auto averagingMethod = AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))));
+  const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
+
   sort_hits(hits, "TIME");
 
   std::vector<Hit> selected_hits;
   if (hits_are_singles) {
-    std::tie(N0, N, selected_hits) = select_coincident_singles(hits, COMPTON_E_TH);
+    std::tie(N0, N, selected_hits) = select_coincident_singles(hits, COMPTON_E_TH, systemType, averagingMethod);
   }
   else {
     std::tie(N0, N, selected_hits) = select_coincident_hits(hits, COMPTON_E_TH);
@@ -293,20 +292,25 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
 
 }
 
-// TODO: check positions
 void RunTests()
 {
-  const double epsilon = 0.000001;
+  const double epsilon = 0.0001;
 
   Hit h1;
   h1.edep = 10;
+  h1.time = 12;
   h1.posX = 1; h1.posY = 2; h1.posZ = 3;
+
   Hit h2;
   h2.edep = 80;
+  h2.time = 22;
   h2.posX = 2; h2.posY = 3; h2.posZ = 4;
+
   Hit h3;
   h3.edep = 50;
+  h3.time = 32;
   h3.posX = 7; h3.posY = 4; h3.posZ = 5;
+
   std::vector<Hit> hits = {h1, h2, h3};
 
   for (auto& h : hits)
@@ -316,18 +320,26 @@ void RunTests()
   }
 
   auto single1 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
-  std::cout << single1.posX << " " << single1.posY << " " << single1.posZ << " " << std::endl;
+  //std::cout << single1.time << " " << single1.posX << " " << single1.posY << " " << single1.posZ << " " << std::endl;
+  assert(std::abs(single1.time-22) < epsilon);
+  assert(std::abs(single1.posX-3.333333333) < epsilon);
 
-  auto single2 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
-  std::cout << single2.posX << " " << single2.posY << " " << single2.posZ << " " << std::endl;
+  auto single2 = merge_hits(hits, kCentroidWinnerEnergyWeighted);
+  //std::cout << single2.time << " " << single2.posX << " " << single2.posY << " " << single2.posZ << " " << std::endl;
+  assert(std::abs(single2.time-24.85714286) < epsilon);
+  assert(std::abs(single2.posX-3.714285714) < epsilon);
 
-  auto single3 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
-  std::cout << single3.posX << " " << single3.posY << " " << single3.posZ << " " << std::endl;
+  auto single3 = merge_hits(hits, kCentroidWinnerEnergyWeightedFirstTime);
+  //std::cout << single3.time << " " << single3.posX << " " << single3.posY << " " << single3.posZ << " " << std::endl;
+  assert(std::abs(single3.time-12) < epsilon);
+  assert(std::abs(single3.posX-3.714285714) < epsilon);
 
   auto single4 = merge_hits(hits, kEnergyWinner);
+  //std::cout << single4.time << " " << single4.posX << " " << single4.posY << " " << single4.posZ << " " << std::endl;
+  assert(std::abs(single4.time-22) < epsilon);
+  assert(std::abs(single4.posX-2) < epsilon);
   assert(single4.eventID == 10);
   assert(single4.volumeID == 9);
   assert(std::abs(single4.edep - 140) < epsilon); // Energy of single4 == sum of energies of hits
-  std::cout << single4.posX << " " << single4.posY << " " << single4.posZ << " " << std::endl;
 }
 }

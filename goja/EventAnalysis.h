@@ -39,6 +39,7 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
   /// returns number of singles above noise energy threshold, number of singles above Compton energy threshold, and selected singles
   std::tuple<int, int, std::vector<Hit>> select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold);
   EventType verify_type_of_coincidence(const Hit &h1,const Hit &h2);
+  void print_coincidence(const Hit& h1, const Hit& h2);
   void print_coincidences(const std::vector<Hit>& hits);
   void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
 

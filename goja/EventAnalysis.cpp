@@ -320,26 +320,25 @@ void RunTests()
   }
 
   auto single1 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
-  //std::cout << single1.time << " " << single1.posX << " " << single1.posY << " " << single1.posZ << " " << std::endl;
   assert(std::abs(single1.time-22) < epsilon);
   assert(std::abs(single1.posX-3.333333333) < epsilon);
+  assert(std::abs(single1.edep - 140) < epsilon); // Energy of single == sum of energies of hits
 
   auto single2 = merge_hits(hits, kCentroidWinnerEnergyWeighted);
-  //std::cout << single2.time << " " << single2.posX << " " << single2.posY << " " << single2.posZ << " " << std::endl;
   assert(std::abs(single2.time-24.85714286) < epsilon);
   assert(std::abs(single2.posX-3.714285714) < epsilon);
+  assert(std::abs(single2.edep - 140) < epsilon); // Energy of single == sum of energies of hits
 
   auto single3 = merge_hits(hits, kCentroidWinnerEnergyWeightedFirstTime);
-  //std::cout << single3.time << " " << single3.posX << " " << single3.posY << " " << single3.posZ << " " << std::endl;
   assert(std::abs(single3.time-12) < epsilon);
   assert(std::abs(single3.posX-3.714285714) < epsilon);
+  assert(std::abs(single3.edep - 140) < epsilon); // Energy of single == sum of energies of hits
 
   auto single4 = merge_hits(hits, kEnergyWinner);
-  //std::cout << single4.time << " " << single4.posX << " " << single4.posY << " " << single4.posZ << " " << std::endl;
   assert(std::abs(single4.time-22) < epsilon);
   assert(std::abs(single4.posX-2) < epsilon);
   assert(single4.eventID == 10);
   assert(single4.volumeID == 9);
-  assert(std::abs(single4.edep - 140) < epsilon); // Energy of single4 == sum of energies of hits
+  assert(std::abs(single4.edep - 140) < epsilon); // Energy of single == sum of energies of hits
 }
 }

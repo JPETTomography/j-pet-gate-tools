@@ -17,5 +17,7 @@ void Hit::print_hit() {
   cout << "source position = [" << sourcePosX << ", " << sourcePosY << ", " << sourcePosZ << "]" << endl;
   cout << "nPhantomCompton=" << nPhantomCompton << endl;
   cout << "nCrystalCompton=" << nCrystalCompton << endl;
+  cout << "nRayleighCompton=" << nPhantomRayleigh << endl;
+  cout << "nRayleighCompton=" << nCrystalRayleigh << endl;
 
 }

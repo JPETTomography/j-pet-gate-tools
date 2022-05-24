@@ -32,9 +32,8 @@ LoopResults Hits::Loop(bool singles) {
     return true;
   };
 
-  auto hitIsProper = [](const Hit& hit, const string& treeName, int pdgEncoding, int nPhantomRayleigh, int nCrystalRayleigh, double compton_e_th_0)->bool { 
-      bool hit_is_proper = hit.edep > compton_e_th_0 // deposited energy is larger than the noise threshold
-                           and nPhantomRayleigh==0 and nCrystalRayleigh==0; // the photon is not scattered using Rayleigh scattering
+  auto hitIsProper = [](const Hit& hit, const string& treeName, int pdgEncoding, double compton_e_th_0)->bool {
+      bool hit_is_proper = hit.edep > compton_e_th_0; // deposited energy is larger than the noise threshold
       if (treeName == "Hits")
           hit_is_proper = hit_is_proper and pdgEncoding==22; // gamma photon
       return hit_is_proper;
@@ -60,13 +59,15 @@ LoopResults Hits::Loop(bool singles) {
     hit.sourcePosZ = sourcePosZ;
     hit.nPhantomCompton = nPhantomCompton;
     hit.nCrystalCompton = nCrystalCompton;
+    hit.nPhantomRayleigh = nPhantomRayleigh;
+    hit.nCrystalRayleigh = nCrystalRayleigh;
     std::string procName = std::string(processName);
 
     std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
         
     if(hitIsCompton(procName, tree_name)) { // the photon is scattered using Compton scattering
       lr.counter_all_compton_hits += 1;
-      if (hitIsProper(hit, tree_name, PDGEncoding, nPhantomRayleigh, nCrystalRayleigh, params.COMPTON_E_TH_0)) {
+      if (hitIsProper(hit, tree_name, PDGEncoding, params.COMPTON_E_TH_0)) {
         hits.push_back(hit);
       }
     }
@@ -163,6 +164,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
 
 void Hits::RunTests() 
 {
+
   Hit hit1;
   hit1.time = 10;
   Hit hit2;

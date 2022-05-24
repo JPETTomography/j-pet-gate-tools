@@ -170,7 +170,7 @@ std::tuple<int, int, std::vector<Hit>> select_coincident_singles (const std::vec
   return select_coincident_hits(singles, compton_energy_threshold);
 }
 
-EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
+EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
 
   EventType t = kUnspecified;
 
@@ -193,6 +193,43 @@ EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
 
   return t;
 
+}
+
+// based on ComputeKindGATEEvent from
+// https://github.com/JPETTomography/castor/blob/castor-3.1.1/src/management/gDataConversionUtilities.cc
+EventType verify_type_of_coincidence_castor(const Hit &h1, const  Hit &h2) {
+
+  if (h1.eventID != h2.eventID)
+    // random
+    return kAccidental;
+  else
+  {
+    if (h1.nPhantomCompton == 0 && h2.nPhantomCompton == 0 &&
+         h1.nPhantomRayleigh == 0 && h2.nPhantomRayleigh == 0 &&
+         h1.nCrystalCompton == 1 && h2.nCrystalCompton == 1 &&
+         h1.nCrystalRayleigh == 0 && h2.nCrystalRayleigh == 0)
+        //true
+        return kTrue;
+    else
+    {
+      if (h1.nPhantomCompton == 0 && h2.nPhantomCompton == 0 &&
+          h1.nPhantomRayleigh == 0 && h2.nPhantomRayleigh == 0 &&
+          (h1.nCrystalCompton > 1 || h2.nCrystalCompton > 1 ||
+          h1.nCrystalRayleigh > 0 || h2.nCrystalRayleigh > 0))
+         //detector scat
+         return kDetectorScattered;
+      if (h1.nPhantomCompton == 1 || h2.nPhantomCompton == 1 ||
+          h1.nPhantomRayleigh == 1 || h2.nPhantomRayleigh == 1)
+         //single scat
+          return kPhantomScattered;
+      if (h1.nPhantomCompton > 1 || h2.nPhantomCompton > 1 ||
+          h1.nPhantomRayleigh > 1 || h2.nPhantomRayleigh > 1)
+         //multi scat
+          return kPhantomScattered;
+    }
+  }
+  //unknown
+  return kUnspecified;
 }
 
 //================================================================================
@@ -221,6 +258,7 @@ void print_coincidence(const Hit& h1, const Hit& h2) {
   cout << h2.edep << "\t";
 
   cout << verify_type_of_coincidence(h1, h2) << "\t";
+  cout << verify_type_of_coincidence_castor(h1, h2) << "\t";
 
   cout.precision(2);
   cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";

@@ -21,6 +21,8 @@ struct Hit {
   double sourcePosZ = 0.;    // absolute z position of the source of the hit [mm]
   int nPhantomCompton = -1;  // number of Compton scatterings in the phantom in a track
   int nCrystalCompton = -1;  // number of Compton scatterings in the detecting volumes in a track
+  int nPhantomRayleigh = -1; // number of Rayleigh scatterings in the phantom in a track
+  int nCrystalRayleigh = -1; // number of Rayleigh scatterings in the detecting volumes in a track
 
   Hit();
   void print_hit();

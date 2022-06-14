@@ -257,7 +257,6 @@ void print_coincidence(const Hit& h1, const Hit& h2) {
   cout << h1.edep << "\t";
   cout << h2.edep << "\t";
 
-  //cout << verify_type_of_coincidence(h1, h2) << "\t";
   cout << verify_type_of_coincidence_castor(h1, h2) << "\t";
 
   cout.precision(2);

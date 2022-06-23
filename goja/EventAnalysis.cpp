@@ -261,7 +261,29 @@ void print_coincidence(const Hit& h1, const Hit& h2) {
 
   cout.precision(2);
   cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
-  cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << endl;
+  cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << "\t";
+
+  cout << h1.eventID << "\t";
+  cout << h2.eventID << "\t";
+  cout << h1.nPhantomCompton << "\t";
+  cout << h2.nPhantomCompton << "\t";
+  cout << h1.nPhantomRayleigh << "\t";
+  cout << h2.nPhantomRayleigh << "\t";
+  cout << h1.nCrystalCompton << "\t";
+  cout << h2.nCrystalCompton << "\t";
+  cout << h1.nCrystalRayleigh << "\t";
+  cout << h2.nCrystalRayleigh << "\t";
+
+  cout << h1.rsectorID << "\t";
+  cout << h2.rsectorID << "\t";
+  cout << h1.moduleID << "\t";
+  cout << h2.moduleID << "\t";
+  cout << h1.submoduleID << "\t";
+  cout << h2.submoduleID << "\t";
+  cout << h1.crystalID << "\t";
+  cout << h2.crystalID << "\t";
+  cout << h1.layerID << "\t";
+  cout << h2.layerID << endl;
 
 }
 

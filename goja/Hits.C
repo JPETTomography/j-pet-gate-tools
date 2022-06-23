@@ -48,6 +48,9 @@ LoopResults Hits::Loop(bool singles) {
     hit.eventID = eventID;
     hit.volumeID = volumeID[1]+1; // numbering from 1 not from 0
     hit.rsectorID = rsectorID;
+    hit.moduleID = moduleID;
+    hit.submoduleID = submoduleID;
+    hit.crystalID = crystalID;
     hit.layerID = layerID;
     hit.time = time*1e12; // convert to ps
     hit.edep = edep*1e3; // convert to keV
@@ -64,7 +67,7 @@ LoopResults Hits::Loop(bool singles) {
     std::string procName = std::string(processName);
 
     std::string tree_name = std::string(getenv("GOJA_TREE_NAME"));
-        
+
     if(hitIsCompton(procName, tree_name)) { // the photon is scattered using Compton scattering
       lr.counter_all_compton_hits += 1;
       if (hitIsProper(hit, tree_name, PDGEncoding, params.COMPTON_E_TH_0)) {

@@ -379,25 +379,25 @@ void RunTests()
   }
 
   auto single1 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
-  assert(std::abs(single1.time-22) < epsilon);
-  assert(std::abs(single1.posX-3.333333333) < epsilon);
-  assert(std::abs(single1.edep - 140) < epsilon); // Energy of single == sum of energies of hits
+  assert(std::abs(single1.time-22) < epsilon); // (12+22+32)/3 = 22
+  assert(std::abs(single1.posX-3.333333333) < epsilon); // (1+2+7)/2 = 3.333333333
+  assert(std::abs(single1.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
   auto single2 = merge_hits(hits, kCentroidWinnerEnergyWeighted);
-  assert(std::abs(single2.time-24.85714286) < epsilon);
-  assert(std::abs(single2.posX-3.714285714) < epsilon);
-  assert(std::abs(single2.edep - 140) < epsilon); // Energy of single == sum of energies of hits
+  assert(std::abs(single2.time-24.85714286) < epsilon); // (10*12+80*22+50*32)/140 = 24.85714286
+  assert(std::abs(single2.posX-3.714285714) < epsilon); // (10*1+80*2+50*7)/140 = 3.714285714
+  assert(std::abs(single2.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
   auto single3 = merge_hits(hits, kCentroidWinnerEnergyWeightedFirstTime);
-  assert(std::abs(single3.time-12) < epsilon);
-  assert(std::abs(single3.posX-3.714285714) < epsilon);
-  assert(std::abs(single3.edep - 140) < epsilon); // Energy of single == sum of energies of hits
+  assert(std::abs(single3.time-12) < epsilon); // min(12,22,32) = 12
+  assert(std::abs(single3.posX-3.714285714) < epsilon); // (10*1+80*2+50*7)/140 = 3.714285714
+  assert(std::abs(single3.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
   auto single4 = merge_hits(hits, kEnergyWinner);
-  assert(std::abs(single4.time-22) < epsilon);
-  assert(std::abs(single4.posX-2) < epsilon);
-  assert(single4.eventID == 10);
-  assert(single4.volumeID == 9);
-  assert(std::abs(single4.edep - 140) < epsilon); // Energy of single == sum of energies of hits
+  assert(std::abs(single4.time-22) < epsilon); // max(10,80,50) = 80 => single takes attributes of hit h2
+  assert(std::abs(single4.posX-2) < epsilon); // max(10,80,50) = 80 => single takes attributes of hit h2
+  assert(single4.eventID == 10); // 10 is a value set manually
+  assert(single4.volumeID == 9); // 9 is a value set manually
+  assert(std::abs(single4.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 }
 }

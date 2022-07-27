@@ -66,6 +66,9 @@ public :
    Float_t         posY;
    Float_t         posZ;
    Int_t           rsectorID;
+   Int_t           moduleID;
+   Int_t           submoduleID;
+   Int_t           crystalID;
    Int_t           layerID;
    Int_t           nPhantomCompton;
    Int_t           nCrystalCompton;
@@ -92,6 +95,9 @@ public :
    TBranch        *b_posY;   //!
    TBranch        *b_posZ;   //!
    TBranch        *b_rsectorID;
+   TBranch        *b_moduleID;
+   TBranch        *b_submoduleID;
+   TBranch        *b_crystalID;
    TBranch        *b_layerID;   //!
    TBranch        *b_nPhantomCompton;   //!
    TBranch        *b_nCrystalCompton;   //!
@@ -225,8 +231,12 @@ void Hits::Init(TTree *tree)
    }
    fChain->SetBranchAddress("time", &time, &b_time);
   std::string systemType = std::string(getenv("GOJA_SYSTEM_TYPE"));
-   if (systemType == "cylindricalPET")
+   if (systemType == "cylindricalPET") {
      fChain->SetBranchAddress("rsectorID", &rsectorID, &b_rsectorID);
+     fChain->SetBranchAddress("moduleID", &moduleID, &b_moduleID);
+     fChain->SetBranchAddress("submoduleID", &submoduleID, &b_submoduleID);
+     fChain->SetBranchAddress("crystalID", &crystalID, &b_crystalID);
+   }
    fChain->SetBranchAddress("layerID", &layerID, &b_layerID);
    fChain->SetBranchAddress("sourcePosX", &sourcePosX, &b_sourcePosX);
    fChain->SetBranchAddress("sourcePosY", &sourcePosY, &b_sourcePosY);

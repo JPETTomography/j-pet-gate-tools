@@ -44,22 +44,25 @@ Files 'goja' and 'goja_manager.py' will be installed by default in /usr/local/bi
 GOJA output
 -----------
 
-GOJA output consists of 19 columns. Each line of the output contains a single coincidence (LOR).
-Columns 1-4 contain information about the 1st hit:
+GOJA output consists of 39 columns. Each line of the output contains a single coincidence (LOR).
+
+Columns 1-4 contain information about the 1st hit/single:
 1) posX1 [cm]
 2) posY1 [cm]
 3) posZ1 [cm]
 4) time1 [ps]
-Columns 5-8 contain information about the 2nd hit:
+
+Columns 5-8 contain information about the 2nd hit/single:
 5) posX2 [cm]
 6) posY2 [cm]
 7) posZ2 [cm]
 8) time2 [ps]
+
 Next columns contain following information:
 9) volumeID of the 1st hit
 10) volumeID of the 2nd hit
-11) edep of the 1st hit [keV]
-12) edep of the 2nd hit [keV]
+11) edep of the 1st hit/single [keV]
+12) edep of the 2nd hit/single [keV]
 13) type of coincidence (1 - true, 2 - phantom-scattered, 3 - detector-scattered, 4 - accidental)
 14) sourcePosX1 [cm]
 15) sourcePosY1 [cm]
@@ -67,6 +70,30 @@ Next columns contain following information:
 17) sourcePosX2 [cm]
 18) sourcePosY2 [cm]
 19) sourcePosZ2 [cm]
+
+Next ten columns are used to obtain kind of coincidence in castor-GATERootToCastor:
+20) eventID of the 1st single
+21) eventID of the 2nd single
+22) nPhantomCompton of the 1st single
+23) nPhantomCompton of the 2nd single
+24) nPhantomRayleigh of the 1st single
+25) nPhantomRayleigh of the 2nd single
+26) nCrystalCompton of the 1st single
+27) nCrystalCompton of the 2nd single
+28) nCrystalRayleigh of the 1st single
+29) nCrystalRayleigh of the 2nd single
+
+Next ten columns are used to obtain ids of singles for reconstruction purposes in castor-GATERootToCastor:
+30) rsectorID of the 1st single
+31) rsectorID of the 2nd single
+32) moduleID of the 1st single
+33) moduleID of the 2nd single
+34) submoduleID of the 1st single
+35) submoduleID of the 2nd single
+36) crystalID of the 1st single
+37) crystalID of the 2nd single
+38) layerID of the 1st single
+39) layerID of the 2nd single
 
 Usage
 -----

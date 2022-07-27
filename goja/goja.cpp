@@ -60,6 +60,9 @@ int main (int argc, char* argv[]) {
   ("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (includes N, default: 1000)")
   ("sep", po::value<string>(), "separate events using time window (arg=0) or using IDs of hits (arg=1) (default: 0)")
   ("singles", po::bool_switch(&singles), "merge hits to singles")
+  ("averaging-method", po::value<string>(), "averaging method: 0 - kUnspecifiedAM, 1 - kCentroidWinnerNaivelyWeighted, "
+                                            "2 - kCentroidWinnerEnergyWeighted, 3 - kCentroidWinnerEnergyWeightedFirstTime, "
+                                            "4 - kEnergyWinner (default: 3)")
   ("system-type", po::value<string>(), "GATE systemType: scanner or cylindricalPET")
   ("tree-name", po::value<string>(), "tree name: Hits or HESingles (only for cylindricalPET system type)")
 
@@ -105,6 +108,7 @@ int main (int argc, char* argv[]) {
   SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
   SET_GOJA_ENV_VAR("system-type", "GOJA_SYSTEM_TYPE", "scanner");
   SET_GOJA_ENV_VAR("tree-name", "GOJA_TREE_NAME", "Hits");
+  SET_GOJA_ENV_VAR("averaging-method", "GOJA_AVERAGING_METHOD", "3");
 
   double real_time = 0.;
   vector<int> multiplicities;

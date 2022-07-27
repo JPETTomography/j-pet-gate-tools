@@ -37,6 +37,7 @@ target_link_libraries(goja ${ROOT_LIBRARIES} ${Boost_LIBRARIES})
 set_target_properties(goja PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
 install (TARGETS goja DESTINATION bin)
 install (FILES ${PROJECT_SOURCE_DIR}/goja_manager.py
+               ${PROJECT_SOURCE_DIR}/goja2gate.py
                ${PROJECT_SOURCE_DIR}/verify_gate_results.py
                ${PROJECT_SOURCE_DIR}/verify_goja_results.py
                ${PROJECT_SOURCE_DIR}/../examples/python_scripts/nema_common.py

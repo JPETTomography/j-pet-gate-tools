@@ -183,12 +183,13 @@ std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, dou
  int prompt_multiplicity = 0;
  for (unsigned int i=0; i<hits.size(); i++) {
     if (hits[i].edep > prompt_energy_threshold) {
- triple_hits.push_back(hits[i]);
- prompt_multiplicity++;
+    triple_hits.push_back(hits[i]);
+    prompt_multiplicity++;
  }
   }
  if(prompt_multiplicity == 1) {
- bool isGood = true;
+   return std::make_tuple(prompt_multiplicity == 1, triple_hits);
+   bool isGood = true;
  }
  else {
  bool isGood = false;
@@ -198,7 +199,7 @@ std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, dou
 
 }
 
-EventType verify_type_of_triple_coincidence(const Hit &h1,const  Hit &h2,const  Hit &h3) {
+EventType verify_type_of_triple_coincidence(const Hit &h1, const  Hit &h2, const  Hit &h3) {
 
   EventType t = kUnspecified;
 

@@ -106,7 +106,7 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner = kCen
 
   case kEnergyWinner: {
     std::vector<double> energies;
-     for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
+    for (unsigned int i = 0; i<nHits; i++) energies.push_back(hits[i].edep);
     unsigned int max_index = std::distance(
         energies.begin(), std::max_element(energies.begin(), energies.end()));
     h.time = hits[max_index].time;
@@ -170,7 +170,7 @@ std::tuple<int, int, std::vector<Hit>> select_coincident_singles (const std::vec
   return select_coincident_hits(singles, compton_energy_threshold);
 }
 
-EventType verify_type_of_coincidence(const Hit &h1,const  Hit &h2) {
+EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
 
   EventType t = kUnspecified;
 
@@ -409,8 +409,8 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles, bool triple_coincid
   double PROMPT_E_TH = atof(getenv(“GOJA_PROMPT_E_TH”))*1e3;
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
-  int N =0;
-  int N0 =0;
+  int N = 0;
+  int N0 = 0;
   const auto averagingMethod = AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))));
   const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
 
@@ -510,5 +510,4 @@ void RunTests()
   assert(single4.eventID == 10); // 10 is a value set manually
   assert(single4.volumeID == 9); // 9 is a value set manually
   assert(std::abs(single4.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
-}
 }

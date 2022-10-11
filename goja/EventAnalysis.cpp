@@ -170,29 +170,36 @@ std::tuple<int, int, std::vector<Hit>> select_coincident_singles (const std::vec
   return select_coincident_hits(singles, compton_energy_threshold);
 }
 
-EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
+bool all_same_event(const vector<Hit>& hits) {
+ unsigned int nhits = hits.size();
+ if ( nhits == 0 ) {
+  return false;
+ }
+ const int ref_id = hits.at(0).eventID;
+ return std::all_of(hits.cbegin(), hits.cend(), [ref_id](Hit& hit){ return hit.eventID == ref_id; });
+}
 
-  EventType t = kUnspecified;
+bool not_phantom_compton(const vector<Hit>& hits) {
+ return std::all_of(hits.cbegin(), hits.cend(), [](Hit& hit){ return hit.nPhantomCompton == 0; });
+}
 
-  if (h1.eventID==h2.eventID) { //true, phantom-scattered and detector-scattered
-    if (h1.nPhantomCompton==0 and h2.nPhantomCompton==0) {
-      if (h1.nCrystalCompton==1 and h2.nCrystalCompton==1) { //true
-        t = kTrue;
-      }
-      else { //detector-scattered
-        t = kDetectorScattered;
-      }
-    }
-    else { //phantom-scattered
-      t = kPhantomScattered;
-    }
+bool all_crystal_compton(const vector<Hit>& hits) {
+ return std::all_of(hits.cbegin(), hits.cend(), [](Hit& hit){ return hit.nCrystalCompton == 1; });
+}
+
+EventType verify_type_of_coincidence(const std::vector<Hit>& hits) {
+ if ( all_same_event(hits) ) {
+  //true, phantom-scattered and detector-scattered
+  if ( not_phantom_compton(hits) ) {
+   if ( all_crystal_compton(hits) ) {
+    return kTrue;
+   }
+   return kDetectorScattered;
   }
-  else { //accidental
-    t = kAccidental;
-  }
-
-  return t;
-
+  return kPhantomScattered;
+ }
+ //otherwise --> accidental
+ return kAccidental;
 }
 
 // based on ComputeKindGATEEvent from
@@ -231,31 +238,23 @@ EventType verify_type_of_coincidence_castor(const Hit &h1, const  Hit &h2) {
   //unknown
   return kUnspecified;
 }
-
-EventType verify_type_of_triple_coincidence(const Hit &h1, const  Hit &h2, const  Hit &h3) {
-
-  EventType t = kUnspecified;
-
-  if (h1.eventID==h2.eventID and h1.eventID==h3.eventID) { //true, phantom-scattered and detector-scattered
-    if (h1.nPhantomCompton==0 and h2.nPhantomCompton==0 and h3.nPhantomCompton==0) {
-      if (h1.nCrystalCompton==1 and h2.nCrystalCompton==1 and h3.nCrystalCompton==1) { //true
-        t = kTrue;
-      }
-      else { //detector-scattered
-        t = kDetectorScattered;
-      }
-    }
-    else { //phantom-scattered
-      t = kPhantomScattered;
-    }
+// Code checking the type of 3 gamma events. Gammas are assigned to four classes. True, Phantom Scattered, Detector
+// Scattered and Accidental (Random).
+EventType verify_type_of_triple_coincidence(const std::vector<Hit>& hits) {
+ if ( all_same_event(hits) ) {
+  //true, phantom-scattered and detector-scattered
+  if ( not_phantom_compton(hits) ) {
+   if ( all_crystal_compton(hits) ) {
+    return kTrue;
+   }
+   return kDetectorScattered;
   }
-  else { //accidental
-    t = kAccidental;
-  }
-
-  return t;
-
+  return kPhantomScattered;
+ }
+ //otherwise --> accidental
+ return kAccidental;
 }
+
 
 std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, double prompt_energy_threshold) 
 {
@@ -345,9 +344,11 @@ void print_coincidences(const std::vector<Hit>& hits) {
 
 }
 
+// Code printing specific information about the hits. The information include X, Y and Z position; detection time,
+// energy deposition etc.
 void print_triple_coincidences(const std::vector<Hit>& hits, PROMPT_E_TH) {
 
- assert(hits.size() ==3);
+ assert(hits.size() == 3);
 
  std::vector<Hit> triple_hits;
  bool isGood;
@@ -402,7 +403,7 @@ void print_triple_coincidences(const std::vector<Hit>& hits, PROMPT_E_TH) {
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void analyze_event(vector<Hit> &hits, bool hits_are_singles, bool triple_coincidence)
+void analyze_event(const vector<Hit> &hits, const bool hits_are_singles, const bool triple_coincidence)
 {
 
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
@@ -431,10 +432,10 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles, bool triple_coincid
   //if (N>=2 and N<=MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
 
   if (triple_coincidences) {
-  if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
+  if (N==MAX_N and N0<=MAX_N0) {print_coincidences(selected_hits);}
   }
   else {
-  if (N==MAX_N and N0<=MAX_N0) print_triple_coincidences(selected_hits);
+  if (N==MAX_N and N0<=MAX_N0) {print_triple_coincidences(selected_hits)};
   }
 
   if (DEBUG) {

@@ -346,7 +346,7 @@ void print_coincidences(const std::vector<Hit>& hits) {
 
 // Code printing specific information about the hits. The information include X, Y and Z position; detection time,
 // energy deposition etc.
-void print_triple_coincidences(const std::vector<Hit>& hits, PROMPT_E_TH) {
+void print_triple_coincidences(const std::vector<Hit>& hits, double PROMPT_E_TH) {
 
  assert(hits.size() == 3);
 

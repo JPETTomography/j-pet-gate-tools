@@ -32,7 +32,8 @@ goja-tools
 jplot
 -----
 
-  Draw line of response. Input lm file generate aplication analysis
+  Draw line of response. 
+  Input lm file generate aplication analysis
   made by Pawel Kowalski.
 
   python jplot.py  <input_file>

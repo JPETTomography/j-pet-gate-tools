@@ -176,15 +176,15 @@ bool all_same_event(const vector<Hit>& hits) {
   return false;
  }
  const int ref_id = hits.at(0).eventID;
- return std::all_of(hits.cbegin(), hits.cend(), [ref_id](Hit& hit){ return hit.eventID == ref_id; });
+ return std::all_of(hits.cbegin(), hits.cend(), [ref_id](const Hit& hit){ return hit.eventID == ref_id; });
 }
 
 bool not_phantom_compton(const vector<Hit>& hits) {
- return std::all_of(hits.cbegin(), hits.cend(), [](Hit& hit){ return hit.nPhantomCompton == 0; });
+ return std::all_of(hits.cbegin(), hits.cend(), [](const Hit& hit){ return hit.nPhantomCompton == 0; });
 }
 
 bool all_crystal_compton(const vector<Hit>& hits) {
- return std::all_of(hits.cbegin(), hits.cend(), [](Hit& hit){ return hit.nCrystalCompton == 1; });
+ return std::all_of(hits.cbegin(), hits.cend(), [](const Hit& hit){ return hit.nCrystalCompton == 1; });
 }
 
 EventType verify_type_of_coincidence(const std::vector<Hit>& hits) {
@@ -256,7 +256,7 @@ EventType verify_type_of_triple_coincidence(const std::vector<Hit>& hits) {
 }
 
 
-std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, double prompt_energy_threshold) 
+std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, double prompt_energy_threshold)
 {
   std::vector<Hit> triple_hits;
 
@@ -270,6 +270,7 @@ std::tuple<bool, std::vector<Hit>> check_gamma_type(const vector<Hit> &hits, dou
  prompt_multiplicity++;
  }
   }
+ bool isGood;
  if(prompt_multiplicity == 1) {
  bool isGood = true;
  }
@@ -306,7 +307,7 @@ void print_coincidence(const Hit& h1, const Hit& h2) {
   cout << h1.edep << "\t";
   cout << h2.edep << "\t";
 
-  cout << verify_type_of_coincidence_castor(h1, h2) << "\t";
+  cout << event_analysis::verify_type_of_coincidence_castor(h1, h2) << "\t";
 
   cout.precision(2);
   cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
@@ -352,7 +353,7 @@ void print_triple_coincidences(const std::vector<Hit>& hits, double PROMPT_E_TH)
 
  std::vector<Hit> triple_hits;
  bool isGood;
- std::tie(isGood, triple_hits) = check_gamma_type(hits, PROMPT_E_TH);
+ std::tie(isGood, triple_hits) = event_analysis::check_gamma_type(hits, PROMPT_E_TH);
 
  if(isGood){
 
@@ -379,7 +380,7 @@ void print_triple_coincidences(const std::vector<Hit>& hits, double PROMPT_E_TH)
   cout << h1.edep << "\t";
   cout << h2.edep << "\t";
 
-  cout << verify_type_of_triple_coincidence(h1, h2, h3) << "\t";
+  cout << event_analysis::verify_type_of_triple_coincidence(triple_hits) << "\t";
 
   cout.precision(2);
   cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
@@ -407,22 +408,22 @@ void analyze_event(const vector<Hit> &hits, const bool hits_are_singles, const b
 {
 
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
-  double PROMPT_E_TH = atof(getenv(“GOJA_PROMPT_E_TH”))*1e3;
+  double PROMPT_E_TH = atof(getenv("GOJA_PROMPT_E_TH"))*1e3;
   int MAX_N = int(atof(getenv("GOJA_MAX_N")));
   int MAX_N0 = int(atof(getenv("GOJA_MAX_N0")));
   int N = 0;
   int N0 = 0;
-  const auto averagingMethod = AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))));
+  const auto averagingMethod = event_analysis::AveragingMethod(int(atof(getenv("GOJA_AVERAGING_METHOD"))));
   const string systemType = string(getenv("GOJA_SYSTEM_TYPE"));
 
-  sort_hits(hits, "TIME");
+  event_analysis::sort_hits(const_cast<vector<struct Hit> &>(hits), "TIME");
 
   std::vector<Hit> selected_hits;
   if (hits_are_singles) {
     std::tie(N0, N, selected_hits) = select_coincident_singles(hits, COMPTON_E_TH, systemType, averagingMethod);
   }
   else {
-    std::tie(N0, N, selected_hits) = select_coincident_hits(hits, COMPTON_E_TH);
+    std::tie(N0, N, selected_hits) = event_analysis::select_coincident_hits(hits, COMPTON_E_TH);
   }
 
   // If number of selected singles/hits equals maximum number of events above the fixed energy threshold in the coincidence window
@@ -431,11 +432,11 @@ void analyze_event(const vector<Hit> &hits, const bool hits_are_singles, const b
   if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
   //if (N>=2 and N<=MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
 
-  if (triple_coincidences) {
+  if (triple_coincidence) {
   if (N==MAX_N and N0<=MAX_N0) {print_coincidences(selected_hits);}
   }
   else {
-  if (N==MAX_N and N0<=MAX_N0) {print_triple_coincidences(selected_hits)};
+  if (N==MAX_N and N0<=MAX_N0) {print_triple_coincidences(selected_hits, PROMPT_E_TH);};
   }
 
   if (DEBUG) {
@@ -490,22 +491,22 @@ void RunTests()
     h.volumeID = 9;
   }
 
-  auto single1 = merge_hits(hits, kCentroidWinnerNaivelyWeighted);
+  auto single1 = merge_hits(hits, event_analysis::kCentroidWinnerNaivelyWeighted);
   assert(std::abs(single1.time-22) < epsilon); // (12+22+32)/3 = 22
   assert(std::abs(single1.posX-3.333333333) < epsilon); // (1+2+7)/2 = 3.333333333
   assert(std::abs(single1.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
-  auto single2 = merge_hits(hits, kCentroidWinnerEnergyWeighted);
+  auto single2 = merge_hits(hits, event_analysis::kCentroidWinnerEnergyWeighted);
   assert(std::abs(single2.time-24.85714286) < epsilon); // (10*12+80*22+50*32)/140 = 24.85714286
   assert(std::abs(single2.posX-3.714285714) < epsilon); // (10*1+80*2+50*7)/140 = 3.714285714
   assert(std::abs(single2.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
-  auto single3 = merge_hits(hits, kCentroidWinnerEnergyWeightedFirstTime);
+  auto single3 = merge_hits(hits, event_analysis::kCentroidWinnerEnergyWeightedFirstTime);
   assert(std::abs(single3.time-12) < epsilon); // min(12,22,32) = 12
   assert(std::abs(single3.posX-3.714285714) < epsilon); // (10*1+80*2+50*7)/140 = 3.714285714
   assert(std::abs(single3.edep - 140) < epsilon); // Energy of single == sum of energies of hits: 10+80+50 = 140
 
-  auto single4 = merge_hits(hits, kEnergyWinner);
+  auto single4 = merge_hits(hits, event_analysis::kEnergyWinner);
   assert(std::abs(single4.time-22) < epsilon); // max(10,80,50) = 80 => single takes attributes of hit h2
   assert(std::abs(single4.posX-2) < epsilon); // max(10,80,50) = 80 => single takes attributes of hit h2
   assert(single4.eventID == 10); // 10 is a value set manually

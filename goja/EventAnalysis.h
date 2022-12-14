@@ -64,8 +64,7 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
   void print_coincidence(const Hit& h1, const Hit& h2);
   void print_coincidences(const std::vector<Hit>& hits);
   void print_triple_coincidences(const std::vector<Hit>& hits, double PROMPT_E_TH);
-  void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
-  void analyze_event(const std::vector<Hit> &hits, const bool hits_are_singles, const bool triple_coincidence);
+  void analyze_event(const std::vector<Hit> &hits, const bool hits_are_singles = true, const bool triple_coincidence = false);
 
 };
 

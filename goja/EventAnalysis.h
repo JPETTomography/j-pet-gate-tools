@@ -41,8 +41,20 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
   /// returns number of singles above noise energy threshold, number of singles above Compton energy threshold, and selected singles
   std::tuple<int, int, std::vector<Hit>> select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold);
 
-  // Below function contains simple definition of coincidence that does not take into account Rayleigh scatterings
-  EventType verify_type_of_coincidence(const Hit &h1, const Hit &h2);
+  /// function checks if hits come from the same annihilation event
+  bool all_same_event(const std::vector<Hit>& hits);
+
+  /// returns 1 if the hit was not scattered in phantom
+  bool not_phantom_compton(const std::vector<Hit>& hits);
+
+  /// returns 1 if there was not any scattering in the detector
+  bool all_crystal_compton(const std::vector<Hit>& hits);
+
+  // Function below contains simple definition of coincidence that does not take into account Rayleigh scatterings
+  EventType verify_type_of_coincidence(const std::vector<Hit>& hits);
+
+  // Function below assigns the classes of coincidences when the 3-gamma event occurs.
+  EventType verify_type_of_triple_coincidence(const std::vector<Hit>& hits);
 
   // Below function contains definition of coincidence that takes into account Rayleigh scatterings,
   // the definition is based on the snippet from the CASToR software: function ComputeKindGATEEvent from
@@ -51,7 +63,8 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
   void print_coincidence(const Hit& h1, const Hit& h2);
   void print_coincidences(const std::vector<Hit>& hits);
-  void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
+  void print_triple_coincidences(const std::vector<Hit>& hits, double PROMPT_E_TH);
+  void analyze_event(const std::vector<Hit> &hits, const bool hits_are_singles = true, const bool triple_coincidence = false);
 
 };
 

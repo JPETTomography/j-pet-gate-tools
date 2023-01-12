@@ -195,6 +195,69 @@ EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
 
 }
 
+std::tuple<bool, std::vector<Hit>> check_if_2plus1(const std::vector<Hit>& hits)
+{
+  double COMPTON_E_TH_PROMPT = atof(getenv("GOJA_COMPTON_E_TH_PROMPT"))*1e3;
+  
+  std::vector<Hit> triple_hits;
+
+  for (unsigned int i = 0; i < hits.size(); i++)
+  {
+    if (hits[i].edep <= COMPTON_E_TH_PROMPT)
+    {
+      triple_hits.push_back(hits[i]);
+    }
+  }
+  int prompt_multiplicity = 0;
+  for (unsigned int i = 0; i < hits.size(); i++)
+  {
+    if (hits[i].edep > COMPTON_E_TH_PROMPT)
+    {
+      triple_hits.push_back(hits[i]);
+      prompt_multiplicity++;
+    }
+  }
+  bool isGood = false;
+  if(prompt_multiplicity == 1)
+  {
+    isGood = true;
+  }
+
+  return std::make_tuple(isGood, triple_hits);
+}
+
+EventType verify_type_of_triple_coincidence(const Hit &h1,const  Hit &h2,const  Hit &h3) {
+
+  if (h1.eventID != h2.eventID && h1.eventID != h3.eventID)
+    // random
+    return kAccidental;
+  else
+  {
+    if (h1.nPhantomCompton == 0 && h2.nPhantomCompton == 0 && h3.nPhantomCompton == 0 &&
+         h1.nPhantomRayleigh == 0 && h2.nPhantomRayleigh == 0 && h3.nPhantomRayleigh == 0 &&
+         h1.nCrystalCompton == 1 && h2.nCrystalCompton == 1 && h3.nCrystalCompton == 1 &&
+         h1.nCrystalRayleigh == 0 && h2.nCrystalRayleigh == 0 && h3.nCrystalRayleigh == 0)
+        //true
+        return kTrue;
+    else
+    {
+      if (h1.nPhantomCompton == 0 && h2.nPhantomCompton == 0 && h3.nPhantomCompton == 0 &&
+          h1.nPhantomRayleigh == 0 && h2.nPhantomRayleigh == 0 && h3.nPhantomRayleigh == 0 &&
+          (h1.nCrystalCompton > 1 || h2.nCrystalCompton > 1 || h3.nCrystalCompton > 1 ||
+          h1.nCrystalRayleigh > 0 || h2.nCrystalRayleigh > 0 || h3.nCrystalRayleigh > 0))
+         //detector scat
+         return kDetectorScattered;
+      if (h1.nPhantomCompton >= 1 || h2.nPhantomCompton >= 1 || h3.nPhantomCompton >= 1 ||
+          h1.nPhantomRayleigh >= 1 || h2.nPhantomRayleigh >= 1 || h3.nPhantomRayleigh >= 1)
+         //phantom scat
+          return kPhantomScattered;
+    }
+  }
+  //unknown
+  return kUnspecified;
+
+}
+
 // based on ComputeKindGATEEvent from
 // https://github.com/JPETTomography/castor/blob/castor-3.1.1/src/management/gDataConversionUtilities.cc
 EventType verify_type_of_coincidence_castor(const Hit &h1, const  Hit &h2) {
@@ -295,11 +358,78 @@ void print_coincidences(const std::vector<Hit>& hits) {
 
 }
 
+void print_triple_coincidences(const std::vector<Hit>& hits) {   //------NEW--------- whole function
+
+  assert(hits.size() ==3);
+  
+  std::vector<Hit> triple_hits;
+  bool isGood;
+  std::tie(isGood, triple_hits) = check_if_2plus1(hits);
+
+  if (isGood)
+  {
+    cout.setf(ios::fixed);
+
+    Hit h1 = triple_hits[0];
+    Hit h2 = triple_hits[1];
+    Hit h3 = triple_hits[2];
+
+    cout.precision(2);
+    cout << h1.posX/10. << "\t" << h1.posY/10. << "\t" << h1.posZ/10. << "\t";
+    cout.precision(1);
+    cout << h1.time << "\t";
+
+    cout.precision(2);
+    cout << h2.posX/10. << "\t" << h2.posY/10. << "\t" << h2.posZ/10. << "\t";
+    cout.precision(1);
+    cout << h2.time << "\t";
+
+    cout << h1.volumeID << "\t";
+    cout << h2.volumeID << "\t";
+
+    cout.precision(2);
+    cout << h1.edep << "\t";
+    cout << h2.edep << "\t";
+
+    cout << verify_type_of_triple_coincidence(h1, h2, h3) << "\t";
+
+    cout.precision(2);
+    cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
+    cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << "\t";
+    
+    cout.precision(2);
+    cout << h3.posX/10. << "\t" << h3.posY/10. << "\t" << h3.posZ/10. << "\t";
+    cout.precision(1);
+    cout << h3.time << "\t";
+
+    cout << h3.volumeID << "\t";
+
+    cout.precision(2);
+    cout << h3.edep << "\t";
+    
+    cout.precision(2);
+    cout << h3.sourcePosX/10. << "\t" << h3.sourcePosY/10. << "\t" << h3.sourcePosZ/10. << "\t";
+
+    cout << h3.eventID << "\t";
+    cout << h3.nPhantomCompton << "\t";
+    cout << h3.nPhantomRayleigh << "\t";
+    cout << h3.nCrystalCompton << "\t";
+    cout << h3.nCrystalRayleigh << "\t";
+
+    cout << h3.rsectorID << "\t";
+    cout << h3.moduleID << "\t";
+    cout << h3.submoduleID << "\t";
+    cout << h3.crystalID << "\t";
+    cout << h3.layerID << endl;
+  }
+
+}
+
 //================================================================================
 // MAIN ANALYSIS FUNCTION
 //================================================================================
 
-void analyze_event(vector<Hit> &hits, bool hits_are_singles)
+void analyze_event(vector<Hit> &hits, bool hits_are_singles, bool triple_coinc)
 {
 
   double COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3;
@@ -320,11 +450,18 @@ void analyze_event(vector<Hit> &hits, bool hits_are_singles)
     std::tie(N0, N, selected_hits) = select_coincident_hits(hits, COMPTON_E_TH);
   }
 
-  // If number of selected singles/hits equals maximum number of events above the fixed energy threshold in the coincidence window
-  // and number of all hits in the event is equal or smaller than maximum number of events above the noise energy threshold in the coincidence window
-  // then print the coincidence:
-  if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
-  //if (N>=2 and N<=MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
+  if(triple_coinc)
+  {
+    if (N==MAX_N+1 and N0<=MAX_N0) print_triple_coincidences(selected_hits);
+  }
+  else
+  {
+    // If number of selected singles/hits equals maximum number of events above the fixed energy threshold in the coincidence window
+    // and number of all hits in the event is equal or smaller than maximum number of events above the noise energy threshold in the coincidence window
+    // then print the coincidence:
+    if (N==MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
+    //if (N>=2 and N<=MAX_N and N0<=MAX_N0) print_coincidences(selected_hits);
+  }
 
   if (DEBUG) {
     cout.setf(ios::fixed);

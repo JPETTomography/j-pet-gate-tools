@@ -15,9 +15,9 @@
 
 using namespace std;
 
-LoopResults Hits::Loop(bool singles) {
+LoopResults Hits::Loop(bool singles, bool triple) {
   ConfigParams params;
-  params.Init(singles);
+  params.Init(singles, triple);
 
   LoopResults lr;
   if (fChain == 0)
@@ -134,7 +134,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
               2) { // if the number of hits in the current event is at least 2
             
             event_analysis::analyze_event(event,
-                             params.SINGLES); // then the current event is analyzed
+                             params.SINGLES, params.TRIPLE); // then the current event is analyzed
           }
           event.clear();                 // the current event is destroyed
           if (hit.edep > params.COMPTON_E_TH) { // start forming the event with the hit
@@ -153,7 +153,7 @@ void Hits::FindAndDumpCoincidences(const std::vector<Hit> &hits, const ConfigPar
       lr.multiplicities.push_back(event.size());
       if (event.size() >=
           2) { // if the number of hits in the last event is at least 2
-        event_analysis::analyze_event(event, params.SINGLES); // then the last event is analyzed
+        event_analysis::analyze_event(event, params.SINGLES, params.TRIPLE); // then the last event is analyzed
       }
       event.clear(); // the last event is destroyed
     }

@@ -45,6 +45,7 @@ int main (int argc, char* argv[]) {
 
   bool singles = false;
   bool areTestsOn = false;
+  bool triple = false;
 
   po::options_description desc("\nGOJA (GATE Output J-PET Analyzer) help\n\nAllowed options");
   desc.add_options()
@@ -55,6 +56,8 @@ int main (int argc, char* argv[]) {
   // Forming coincidences options:
   ("eth", po::value<string>(), "fixed energy threshold [MeV] (default: 0.2 MeV)")
   ("eth0", po::value<string>(), "noise energy threshold [MeV] (default: 0.0 MeV)")
+  ("eth-prompt", po::value<string>(), "fixed energy threshold for prompts [MeV] (default: 0.35 MeV)")
+  ("triple", po::bool_switch(&triple), "use triple coincidences")
   ("tw", po::value<string>(), "time window for a coincidence [ns] (default: 3 ns)")
   ("N", po::value<string>(), "maximum number of events above the fixed energy threshold in the coincidence window (default: 2)")
   ("N0", po::value<string>(), "maximum number of events above the noise energy threshold in the coincidence window (includes N, default: 1000)")
@@ -102,6 +105,7 @@ int main (int argc, char* argv[]) {
 
   SET_GOJA_ENV_VAR("eth", "GOJA_COMPTON_E_TH", "0.2");
   SET_GOJA_ENV_VAR("eth0", "GOJA_COMPTON_E_TH_0", "0.0");
+  SET_GOJA_ENV_VAR("eth-prompt", "GOJA_COMPTON_E_TH_PROMPT", "0.35");
   SET_GOJA_ENV_VAR("tw", "GOJA_TIME_WINDOW", "3");
   SET_GOJA_ENV_VAR("N", "GOJA_MAX_N", "2");
   SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "1000");
@@ -125,7 +129,7 @@ int main (int argc, char* argv[]) {
     ss << vm["root"].as<string>();
     setenv("GOJA_ROOT_FILENAME", ss.str().c_str(), 1);
     Hits h;
-    LoopResults lr = h.Loop(singles);
+    LoopResults lr = h.Loop(singles, triple);
     real_time = lr.real_time;
     multiplicities = lr.multiplicities;
     counter_all_compton_hits = lr.counter_all_compton_hits;
@@ -147,7 +151,7 @@ int main (int argc, char* argv[]) {
       string root_filename = basename + to_string(i) + ".root";
       setenv("GOJA_ROOT_FILENAME", root_filename.c_str(), 1);
       Hits h;
-      LoopResults lr = h.Loop(singles);
+      LoopResults lr = h.Loop(singles, triple);
       real_time += lr.real_time;
       multiplicities.insert(multiplicities.end(), lr.multiplicities.begin(), lr.multiplicities.end());
     }

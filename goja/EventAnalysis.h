@@ -42,7 +42,7 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
   std::tuple<int, int, std::vector<Hit>> select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold);
   
   // returns information if among inputed 3 hits there is exactly one prompt hit and moves the position of this hit in inputed vector to the last
-  std::tuple<bool, std::vector<Hit>> check_if_2plus1(const std::vector<Hit>& hits);
+  std::tuple<bool, std::vector<Hit>> get_2plus1_if_present(const std::vector<Hit>& hits);
 
   // Below function contains simple definition of coincidence that does not take into account Rayleigh scatterings
   EventType verify_type_of_coincidence(const Hit &h1, const Hit &h2);

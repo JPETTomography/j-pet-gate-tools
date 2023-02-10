@@ -195,30 +195,32 @@ EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
 
 }
 
-std::tuple<bool, std::vector<Hit>> check_if_2plus1(const std::vector<Hit>& hits)
+std::tuple<bool, std::vector<Hit>> get_2plus1_if_present(const std::vector<Hit>& hits)
 {
   double COMPTON_E_TH_PROMPT = atof(getenv("GOJA_COMPTON_E_TH_PROMPT"))*1e3;
   
+  std::vector<Hit> annihilation_hits;
+  std::vector<Hit> prompt_hits;
+  
+  for (auto& hit: hits )
+  {
+    if (hit.edep <= COMPTON_E_TH_PROMPT)
+    {
+      annihilation_hits.push_back(hit);
+    }
+    else
+    {
+      prompt_hits.push_back(hit);        
+    }
+  }
+  
   std::vector<Hit> triple_hits;
-
-  for (unsigned int i = 0; i < hits.size(); i++)
-  {
-    if (hits[i].edep <= COMPTON_E_TH_PROMPT)
-    {
-      triple_hits.push_back(hits[i]);
-    }
-  }
-  int prompt_multiplicity = 0;
-  for (unsigned int i = 0; i < hits.size(); i++)
-  {
-    if (hits[i].edep > COMPTON_E_TH_PROMPT)
-    {
-      triple_hits.push_back(hits[i]);
-      prompt_multiplicity++;
-    }
-  }
+  triple_hits.reserve( 3 );
+  triple_hits.insert( triple_hits.end(), annihilation_hits.begin(), annihilation_hits.end() );
+  triple_hits.insert( triple_hits.end(), prompt_hits.begin(), prompt_hits.end() );
+  
   bool isGood = false;
-  if(prompt_multiplicity == 1)
+  if(prompt_hits.size() == 1)
   {
     isGood = true;
   }
@@ -364,7 +366,7 @@ void print_triple_coincidences(const std::vector<Hit>& hits) {   //------NEW----
   
   std::vector<Hit> triple_hits;
   bool isGood;
-  std::tie(isGood, triple_hits) = check_if_2plus1(hits);
+  std::tie(isGood, triple_hits) = get_2plus1_if_present(hits);
 
   if (isGood)
   {
@@ -396,6 +398,28 @@ void print_triple_coincidences(const std::vector<Hit>& hits) {   //------NEW----
     cout.precision(2);
     cout << h1.sourcePosX/10. << "\t" << h1.sourcePosY/10. << "\t" << h1.sourcePosZ/10. << "\t";
     cout << h2.sourcePosX/10. << "\t" << h2.sourcePosY/10. << "\t" << h2.sourcePosZ/10. << "\t";
+
+    cout << h1.eventID << "\t";
+    cout << h2.eventID << "\t";
+    cout << h1.nPhantomCompton << "\t";
+    cout << h2.nPhantomCompton << "\t";
+    cout << h1.nPhantomRayleigh << "\t";
+    cout << h2.nPhantomRayleigh << "\t";
+    cout << h1.nCrystalCompton << "\t";
+    cout << h2.nCrystalCompton << "\t";
+    cout << h1.nCrystalRayleigh << "\t";
+    cout << h2.nCrystalRayleigh << "\t";
+
+    cout << h1.rsectorID << "\t";
+    cout << h2.rsectorID << "\t";
+    cout << h1.moduleID << "\t";
+    cout << h2.moduleID << "\t";
+    cout << h1.submoduleID << "\t";
+    cout << h2.submoduleID << "\t";
+    cout << h1.crystalID << "\t";
+    cout << h2.crystalID << "\t";
+    cout << h1.layerID << "\t";
+    cout << h2.layerID << "\t";
     
     cout.precision(2);
     cout << h3.posX/10. << "\t" << h3.posY/10. << "\t" << h3.posZ/10. << "\t";

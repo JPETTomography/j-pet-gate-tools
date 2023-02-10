@@ -66,7 +66,7 @@ int main (int argc, char* argv[]) {
   ("averaging-method", po::value<string>(), "averaging method: 0 - kUnspecifiedAM, 1 - kCentroidWinnerNaivelyWeighted, "
                                             "2 - kCentroidWinnerEnergyWeighted, 3 - kCentroidWinnerEnergyWeightedFirstTime, "
                                             "4 - kEnergyWinner (default: 3)")
-  ("system-type", po::value<string>(), "GATE systemType: scanner or cylindricalPET")
+  ("system-type", po::value<string>(), "GATE systemType: scanner or cylindricalPET (default: cylindricalPET)")
   ("tree-name", po::value<string>(), "tree name: Hits or HESingles (only for cylindricalPET system type)")
 
   // Input options:
@@ -110,7 +110,7 @@ int main (int argc, char* argv[]) {
   SET_GOJA_ENV_VAR("N", "GOJA_MAX_N", "2");
   SET_GOJA_ENV_VAR("N0", "GOJA_MAX_N0", "1000");
   SET_GOJA_ENV_VAR("sep", "GOJA_SEP", "0");
-  SET_GOJA_ENV_VAR("system-type", "GOJA_SYSTEM_TYPE", "scanner");
+  SET_GOJA_ENV_VAR("system-type", "GOJA_SYSTEM_TYPE", "cylindricalPET");
   SET_GOJA_ENV_VAR("tree-name", "GOJA_TREE_NAME", "Hits");
   SET_GOJA_ENV_VAR("averaging-method", "GOJA_AVERAGING_METHOD", "3");
 

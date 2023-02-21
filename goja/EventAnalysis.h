@@ -40,6 +40,9 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
 
   /// returns number of singles above noise energy threshold, number of singles above Compton energy threshold, and selected singles
   std::tuple<int, int, std::vector<Hit>> select_coincident_singles(const std::vector<Hit> &hits, double compton_energy_threshold);
+  
+  // returns information if among inputed 3 hits there is exactly one prompt hit and moves the position of this hit in inputed vector to the last
+  std::tuple<bool, std::vector<Hit>> get_2plus1_if_present(const std::vector<Hit>& hits, double compton_e_th_prompt);
 
   // Below function contains simple definition of coincidence that does not take into account Rayleigh scatterings
   EventType verify_type_of_coincidence(const Hit &h1, const Hit &h2);
@@ -50,8 +53,9 @@ Hit merge_hits(const std::vector<Hit> &hits, const AveragingMethod winner);
   EventType verify_type_of_coincidence_castor(const Hit &h1, const  Hit &h2);
 
   void print_coincidence(const Hit& h1, const Hit& h2);
+  void print_triple_coincidences(const std::vector<Hit>& hits);
   void print_coincidences(const std::vector<Hit>& hits);
-  void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true);
+  void analyze_event(std::vector<Hit> &hits, bool hits_are_singles = true, bool triple_coinc = false);
 
 };
 

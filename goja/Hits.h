@@ -13,23 +13,27 @@
 #include "Hit.h"
 
 struct ConfigParams {
-  void Init(bool singles) {
+  void Init(bool singles, bool triple) {
     COMPTON_E_TH_0 = atof(getenv("GOJA_COMPTON_E_TH_0"))*1e3; // [COMPTON_E_TH_0]=keV
     COMPTON_E_TH = atof(getenv("GOJA_COMPTON_E_TH"))*1e3; // [COMPTON_E_TH]=keV
+    COMPTON_E_TH_PROMPT = atof(getenv("GOJA_COMPTON_E_TH_PROMPT"))*1e3; // [COMPTON_E_TH_PROMPT]=keV
     TIME_WINDOW = atof(getenv("GOJA_TIME_WINDOW"))*1e3; // [TIME_WINDOW]=ps
     int sep = int(atof(getenv("GOJA_SEP")));
     if (sep==0) EVENTS_SEPARATION_USING_TIME_WINDOW=1;
     else EVENTS_SEPARATION_USING_TIME_WINDOW=0;
     EVENTS_SEPARATION_USING_IDS_OF_EVENTS = 1-EVENTS_SEPARATION_USING_TIME_WINDOW;
     SINGLES = singles;
+    TRIPLE = triple;
   }
 
   double COMPTON_E_TH_0 = -1;
   double COMPTON_E_TH= -1;
+  double COMPTON_E_TH_PROMPT= -1;
   double TIME_WINDOW =-1;
   int EVENTS_SEPARATION_USING_TIME_WINDOW = -1; 
   int EVENTS_SEPARATION_USING_IDS_OF_EVENTS = -1; 
   bool SINGLES = false;
+  bool TRIPLE = false;
 
 };
 
@@ -121,7 +125,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual LoopResults Loop(bool singles);
+   virtual LoopResults Loop(bool singles,bool triple);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
 

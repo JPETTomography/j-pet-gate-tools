@@ -195,16 +195,15 @@ EventType verify_type_of_coincidence(const Hit &h1, const  Hit &h2) {
 
 }
 
-std::tuple<bool, std::vector<Hit>> get_2plus1_if_present(const std::vector<Hit>& hits)
+std::tuple<bool, std::vector<Hit>> get_2plus1_if_present(const std::vector<Hit>& hits, double compton_e_th_prompt)
 {
-  double COMPTON_E_TH_PROMPT = atof(getenv("GOJA_COMPTON_E_TH_PROMPT"))*1e3;
   
   std::vector<Hit> annihilation_hits;
   std::vector<Hit> prompt_hits;
   
   for (auto& hit: hits )
   {
-    if (hit.edep <= COMPTON_E_TH_PROMPT)
+    if (hit.edep <= compton_e_th_prompt)
     {
       annihilation_hits.push_back(hit);
     }
@@ -360,13 +359,14 @@ void print_coincidences(const std::vector<Hit>& hits) {
 
 }
 
-void print_triple_coincidences(const std::vector<Hit>& hits) {   //------NEW--------- whole function
+void print_triple_coincidences(const std::vector<Hit>& hits) {
 
+  double COMPTON_E_TH_PROMPT = atof(getenv("GOJA_COMPTON_E_TH_PROMPT"))*1e3;
   assert(hits.size() ==3);
   
   std::vector<Hit> triple_hits;
   bool isGood;
-  std::tie(isGood, triple_hits) = get_2plus1_if_present(hits);
+  std::tie(isGood, triple_hits) = get_2plus1_if_present(hits, COMPTON_E_TH_PROMPT);
 
   if (isGood)
   {
